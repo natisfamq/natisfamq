@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Family Cloud | Management</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div id="loginPage" class="full-screen">
+        <div class="glass-box">
+            <div class="logo-circle">M</div>
+            <h1>Family OS</h1>
+            <input type="text" id="userName" placeholder="Username">
+            <input type="password" id="userPass" placeholder="Password">
+            <button class="btn-main" onclick="login()">Zaloguj</button>
+            <p id="loginError" class="error"></p>
+        </div>
+    </div>
+
+    <div id="mainPanel" style="display: none;">
+        <nav class="glass-nav">
+            <div class="nav-brand">FAMILY<span>CLOUD</span></div>
+            <ul class="nav-links">
+                <li onclick="switchTab('tab-aktywnosc')">Aktywność</li>
+                <li onclick="switchTab('tab-pracownicy')">Członkowie</li>
+                <li id="adminTab" class="admin-only" onclick="switchTab('tab-admin')" style="display:none;">Admin Panel</li>
+                <li onclick="location.reload()" class="logout">Wyloguj</li>
+            </ul>
+        </nav>
+
+        <div class="container">
+            <div id="tab-aktywnosc" class="tab-content glass-card">
+                <h2>Wyślij Raport</h2>
+                <select id="reportType">
+                    <option>Dostawa Materiałów</option>
+                    <option>AirDrop</option>
+                    <option>Napad</option>
+                    <option>Rekrutacja</option>
+                </select>
+                <input type="url" id="reportLink" placeholder="Link z imgur.com">
+                <button class="btn-main" onclick="sendReport()">Wyślij Raport</button>
+            </div>
+
+            <div id="tab-pracownicy" class="tab-content glass-card" style="display:none;">
+                <h2>Lista Członków</h2>
+                <table class="glass-table">
+                    <thead><tr><th>Nick</th><th>Ranga</th><th>Ostatnio</th></tr></thead>
+                    <tbody id="publicUserList"></tbody>
+                </table>
+            </div>
+
+            <div id="tab-admin" class="tab-content" style="display:none;">
+                <div class="glass-card">
+                    <h2>Oczekujące Raporty</h2>
+                    <div id="adminReportsContainer"></div>
+                </div>
+                <div class="glass-card">
+                    <h2>Stwórz Nowego Członka</h2>
+                    <div class="row">
+                        <input type="text" id="newUserName" placeholder="Nick">
+                        <input type="text" id="newUserPass" placeholder="Hasło">
+                        <select id="newUserRole">
+                            <option value="USER">User</option>
+                            <option value="ADMIN">Admin</option>
+                        </select>
+                        <button class="btn-main" onclick="createUser()">Stwórz Konto</button>
+                    </div>
+                </div>
+                <div class="glass-card">
+                    <h2>Bezpieczeństwo & Konta (Kliknij IP by odsłonić)</h2>
+                    <table class="glass-table">
+                        <thead><tr><th>Użytkownik</th><th>IP</th><th>Akcje</th></tr></thead>
+                        <tbody id="adminUsersList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
