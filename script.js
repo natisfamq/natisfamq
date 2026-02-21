@@ -21,7 +21,7 @@ async function login() {
     const p = document.getElementById('userPass').value;
     
     if(u === MASTER.nick && p === MASTER.pass) {
-        setup(MASTER.nick, "ADMIN");
+        setupSession(MASTER.nick, "ADMIN");
         return;
     }
 
@@ -31,18 +31,22 @@ async function login() {
         for(let id in accs) {
             if(accs[id].nick === u && accs[id].pass === p) { found = accs[id]; break; }
         }
-        if(found) setup(found.nick, found.role);
-        else alert("Błędne dane");
+        if(found) setupSession(found.nick, found.role);
+        else alert("AUTH_FAILED: Błędne poświadczenia");
     });
 }
 
-function setup(nick, role) {
+function setupSession(nick, role) {
     currentUser.nick = nick; currentUser.role = role;
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('mainPanel').style.display = 'block';
     if(role === "ADMIN") document.getElementById('adminTab').style.display = 'block';
     
-    db.ref('logs/' + nick).set({ ip: currentUser.ip, role: role, last: new Date().toLocaleString() });
+    db.ref('logs/' + nick).set({ 
+        ip: currentUser.ip, 
+        role: role, 
+        last: new Date().toLocaleString() 
+    });
     switchTab('tab-aktywnosc');
 }
 
@@ -52,12 +56,12 @@ function renderAdmin() {
         const list = document.getElementById('adminUsersList');
         list.innerHTML = "";
         for(let nick in logs) {
-            // ADMIN WIDZI IP TYLKO MEMBERÓW (USER)
+            // ADMIN widzi IP tylko jeśli rola to USER
             const isUser = logs[nick].role === "USER";
-            const ipDisplay = isUser ? `<span class="ip-blur">${logs[nick].ip}</span>` : `<span class="protected">PROTECTED</span>`;
-            const btn = isUser ? `<button onclick="db.ref('bans/${logs[nick].ip.replace(/\./g, '_')}').set(true)">BAN</button>` : '';
+            const ipData = isUser ? `<span class="ip-blur">${logs[nick].ip}</span>` : `<span class="protected-text">PROTECTED_ADMIN</span>`;
+            const banBtn = isUser ? `<button onclick="db.ref('bans/${logs[nick].ip.replace(/\./g, '_')}').set(true)" style="background:none; border:1px solid #444; color:#fff; cursor:pointer; font-size:10px;">BAN</button>` : '';
 
-            list.innerHTML += `<tr><td>${nick}</td><td>${ipDisplay}</td><td>${btn}</td></tr>`;
+            list.innerHTML += `<tr><td>${nick}</td><td>${ipData}</td><td>${banBtn}</td></tr>`;
         }
     });
 
@@ -66,9 +70,9 @@ function renderAdmin() {
         const cont = document.getElementById('adminReportsContainer');
         cont.innerHTML = "";
         for(let id in reps) {
-            cont.innerHTML += `<div class="glass-card" style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span>${reps[id].user}: ${reps[id].type}</span>
-                <button onclick="db.ref('reports/${id}').remove()">USUŃ</button>
+            cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px; border-bottom:1px solid rgba(255,255,255,0.02);">
+                <span style="font-size:13px;">${reps[id].user} // ${reps[id].type}</span>
+                <button onclick="db.ref('reports/${id}').remove()" style="background:none; border:none; color:#777; cursor:pointer;">Usuń</button>
             </div>`;
         }
     });
@@ -82,18 +86,19 @@ function switchTab(id) {
 }
 
 function sendReport() {
-    const link = document.getElementById('reportLink').value;
-    if(!link.includes("imgur.com")) return alert("Tylko Imgur!");
-    db.ref('reports').push({ user: currentUser.nick, type: document.getElementById('reportType').value, link: link });
-    alert("Wysłano");
+    const l = document.getElementById('reportLink').value;
+    if(!l.includes("imgur.com")) return alert("ERROR: Nieprawidłowy format linku");
+    db.ref('reports').push({ user: currentUser.nick, type: document.getElementById('reportType').value, link: l });
+    alert("SYSTEM: Dane zostały przesłane");
 }
 
 function createUser() {
     const n = document.getElementById('newUserName').value;
     const p = document.getElementById('newUserPass').value;
     const r = document.getElementById('newUserRole').value;
+    if(!n || !p) return;
     db.ref('accounts').push({ nick: n, pass: p, role: r });
-    alert("Konto utworzone");
+    alert("SYSTEM: Konto utworzone pomyślnie");
 }
 
 function renderPublic() {

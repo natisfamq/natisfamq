@@ -1,21 +1,57 @@
-body { margin: 0; font-family: 'Poppins', sans-serif; background: #0f0f12; color: #e0e0e0; min-height: 100vh; }
-.glass-box, .glass-card, .glass-nav { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; }
+:root {
+    --bg-color: #050505;
+    --glass-bg: rgba(255, 255, 255, 0.02);
+    --border-color: rgba(255, 255, 255, 0.06);
+    --text-main: #ffffff;
+    --text-dim: #777777;
+    --accent: #ffffff;
+}
+
+body { 
+    margin: 0; font-family: 'Inter', sans-serif; 
+    background-color: var(--bg-color); color: var(--text-main); 
+    letter-spacing: -0.02em;
+}
+
 .full-screen { height: 100vh; display: flex; align-items: center; justify-content: center; }
-.glass-box { padding: 40px; width: 300px; text-align: center; }
-.logo-circle { width: 55px; height: 55px; background: #333; border: 1px solid #555; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
-.glass-nav { margin: 20px auto; width: 90%; max-width: 1100px; display: flex; justify-content: space-between; padding: 10px 30px; align-items: center; }
-.nav-brand span { color: #888; margin-left: 5px; }
-.nav-links { list-style: none; display: flex; gap: 20px; }
-.nav-links li { cursor: pointer; opacity: 0.6; transition: 0.3s; font-size: 14px; }
-.nav-links li:hover { opacity: 1; color: #fff; }
-.container { max-width: 1000px; margin: 0 auto; padding: 20px; }
-.glass-card { padding: 25px; margin-bottom: 20px; }
-input, select { width: 100%; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; box-sizing: border-box; }
-.btn-main { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
-.btn-main:hover { background: #333; border-color: #666; }
-.glass-table { width: 100%; border-collapse: collapse; }
-.glass-table th { text-align: left; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px; font-size: 12px; text-transform: uppercase; }
-.glass-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
-.ip-blur { filter: blur(5px); transition: 0.3s; cursor: pointer; }
+
+.glass-container { 
+    background: var(--glass-bg); padding: 50px; border-radius: 2px; 
+    border: 1px solid var(--border-color); width: 320px; text-align: center;
+}
+
+.logo-text { font-weight: 600; font-size: 28px; letter-spacing: 2px; }
+.auth-header p { color: var(--text-dim); font-size: 11px; text-transform: uppercase; margin-top: 5px; }
+
+input, select { 
+    width: 100%; background: transparent; border: 1px solid var(--border-color);
+    padding: 12px; margin: 5px 0; color: #fff; outline: none; transition: 0.3s;
+}
+
+input:focus { border-color: rgba(255,255,255,0.2); }
+
+.btn-auth, .btn-action { 
+    width: 100%; padding: 14px; background: #fff; color: #000; 
+    border: none; font-weight: 600; font-size: 12px; cursor: pointer; margin-top: 15px;
+}
+
+.top-nav { border-bottom: 1px solid var(--border-color); background: rgba(0,0,0,0.5); backdrop-filter: blur(10px); }
+.nav-content { max-width: 1200px; margin: 0 auto; display: flex; justify-content: space-between; padding: 15px 20px; align-items: center; }
+.nav-logo { font-weight: 600; font-size: 14px; }
+.nav-menu { list-style: none; display: flex; gap: 30px; margin: 0; padding: 0; }
+.nav-menu li { font-size: 13px; color: var(--text-dim); cursor: pointer; transition: 0.3s; }
+.nav-menu li:hover { color: #fff; }
+
+.main-wrapper { max-width: 900px; margin: 40px auto; padding: 0 20px; }
+.glass-panel { background: var(--glass-bg); border: 1px solid var(--border-color); padding: 30px; }
+.panel-title { font-size: 18px; font-weight: 400; margin-bottom: 25px; color: var(--text-dim); }
+
+.data-table { width: 100%; border-collapse: collapse; }
+.data-table th { text-align: left; color: var(--text-dim); font-size: 11px; text-transform: uppercase; padding: 10px; border-bottom: 1px solid var(--border-color); }
+.data-table td { padding: 15px 10px; font-size: 14px; border-bottom: 1px solid rgba(255,255,255,0.02); }
+
+.ip-blur { filter: blur(5px); transition: 0.2s; cursor: help; }
 .ip-blur:hover { filter: blur(0); }
-.protected { color: #555; font-size: 11px; font-style: italic; }
+.protected-text { color: #333; font-size: 12px; font-style: italic; }
+.mt-20 { margin-top: 20px; }
+.logout-btn { color: #ff4444 !important; }
