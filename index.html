@@ -3,88 +3,97 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NATIS | Management System</title>
+    <title>NATIS OS // PRIVATE</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
     <div id="loginPage" class="full-screen">
-        <div class="glass-container">
-            <div class="auth-header">
-                <span class="logo-text">NATIS</span>
-                <p>Private Cloud Access</p>
+        <div class="auth-card">
+            <div class="glitch-logo">NATIS</div>
+            <div class="auth-inputs">
+                <input type="text" id="userName" placeholder="użytkownik">
+                <input type="password" id="userPass" placeholder="hasło">
+                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
-            <div class="input-group">
-                <input type="text" id="userName" placeholder="Login">
-                <input type="password" id="userPass" placeholder="Hasło">
-            </div>
-            <button class="btn-auth" onclick="login()">ENTER</button>
-            <p id="loginError" class="error-msg"></p>
+            <p id="loginError" class="error"></p>
         </div>
     </div>
 
     <div id="mainPanel" style="display: none;">
-        <nav class="top-nav">
-            <div class="nav-content">
-                <div class="nav-logo">NATIS // SYSTEM</div>
-                <ul class="nav-menu">
-                    <li onclick="switchTab('tab-aktywnosc')">Raporty</li>
-                    <li onclick="switchTab('tab-pracownicy')">Rodzina</li>
-                    <li id="adminTab" style="display:none;" onclick="switchTab('tab-admin')">Panel Zarządzania</li>
-                    <li onclick="location.reload()" class="logout-btn">Wyloguj</li>
-                </ul>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="brand">NATIS<span>.OS</span></div>
+                <div class="menu">
+                    <span onclick="switchTab('tab-aktywnosc')">Raporty</span>
+                    <span onclick="switchTab('tab-pracownicy')">Członkowie</span>
+                    <span id="adminTab" style="display:none;" onclick="switchTab('tab-admin')">Admin</span>
+                    <span onclick="location.reload()" class="logout">Wyloguj</span>
+                </div>
             </div>
         </nav>
 
-        <div class="main-wrapper">
-            <div id="tab-aktywnosc" class="tab-content glass-panel">
-                <h2 class="panel-title">Nowy Raport</h2>
-                <select id="reportType">
-                    <option>Dostawa Materiałów</option>
-                    <option>AirDrop</option>
-                    <option>Napad</option>
-                </select>
-                <input type="url" id="reportLink" placeholder="imgur.com/...">
-                <button class="btn-action" onclick="sendReport()">Wyślij Dane</button>
-            </div>
+        <main class="content">
+            <section id="tab-aktywnosc" class="tab-content card">
+                <h3 class="card-title">Prześlij dane</h3>
+                <div class="form-group">
+                    <select id="reportType">
+                        <option>Dostawa Materiałów</option>
+                        <option>AirDrop</option>
+                        <option>Napad</option>
+                    </select>
+                    <input type="url" id="reportLink" placeholder="link imgur">
+                    <button class="btn-action" onclick="sendReport()">WYŚLIJ</button>
+                </div>
+            </section>
 
-            <div id="tab-pracownicy" class="tab-content glass-panel" style="display:none;">
-                <h2 class="panel-title">Status Członków</h2>
-                <table class="data-table">
-                    <thead><tr><th>Użytkownik</th><th>Ostatnia Aktywność</th></tr></thead>
+            <section id="tab-pracownicy" class="tab-content card" style="display:none;">
+                <h3 class="card-title">Status Rodziny</h3>
+                <table class="minimal-table">
+                    <thead><tr><th>Konto</th><th>Aktywność</th></tr></thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
-            </div>
+            </section>
 
-            <div id="tab-admin" class="tab-content" style="display:none;">
-                <div class="glass-panel">
-                    <h2 class="panel-title">Oczekujące Raporty</h2>
-                    <div id="adminReportsContainer"></div>
+            <section id="tab-admin" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3 class="card-title">Zarządzanie kontami & IP</h3>
+                    <table class="minimal-table">
+                        <thead><tr><th>User</th><th>IP Address</th><th>Opcje</th></tr></thead>
+                        <tbody id="adminUsersList"></tbody>
+                    </table>
                 </div>
-                <div class="glass-panel mt-20">
-                    <h2 class="panel-title">Baza Kont</h2>
-                    <div class="flex-row">
+                
+                <div class="card mt-15">
+                    <h3 class="card-title">Rejestracja Nowego Członka</h3>
+                    <div class="form-inline">
                         <input type="text" id="newUserName" placeholder="Nick">
                         <input type="text" id="newUserPass" placeholder="Hasło">
                         <select id="newUserRole">
                             <option value="USER">Member</option>
                             <option value="ADMIN">Admin</option>
                         </select>
+                        <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
                     </div>
-                    <button class="btn-action" onclick="createUser()">Dodaj do Systemu</button>
                 </div>
-                <div class="glass-panel mt-20">
-                    <h2 class="panel-title">Bezpieczeństwo</h2>
-                    <table class="data-table">
-                        <thead><tr><th>Nick</th><th>Adres IP</th><th>Akcje</th></tr></thead>
-                        <tbody id="adminUsersList"></tbody>
-                    </table>
+
+                <div class="card mt-15">
+                    <h3 class="card-title">Raporty do weryfikacji</h3>
+                    <div id="adminReportsContainer"></div>
                 </div>
-            </div>
+            </section>
+        </main>
+    </div>
+
+    <div id="historyModal" class="modal">
+        <div class="modal-content card">
+            <h3 id="historyTitle" class="card-title" style="color:#fff">Historia</h3>
+            <div id="historyBody" class="history-list"></div>
+            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ</button>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
