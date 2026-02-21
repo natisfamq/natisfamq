@@ -3,17 +3,20 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Family Cloud | Management</title>
+    <title>Family Cloud | MajesticRP</title>
     <link rel="stylesheet" href="style.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
     <div id="loginPage" class="full-screen">
         <div class="glass-box">
             <div class="logo-circle">M</div>
             <h1>Family OS</h1>
-            <input type="text" id="userName" placeholder="Username">
-            <input type="password" id="userPass" placeholder="Password">
+            <input type="text" id="userName" placeholder="Nick">
+            <input type="password" id="userPass" placeholder="Hasło">
             <button class="btn-main" onclick="login()">Zaloguj</button>
             <p id="loginError" class="error"></p>
         </div>
@@ -44,9 +47,9 @@
             </div>
 
             <div id="tab-pracownicy" class="tab-content glass-card" style="display:none;">
-                <h2>Lista Członków</h2>
+                <h2>Status Rodziny</h2>
                 <table class="glass-table">
-                    <thead><tr><th>Nick</th><th>Ranga</th><th>Ostatnio</th></tr></thead>
+                    <thead><tr><th>Nick</th><th>Ostatnio Aktywny</th></tr></thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
             </div>
@@ -57,9 +60,9 @@
                     <div id="adminReportsContainer"></div>
                 </div>
                 <div class="glass-card">
-                    <h2>Stwórz Nowego Członka</h2>
+                    <h2>Zarządzanie Kontami</h2>
                     <div class="row">
-                        <input type="text" id="newUserName" placeholder="Nick">
+                        <input type="text" id="newUserName" placeholder="Nowy Nick">
                         <input type="text" id="newUserPass" placeholder="Hasło">
                         <select id="newUserRole">
                             <option value="USER">User</option>
@@ -69,7 +72,7 @@
                     </div>
                 </div>
                 <div class="glass-card">
-                    <h2>Bezpieczeństwo & Konta (Kliknij IP by odsłonić)</h2>
+                    <h2>Bezpieczeństwo & IP</h2>
                     <table class="glass-table">
                         <thead><tr><th>Użytkownik</th><th>IP</th><th>Akcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
@@ -78,6 +81,7 @@
             </div>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
