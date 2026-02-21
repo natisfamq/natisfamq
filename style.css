@@ -1,24 +1,21 @@
-body { 
-    margin: 0; font-family: 'Poppins', sans-serif; 
-    background: radial-gradient(circle at center, #0a192f 0%, #020c1b 100%); 
-    color: #e6f1ff; min-height: 100vh; 
-}
-.main-logo { font-family: 'Orbitron', sans-serif; font-size: 3rem; font-weight: 700; color: #64ffda; text-shadow: 0 0 20px rgba(100, 255, 218, 0.5); }
-.subtitle { font-size: 0.8rem; letter-spacing: 4px; color: #8892b0; margin-bottom: 20px; }
-.glass-box, .glass-card, .glass-nav { 
-    background: rgba(17, 34, 64, 0.7); backdrop-filter: blur(12px); 
-    border: 1px solid rgba(100, 255, 218, 0.1); border-radius: 4px; 
-}
-.glass-nav { border-bottom: 2px solid #64ffda; }
-.nav-brand { font-family: 'Orbitron'; color: #ccd6f6; }
-.nav-brand span { color: #64ffda; }
-.btn-main { 
-    background: transparent; border: 1px solid #64ffda; color: #64ffda; 
-    padding: 12px; font-family: 'Orbitron'; cursor: pointer; transition: 0.3s; 
-}
-.btn-main:hover { background: rgba(100, 255, 218, 0.1); box-shadow: 0 0 15px rgba(100, 255, 218, 0.3); }
-input, select { background: #0a192f; border: 1px solid #233554; color: #ccd6f6; padding: 10px; margin: 5px 0; width: 100%; box-sizing: border-box; }
-.glass-table th { color: #64ffda; text-transform: uppercase; font-size: 12px; }
-.ip-blur { filter: blur(5px); background: rgba(100, 255, 218, 0.05); }
+body { margin: 0; font-family: 'Poppins', sans-serif; background: #0f0f12; color: #e0e0e0; min-height: 100vh; }
+.glass-box, .glass-card, .glass-nav { background: rgba(255, 255, 255, 0.03); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 12px; }
+.full-screen { height: 100vh; display: flex; align-items: center; justify-content: center; }
+.glass-box { padding: 40px; width: 300px; text-align: center; }
+.logo-circle { width: 55px; height: 55px; background: #333; border: 1px solid #555; border-radius: 50%; margin: 0 auto 20px; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 24px; color: #fff; box-shadow: 0 0 15px rgba(255,255,255,0.1); }
+.glass-nav { margin: 20px auto; width: 90%; max-width: 1100px; display: flex; justify-content: space-between; padding: 10px 30px; align-items: center; }
+.nav-brand span { color: #888; margin-left: 5px; }
+.nav-links { list-style: none; display: flex; gap: 20px; }
+.nav-links li { cursor: pointer; opacity: 0.6; transition: 0.3s; font-size: 14px; }
+.nav-links li:hover { opacity: 1; color: #fff; }
+.container { max-width: 1000px; margin: 0 auto; padding: 20px; }
+.glass-card { padding: 25px; margin-bottom: 20px; }
+input, select { width: 100%; padding: 12px; margin: 8px 0; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); color: #fff; border-radius: 6px; box-sizing: border-box; }
+.btn-main { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; font-weight: bold; cursor: pointer; transition: 0.3s; margin-top: 10px; }
+.btn-main:hover { background: #333; border-color: #666; }
+.glass-table { width: 100%; border-collapse: collapse; }
+.glass-table th { text-align: left; color: #888; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 12px; font-size: 12px; text-transform: uppercase; }
+.glass-table td { padding: 12px; border-bottom: 1px solid rgba(255,255,255,0.03); }
+.ip-blur { filter: blur(5px); transition: 0.3s; cursor: pointer; }
 .ip-blur:hover { filter: blur(0); }
-.admin-only-text { color: #8892b0; font-style: italic; font-size: 11px; }
+.protected { color: #555; font-size: 11px; font-style: italic; }

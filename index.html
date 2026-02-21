@@ -3,34 +3,35 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Natis OS | Family Management</title>
+    <title>NATIS OS</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
     <div id="loginPage" class="full-screen">
         <div class="glass-box">
-            <div class="main-logo">NATIS</div>
-            <p class="subtitle">Secure Cloud System</p>
+            <div class="logo-circle">N</div>
+            <h1>NATIS OS</h1>
             <input type="text" id="userName" placeholder="Username">
             <input type="password" id="userPass" placeholder="Password">
-            <button class="btn-main" onclick="login()">AUTHORIZE</button>
+            <button class="btn-main" onclick="login()">Zaloguj</button>
             <p id="loginError" class="error"></p>
         </div>
     </div>
 
     <div id="mainPanel" style="display: none;">
         <nav class="glass-nav">
-            <div class="nav-brand">NATIS<span>OS</span></div>
+            <div class="nav-brand">NATIS<span>CLOUD</span></div>
             <ul class="nav-links">
                 <li onclick="switchTab('tab-aktywnosc')">Aktywność</li>
                 <li onclick="switchTab('tab-pracownicy')">Członkowie</li>
-                <li id="adminTab" class="admin-only" onclick="switchTab('tab-admin')" style="display:none;">Admin Panel</li>
+                <li id="adminTab" style="display:none;" onclick="switchTab('tab-admin')">Admin Panel</li>
                 <li onclick="location.reload()" class="logout">Wyloguj</li>
             </ul>
         </nav>
+
         <div class="container">
             <div id="tab-aktywnosc" class="tab-content glass-card">
                 <h2>Wyślij Raport</h2>
@@ -39,12 +40,12 @@
                     <option>AirDrop</option>
                     <option>Napad</option>
                 </select>
-                <input type="url" id="reportLink" placeholder="Imgur Link">
-                <button class="btn-main" onclick="sendReport()">SEND DATA</button>
+                <input type="url" id="reportLink" placeholder="Link z imgur.com">
+                <button class="btn-main" onclick="sendReport()">Wyślij</button>
             </div>
 
             <div id="tab-pracownicy" class="tab-content glass-card" style="display:none;">
-                <h2>Status Rodziny</h2>
+                <h2>Lista Członków</h2>
                 <table class="glass-table">
                     <thead><tr><th>Nick</th><th>Ostatnio Aktywny</th></tr></thead>
                     <tbody id="publicUserList"></tbody>
@@ -53,21 +54,21 @@
 
             <div id="tab-admin" class="tab-content" style="display:none;">
                 <div class="glass-card">
-                    <h2>Oczekujące Raporty</h2>
+                    <h2>Raporty</h2>
                     <div id="adminReportsContainer"></div>
                 </div>
                 <div class="glass-card">
-                    <h2>Zarządzanie Kontami</h2>
+                    <h2>Zarządzanie</h2>
                     <input type="text" id="newUserName" placeholder="Nick">
                     <input type="text" id="newUserPass" placeholder="Hasło">
                     <select id="newUserRole">
                         <option value="USER">Member</option>
                         <option value="ADMIN">Admin</option>
                     </select>
-                    <button class="btn-main" onclick="createUser()">CREATE ACCOUNT</button>
+                    <button class="btn-main" onclick="createUser()">Stwórz Konto</button>
                 </div>
                 <div class="glass-card">
-                    <h2>Bezpieczeństwo (Tylko Members IP)</h2>
+                    <h2>Bezpieczeństwo</h2>
                     <table class="glass-table">
                         <thead><tr><th>Użytkownik</th><th>IP</th><th>Akcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>

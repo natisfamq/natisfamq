@@ -17,79 +17,63 @@ let currentUser = { nick: "", ip: "0.0.0.0", role: "USER" };
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => currentUser.ip = data.ip);
 
 async function login() {
-    const userInp = document.getElementById('userName').value;
-    const passInp = document.getElementById('userPass').value;
+    const u = document.getElementById('userName').value;
+    const p = document.getElementById('userPass').value;
     
-    if (userInp === MASTER.nick && passInp === MASTER.pass) {
-        setupSession(MASTER.nick, "ADMIN");
+    if(u === MASTER.nick && p === MASTER.pass) {
+        setup(MASTER.nick, "ADMIN");
         return;
     }
 
-    db.ref('accounts').once('value', snapshot => {
-        const accounts = snapshot.val();
+    db.ref('accounts').once('value', snap => {
+        const accs = snap.val();
         let found = null;
-        for(let id in accounts) {
-            if(accounts[id].nick === userInp && accounts[id].pass === passInp) {
-                found = accounts[id];
-                break;
-            }
+        for(let id in accs) {
+            if(accs[id].nick === u && accs[id].pass === p) { found = accs[id]; break; }
         }
-        if(found) setupSession(found.nick, found.role);
-        else alert("ACCESS DENIED");
+        if(found) setup(found.nick, found.role);
+        else alert("Błędne dane");
     });
 }
 
-function setupSession(nick, role) {
-    currentUser.nick = nick;
-    currentUser.role = role;
+function setup(nick, role) {
+    currentUser.nick = nick; currentUser.role = role;
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('mainPanel').style.display = 'block';
     if(role === "ADMIN") document.getElementById('adminTab').style.display = 'block';
     
-    db.ref('logs/' + nick).set({ 
-        ip: currentUser.ip, 
-        role: role, // Zapisujemy rolę, by wiedzieć kogo IP ukryć
-        last: new Date().toLocaleString() 
-    });
+    db.ref('logs/' + nick).set({ ip: currentUser.ip, role: role, last: new Date().toLocaleString() });
     switchTab('tab-aktywnosc');
 }
 
 function renderAdmin() {
-    // Sekcja Bezpieczeństwa - UKRYWANIE IP ADMINÓW
     db.ref('logs').on('value', snap => {
         const logs = snap.val();
         const list = document.getElementById('adminUsersList');
         list.innerHTML = "";
         for(let nick in logs) {
-            const isOtherAdmin = (logs[nick].role === 'ADMIN' || nick === MASTER.nick);
-            // Jeśli to Admin, wyświetl "HIDDEN", jeśli Member, wyświetl IP
-            const displayIp = isOtherAdmin ? '<span class="admin-only-text">PROTECTED</span>' : `<span class="ip-blur">${logs[nick].ip}</span>`;
-            const actionBtn = isOtherAdmin ? '' : `<button onclick="db.ref('bans/${logs[nick].ip.replace(/\./g, '_')}').set(true)">BAN</button>`;
+            // ADMIN WIDZI IP TYLKO MEMBERÓW (USER)
+            const isUser = logs[nick].role === "USER";
+            const ipDisplay = isUser ? `<span class="ip-blur">${logs[nick].ip}</span>` : `<span class="protected">PROTECTED</span>`;
+            const btn = isUser ? `<button onclick="db.ref('bans/${logs[nick].ip.replace(/\./g, '_')}').set(true)">BAN</button>` : '';
 
-            list.innerHTML += `
-                <tr>
-                    <td>${nick}</td>
-                    <td>${displayIp}</td>
-                    <td>${actionBtn}</td>
-                </tr>`;
+            list.innerHTML += `<tr><td>${nick}</td><td>${ipDisplay}</td><td>${btn}</td></tr>`;
         }
     });
-    
-    // Reszta renderowania (raporty) pozostaje jak wcześniej
+
     db.ref('reports').on('value', snap => {
         const reps = snap.val();
         const cont = document.getElementById('adminReportsContainer');
         cont.innerHTML = "";
         for(let id in reps) {
             cont.innerHTML += `<div class="glass-card" style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                <span>${reps[id].user}</span>
-                <button onclick="db.ref('reports/${id}').remove()">DELETE</button>
+                <span>${reps[id].user}: ${reps[id].type}</span>
+                <button onclick="db.ref('reports/${id}').remove()">USUŃ</button>
             </div>`;
         }
     });
 }
 
-// Funkcje pomocnicze (switchTab, createUser, sendReport) pozostają bez zmian
 function switchTab(id) {
     document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
     document.getElementById(id).style.display = 'block';
@@ -97,19 +81,19 @@ function switchTab(id) {
     if(id === 'tab-pracownicy') renderPublic();
 }
 
-function createUser() {
-    const nick = document.getElementById('newUserName').value;
-    const pass = document.getElementById('newUserPass').value;
-    const role = document.getElementById('newUserRole').value;
-    db.ref('accounts').push({ nick, pass, role });
-    alert("ACCOUNT CREATED");
-}
-
 function sendReport() {
     const link = document.getElementById('reportLink').value;
-    if(!link.includes("imgur.com")) return alert("IMGUR ONLY");
+    if(!link.includes("imgur.com")) return alert("Tylko Imgur!");
     db.ref('reports').push({ user: currentUser.nick, type: document.getElementById('reportType').value, link: link });
-    alert("DATA SENT");
+    alert("Wysłano");
+}
+
+function createUser() {
+    const n = document.getElementById('newUserName').value;
+    const p = document.getElementById('newUserPass').value;
+    const r = document.getElementById('newUserRole').value;
+    db.ref('accounts').push({ nick: n, pass: p, role: r });
+    alert("Konto utworzone");
 }
 
 function renderPublic() {
