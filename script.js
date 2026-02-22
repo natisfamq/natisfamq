@@ -16,44 +16,29 @@ let currentUser = { nick: "", ip: "0.0.0.0", role: "Członek" };
 
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(d => currentUser.ip = d.ip);
 
-// LOSOWANIE HASŁA (8 znaków)
 function generatePass() {
     const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
     let pass = "";
-    for (let i = 0; i < 8; i++) {
-        pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    }
+    for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
     document.getElementById('newUserPass').value = pass;
-}
-
-function toggleExtraFields() {
-    const type = document.getElementById('reportType').value;
-    document.getElementById('groverPlants').style.display = (type === 'Grover') ? 'block' : 'none';
-    document.getElementById('captKills').style.display = (type === 'Capt') ? 'block' : 'none';
-    document.getElementById('captDmg').style.display = (type === 'Capt') ? 'block' : 'none';
-}
-
-function calculatePayout(data) {
-    let total = 0;
-    const v1 = parseInt(data.val1) || 0;
-    const v2 = parseInt(data.val2) || 0;
-    if (data.type === "Paczki") total = 10000;
-    else if (data.type === "Cenna") total = 10000;
-    else if (data.type === "Grover") total = v1 * 1000;
-    else if (data.type === "Capt") total = 2500 + (v1 * 1000) + (v2 * 10);
-    return total.toLocaleString() + "$";
 }
 
 async function login() {
     const u = document.getElementById('userName').value;
     const p = document.getElementById('userPass').value;
     if (u === MASTER.nick && p === MASTER.pass) { setup(MASTER.nick, "Zarząd"); return; }
+    
     db.ref('accounts').once('value', snap => {
         const accs = snap.val();
         let found = null;
         for(let id in accs) { if(accs[id].nick === u && accs[id].pass === p) found = accs[id]; }
-        if(found) setup(found.nick, found.role);
-        else document.getElementById('loginError').innerText = "Błąd autoryzacji.";
+        
+        if(found) {
+            if(found.banned) return document.getElementById('loginError').innerText = "TWOJE KONTO ZOSTAŁO ZABLOKOWANE.";
+            setup(found.nick, found.role);
+        } else {
+            document.getElementById('loginError').innerText = "Błąd autoryzacji.";
+        }
     });
 }
 
@@ -77,16 +62,26 @@ function renderAdmin() {
     db.ref('accounts').on('value', async snap => {
         const accs = snap.val();
         const list = document.getElementById('adminUsersList');
-        list.innerHTML = `<tr><td onclick="showHistory('${MASTER.nick}')" style="cursor:pointer; text-decoration:underline;">${MASTER.nick}</td><td>[ PROT ]</td><td>Zarząd</td></tr>`;
+        list.innerHTML = `<tr><td onclick="showHistory('${MASTER.nick}')" style="cursor:pointer; text-decoration:underline;">${MASTER.nick}</td><td><span style="color:#444">[ PROTECTED ]</span></td><td>Zarząd</td></tr>`;
+        
         const logsSnap = await db.ref('logs').once('value');
         const logs = logsSnap.val() || {};
+        
         for(let id in accs) {
-            const nick = accs[id].nick;
-            const ip = logs[nick] ? logs[nick].ip : "OFFLINE";
+            const u = accs[id];
+            const ip = logs[u.nick] ? logs[u.nick].ip : "OFFLINE";
+            // ZABEZPIECZENIE IP DLA ZARZĄDU
+            const displayIp = (u.role === "Zarząd") ? `<span style="color:#444">[ PROTECTED ]</span>` : `<span class="ip-blur">${ip}</span>`;
+            const banText = u.banned ? "ODBLOKUJ" : "BANUJ";
+            const nickColor = u.banned ? "#ff4444" : "#fff";
+
             list.innerHTML += `<tr>
-                <td onclick="showHistory('${nick}')" style="cursor:pointer; text-decoration:underline;">${nick}</td>
-                <td><span class="ip-blur">${ip}</span></td>
-                <td><button onclick="deleteUser('${nick}')" style="background:none; border:1px solid #311; color:#533; border-radius:5px; cursor:pointer; padding:2px 5px;">USUŃ</button></td>
+                <td onclick="showHistory('${u.nick}')" style="cursor:pointer; text-decoration:underline; color:${nickColor}">${u.nick}</td>
+                <td>${displayIp}</td>
+                <td>
+                    <button class="btn-ban" onclick="toggleBan('${id}', ${u.banned})">${banText}</button>
+                    <button onclick="deleteUser('${id}')" style="background:none; border:1px solid #311; color:#533; border-radius:5px; cursor:pointer; padding:2px 5px; font-size:10px;">USUŃ</button>
+                </td>
             </tr>`;
         }
     });
@@ -95,7 +90,7 @@ function renderAdmin() {
         const reps = snap.val();
         const cont = document.getElementById('adminReportsContainer');
         cont.innerHTML = "";
-        if(!reps) return cont.innerHTML = "<p style='color:#222; font-size:12px;'>Brak oczekujących raportów.</p>";
+        if(!reps) return cont.innerHTML = "<p style='color:#222; font-size:12px;'>Brak raportów.</p>";
         for(let id in reps) {
             const payout = calculatePayout(reps[id]);
             cont.innerHTML += `<div style="padding:15px 0; border-bottom:1px solid #111; display:flex; justify-content:space-between; align-items:center;">
@@ -109,6 +104,38 @@ function renderAdmin() {
             </div>`;
         }
     });
+}
+
+function toggleBan(id, currentStatus) {
+    db.ref(`accounts/${id}`).update({ banned: !currentStatus });
+}
+
+function createUser() {
+    const n = document.getElementById('newUserName').value;
+    const p = document.getElementById('newUserPass').value;
+    const r = document.getElementById('newUserRole').value;
+    if(!n || !p) return alert("Brak danych!");
+    db.ref('accounts').push({ nick: n, pass: p, role: r, banned: false }).then(() => {
+        alert("Konto utworzone!");
+        document.getElementById('newUserName').value = "";
+        document.getElementById('newUserPass').value = "";
+    });
+}
+
+async function deleteUser(id) {
+    if (confirm("Usunąć konto na stałe?")) await db.ref(`accounts/${id}`).remove();
+}
+
+// ... Pozostałe funkcje (calculatePayout, sendReport, acceptReport, rejectReport, showHistory, renderPublic) pozostają bez zmian względem poprzedniego zestawu ...
+
+function calculatePayout(data) {
+    let total = 0;
+    const v1 = parseInt(data.val1) || 0;
+    const v2 = parseInt(data.val2) || 0;
+    if (data.type === "Paczki" || data.type === "Cenna") total = 10000;
+    else if (data.type === "Grover") total = v1 * 1000;
+    else if (data.type === "Capt") total = 2500 + (v1 * 1000) + (v2 * 10);
+    return total.toLocaleString() + "$";
 }
 
 function sendReport() {
@@ -166,27 +193,6 @@ async function showHistory(nick) {
 }
 
 function closeHistory() { document.getElementById('historyModal').style.display = 'none'; }
-
-function createUser() {
-    const n = document.getElementById('newUserName').value;
-    const p = document.getElementById('newUserPass').value;
-    const r = document.getElementById('newUserRole').value;
-    if(!n || !p) return alert("Brak danych!");
-    db.ref('accounts').push({ nick: n, pass: p, role: r }).then(() => {
-        alert("Konto utworzone!");
-        document.getElementById('newUserName').value = "";
-        document.getElementById('newUserPass').value = "";
-    });
-}
-
-async function deleteUser(n) {
-    if (confirm(`Usunąć ${n}?`)) {
-        const snap = await db.ref('accounts').once('value');
-        const accs = snap.val();
-        for (let id in accs) { if (accs[id].nick === n) await db.ref(`accounts/${id}`).remove(); }
-        await db.ref(`logs/${n}`).remove();
-    }
-}
 
 function renderPublic() {
     db.ref('accounts').on('value', snap => {
