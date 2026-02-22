@@ -11,7 +11,7 @@
 <body>
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
-            <div class="glitch-logo">NATIS</div>
+            <img src="logo.jpg" alt="NATIS" class="login-logo">
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
                 <input type="password" id="userPass" placeholder="hasło">
@@ -36,37 +36,42 @@
 
         <main class="content">
             <section id="tab-aktywnosc" class="tab-content card">
-                <h3 class="card-title">Prześlij dane</h3>
+                <h3 class="card-title">Nowy Raport</h3>
                 <div class="form-group">
-                    <select id="reportType">
-                        <option>Dostawa Materiałów</option>
-                        <option>AirDrop</option>
-                        <option>Napad</option>
+                    <select id="reportType" onchange="toggleExtraFields()">
+                        <option value="Paczki">Paczki</option>
+                        <option value="Cenna">Cenna</option>
+                        <option value="Grover">Grover</option>
+                        <option value="Capt">Capt</option>
                     </select>
-                    <input type="url" id="reportLink" placeholder="link imgur">
-                    <button class="btn-action" onclick="sendReport()">WYŚLIJ</button>
+                    <div id="extraFields">
+                        <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
+                        <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
+                        <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
+                    </div>
+                    <input type="url" id="reportLink" placeholder="Link Imgur (Dowód)">
+                    <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                 </div>
             </section>
 
             <section id="tab-pracownicy" class="tab-content card" style="display:none;">
                 <h3 class="card-title">Status Rodziny</h3>
                 <table class="minimal-table">
-                    <thead><tr><th>Konto</th><th>Aktywność</th></tr></thead>
+                    <thead><tr><th>Konto</th><th>Rola</th></tr></thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
             </section>
 
             <section id="tab-admin" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3 class="card-title">Zarządzanie kontami & IP</h3>
+                    <h3 class="card-title">Zarządzanie kontami</h3>
                     <table class="minimal-table">
                         <thead><tr><th>User</th><th>IP Address</th><th>Opcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
-                
                 <div class="card mt-15">
-                    <h3 class="card-title">Rejestracja Nowego Członka</h3>
+                    <h3 class="card-title">Dodaj Nowego Członka</h3>
                     <div class="form-inline">
                         <input type="text" id="newUserName" placeholder="Nick">
                         <input type="text" id="newUserPass" placeholder="Hasło">
@@ -77,20 +82,19 @@
                         <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
                     </div>
                 </div>
-
                 <div class="card mt-15">
-                    <h3 class="card-title">Raporty do weryfikacji</h3>
+                    <h3 class="card-title">Raporty (Kwoty do wypłaty)</h3>
                     <div id="adminReportsContainer"></div>
                 </div>
             </section>
         </main>
     </div>
 
-    <div id="historyModal" class="modal">
+    <div id="historyModal" class="modal" style="display:none;">
         <div class="modal-content card">
-            <h3 id="historyTitle" class="card-title" style="color:#fff">Historia</h3>
+            <h3 id="historyTitle" class="card-title" style="color:#fff; margin-top:0;">Historia</h3>
             <div id="historyBody" class="history-list"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ</button>
+            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
         </div>
     </div>
 
