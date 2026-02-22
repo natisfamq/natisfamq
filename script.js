@@ -73,7 +73,11 @@ function renderAdmin() {
         for(let id in accs) {
             const nick = accs[id].nick;
             const ip = logs[nick] ? logs[nick].ip : "OFFLINE";
-            list.innerHTML += `<tr><td onclick="showHistory('${nick}')" style="cursor:pointer; text-decoration:underline;">${nick}</td><td class="ip-blur">${ip}</td><td><button onclick="deleteUser('${nick}')" style="background:none; border:1px solid #311; color:#533; border-radius:5px; cursor:pointer;">USUŃ</button></td></tr>`;
+            list.innerHTML += `<tr>
+                <td onclick="showHistory('${nick}')" style="cursor:pointer; text-decoration:underline;">${nick}</td>
+                <td><span class="ip-blur">${ip}</span></td>
+                <td><button onclick="deleteUser('${nick}')" style="background:none; border:1px solid #311; color:#533; border-radius:5px; cursor:pointer; padding:2px 5px;">USUŃ</button></td>
+            </tr>`;
         }
     });
 
@@ -133,16 +137,16 @@ async function showHistory(nick) {
             found = true;
             const s = all[id];
             const color = s.status === "ZAAKCEPTOWANO" ? "#2ecc71" : "#ff4444";
-            body.innerHTML += `<div class="history-item" style="border-left: 2px solid ${color}">
-                <span class="history-tag" style="color:${color}">${s.status}</span>
-                <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
-                    <b>${s.type}</b> <span>${s.payout}</span>
+            body.innerHTML += `<div class="history-item" style="border-left: 3px solid ${color}">
+                <span style="font-weight:bold; text-transform:uppercase; font-size:10px; color:${color}">${s.status}</span>
+                <div style="display:flex; justify-content:space-between; margin-bottom:5px; margin-top:5px;">
+                    <b>${s.type}</b> <span style="color:#2ecc71">${s.payout}</span>
                 </div>
                 <div style="color:#444; font-size:10px; line-height:1.4;">
-                    Data raportu: ${s.timestamp}<br>
-                    Data decyzji: ${s.decisionAt}<br>
+                    Wysłano: ${s.timestamp}<br>
+                    Decyzja: ${s.decisionAt}<br>
                     Sprawdził: ${s.acceptedBy}<br>
-                    <a href="${s.link}" target="_blank" style="color:#666; text-decoration:none;">[ DOWÓD ]</a>
+                    <a href="${s.link}" target="_blank" style="color:#666; text-decoration:none; font-weight:bold;">[ DOWÓD ]</a>
                 </div>
             </div>`;
         }
