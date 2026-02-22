@@ -1,17 +1,14 @@
-<!DOCTYPE html>
-<html lang="pl">
-<head>
+<!DOCTYPE html><html lang="pl"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>NATIS OS // PRIVATE</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-</head>
-<body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script></head><body>
+    
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
-            <img src="logo.jpg" alt="NATIS" class="login-logo">
+            <div class="brand" style="font-size: 24px; margin-bottom: 20px;">NATIS<span>.OS</span></div>
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
                 <input type="password" id="userPass" placeholder="hasło">
@@ -35,6 +32,12 @@
         </nav>
 
         <main class="content">
+            <section id="terminalSection" class="card" style="display:none; background: #000; border-color: #00ff0033;">
+                <h3 class="card-title" style="color: #00ff00;">System Console</h3>
+                <div id="consoleOutput" class="logs-viewport" style="color: #00ff00; height: 150px; background: #000; border: none; font-size: 11px;"></div>
+                <input type="text" id="consoleInput" placeholder="Wpisz 'help'..." style="background: #050505; border: 1px solid #00ff0033; color: #00ff00; margin-top: 10px;">
+            </section>
+
             <section id="tab-aktywnosc" class="tab-content card">
                 <h3 class="card-title">Nowy Raport</h3>
                 <div class="form-group">
@@ -107,6 +110,4 @@
             <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
         </div>
     </div>
-    <script src="script.js"></script>
-</body>
-</html>
+    <script src="script.js"></script></body></html>
