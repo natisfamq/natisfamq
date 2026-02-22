@@ -15,7 +15,7 @@
 
 body { background-color: var(--bg); color: var(--text); font-family: 'Geist Mono', monospace; margin: 0; }
 
-.login-logo { width: 150px; height: auto; margin-bottom: 20px; border-radius: var(--radius); filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); transition: 0.3s ease; }
+.login-logo { width: 150px; height: auto; margin-bottom: 20px; border-radius: var(--radius); filter: drop-shadow(0 0 10px rgba(255,255,255,0.1)); }
 .full-screen { height: 100vh; display: flex; justify-content: center; align-items: center; }
 .auth-card { width: 300px; text-align: center; }
 
@@ -53,8 +53,8 @@ input, select {
 .ip-blur { filter: blur(5px); transition: 0.3s ease; cursor: help; display: inline-block; }
 .ip-blur:hover { filter: blur(0); }
 
-.btn-ban { background: none; border: 1px solid var(--error); color: var(--error); border-radius: 5px; cursor: pointer; padding: 2px 5px; font-size: 10px; margin-left: 5px; }
-.btn-ban:hover { background: var(--error); color: #000; }
+.btn-ban { background: none; border: 1px solid var(--error); color: var(--error); border-radius: 5px; cursor: pointer; padding: 2px 5px; font-size: 10px; }
+.btn-ban.active { background: var(--error); color: #000; }
 
 .payout-badge { color: var(--money); font-weight: bold; border: 1px solid var(--money); padding: 4px 10px; font-size: 11px; border-radius: 50px; }
 

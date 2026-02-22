@@ -14,6 +14,7 @@ const db = firebase.database();
 const MASTER = { nick: "rex", pass: "Rex321" };
 let currentUser = { nick: "", ip: "0.0.0.0", role: "Członek" };
 
+// POBIERANIE IP
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(d => currentUser.ip = d.ip);
 
 function generatePass() {
@@ -23,22 +24,33 @@ function generatePass() {
     document.getElementById('newUserPass').value = pass;
 }
 
+// LOGOWANIE Z BLOKADĄ IP
 async function login() {
     const u = document.getElementById('userName').value;
     const p = document.getElementById('userPass').value;
+    const err = document.getElementById('loginError');
+
+    // 1. Sprawdź czy IP jest zbanowane
+    const banSnap = await db.ref('bannedIPs').once('value');
+    const bannedList = banSnap.val() || {};
+    const cleanIP = currentUser.ip.replace(/\./g, '_'); // Firebase nie lubi kropek w kluczach
+
+    if (bannedList[cleanIP]) {
+        err.innerText = "DOSTĘP ZABLOKOWANY (IP BANNED)";
+        return;
+    }
+
+    // 2. Logika Mastera
     if (u === MASTER.nick && p === MASTER.pass) { setup(MASTER.nick, "Zarząd"); return; }
     
+    // 3. Logika kont
     db.ref('accounts').once('value', snap => {
         const accs = snap.val();
         let found = null;
         for(let id in accs) { if(accs[id].nick === u && accs[id].pass === p) found = accs[id]; }
         
-        if(found) {
-            if(found.banned) return document.getElementById('loginError').innerText = "TWOJE KONTO ZOSTAŁO ZABLOKOWANE.";
-            setup(found.nick, found.role);
-        } else {
-            document.getElementById('loginError').innerText = "Błąd autoryzacji.";
-        }
+        if(found) setup(found.nick, found.role);
+        else err.innerText = "Błąd autoryzacji.";
     });
 }
 
@@ -66,21 +78,24 @@ function renderAdmin() {
         
         const logsSnap = await db.ref('logs').once('value');
         const logs = logsSnap.val() || {};
+        const banSnap = await db.ref('bannedIPs').once('value');
+        const bannedList = banSnap.val() || {};
         
         for(let id in accs) {
             const u = accs[id];
             const ip = logs[u.nick] ? logs[u.nick].ip : "OFFLINE";
+            const cleanIP = ip.replace(/\./g, '_');
+            const isBanned = bannedList[cleanIP] ? true : false;
+            
             // ZABEZPIECZENIE IP DLA ZARZĄDU
             const displayIp = (u.role === "Zarząd") ? `<span style="color:#444">[ PROTECTED ]</span>` : `<span class="ip-blur">${ip}</span>`;
-            const banText = u.banned ? "ODBLOKUJ" : "BANUJ";
-            const nickColor = u.banned ? "#ff4444" : "#fff";
-
+            
             list.innerHTML += `<tr>
-                <td onclick="showHistory('${u.nick}')" style="cursor:pointer; text-decoration:underline; color:${nickColor}">${u.nick}</td>
+                <td onclick="showHistory('${u.nick}')" style="cursor:pointer; text-decoration:underline;">${u.nick}</td>
                 <td>${displayIp}</td>
                 <td>
-                    <button class="btn-ban" onclick="toggleBan('${id}', ${u.banned})">${banText}</button>
-                    <button onclick="deleteUser('${id}')" style="background:none; border:1px solid #311; color:#533; border-radius:5px; cursor:pointer; padding:2px 5px; font-size:10px;">USUŃ</button>
+                    <button class="btn-ban ${isBanned ? 'active' : ''}" onclick="toggleIpBan('${ip}')">${isBanned ? 'ODBANUJ IP' : 'BANUJ IP'}</button>
+                    <button onclick="deleteUser('${id}')" style="background:none; border:1px solid #222; color:#333; cursor:pointer; margin-left:5px;">X</button>
                 </td>
             </tr>`;
         }
@@ -106,8 +121,18 @@ function renderAdmin() {
     });
 }
 
-function toggleBan(id, currentStatus) {
-    db.ref(`accounts/${id}`).update({ banned: !currentStatus });
+// FUNKCJA BANOWANIA IP
+async function toggleIpBan(ip) {
+    if (ip === "OFFLINE" || ip === "0.0.0.0") return alert("Nie można zbanować tego adresu.");
+    const cleanIP = ip.replace(/\./g, '_');
+    const snap = await db.ref(`bannedIPs/${cleanIP}`).once('value');
+    if (snap.exists()) {
+        await db.ref(`bannedIPs/${cleanIP}`).remove();
+        alert("IP Odbanowane: " + ip);
+    } else {
+        await db.ref(`bannedIPs/${cleanIP}`).set({ timestamp: new Date().toLocaleString() });
+        alert("IP Zbanowane: " + ip);
+    }
 }
 
 function createUser() {
@@ -115,7 +140,7 @@ function createUser() {
     const p = document.getElementById('newUserPass').value;
     const r = document.getElementById('newUserRole').value;
     if(!n || !p) return alert("Brak danych!");
-    db.ref('accounts').push({ nick: n, pass: p, role: r, banned: false }).then(() => {
+    db.ref('accounts').push({ nick: n, pass: p, role: r }).then(() => {
         alert("Konto utworzone!");
         document.getElementById('newUserName').value = "";
         document.getElementById('newUserPass').value = "";
@@ -123,10 +148,10 @@ function createUser() {
 }
 
 async function deleteUser(id) {
-    if (confirm("Usunąć konto na stałe?")) await db.ref(`accounts/${id}`).remove();
+    if (confirm("Usunąć konto?")) await db.ref(`accounts/${id}`).remove();
 }
 
-// ... Pozostałe funkcje (calculatePayout, sendReport, acceptReport, rejectReport, showHistory, renderPublic) pozostają bez zmian względem poprzedniego zestawu ...
+// ... POZOSTAŁE FUNKCJE (calculatePayout, sendReport, etc.) BEZ ZMIAN ...
 
 function calculatePayout(data) {
     let total = 0;
