@@ -1,66 +1,106 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist+Mono:wght@100..900&display=swap');
-
-:root {
-    --bg: #050505;
-    --card-bg: #0a0a0a;
-    --border: #161616;
-    --text: #ffffff;
-    --dim: #444444;
-    --accent: #ffffff;
-    --money: #2ecc71;
-    --error: #ff4444;
-    --radius: 12px;
+/* style.css - Kompletny styl dla NATIS OS */
+body {
+    background-color: #050505;
+    color: #e0e0e0;
+    font-family: 'Courier New', monospace; /* Systemowy klimat */
+    margin: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
 }
 
-body { background-color: var(--bg); color: var(--text); font-family: 'Geist Mono', monospace; margin: 0; overflow-x: hidden; }
-.full-screen { height: 100vh; display: flex; justify-content: center; align-items: center; }
-.auth-card { width: 300px; text-align: center; }
-.login-logo { width: 50%; border-radius: var(--radius); margin-bottom: 20px; }
-
-input, select { 
-    width: 100%; background: var(--card-bg); border: 1px solid var(--border); 
-    padding: 12px; color: #fff; margin-bottom: 10px; outline: none; 
-    font-family: inherit; font-size: 13px; box-sizing: border-box; 
-    border-radius: var(--radius);
+.container {
+    background: #0d0d0d;
+    padding: 25px;
+    border-radius: 8px;
+    box-shadow: 0 0 20px rgba(0,0,0,0.8);
+    width: 100%;
+    max-width: 700px;
+    border: 1px solid #1a1a1a;
 }
 
-.pass-wrapper { position: relative; width: 100%; }
-.dice-btn { position: absolute; right: 10px; top: 11px; background: none; border: none; color: var(--dim); cursor: pointer; font-size: 16px; }
-
-.btn-primary, .btn-action { 
-    width: 100%; padding: 12px; background: var(--accent); color: #000; 
-    border: none; font-weight: 700; cursor: pointer; font-size: 11px; 
-    border-radius: var(--radius); text-transform: uppercase;
+/* Karty i Nawigacja */
+nav {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #222;
+    padding-bottom: 10px;
 }
 
-.navbar { border-bottom: 1px solid var(--border); padding: 15px 0; background: #000; position: sticky; top: 0; z-index: 10; }
-.nav-container { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 20px; align-items: center; }
-.brand { font-weight: 700; font-size: 14px; letter-spacing: 1px; }
-.menu span { cursor: pointer; color: var(--dim); padding: 8px 12px; font-size: 12px; transition: 0.3s; }
-.menu span:hover { color: #fff; }
+nav button {
+    background: transparent;
+    color: #666;
+    border: none;
+    cursor: pointer;
+    font-size: 13px;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
 
-.content { max-width: 800px; margin: 30px auto; padding: 0 20px; }
-.card { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; margin-bottom: 15px; border-radius: var(--radius); }
-.card-title { margin-top: 0; font-size: 11px; color: var(--dim); text-transform: uppercase; letter-spacing: 2px; margin-bottom: 20px; }
+nav button:hover { color: #fff; }
 
-.minimal-table { width: 100%; border-collapse: collapse; table-layout: fixed; }
-.minimal-table th { text-align: left; font-size: 10px; color: #333; text-transform: uppercase; padding-bottom: 10px; }
-.minimal-table td { padding: 12px 0; font-size: 12px; border-bottom: 1px solid #0d0d0d; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+/* Logowanie */
+#loginPage input {
+    display: block;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 12px;
+    margin-bottom: 10px;
+    background: #111;
+    border: 1px solid #333;
+    color: #0f0; /* Zielony tekst jak w terminalu */
+}
 
-.ip-blur { filter: blur(5px); transition: 0.3s; cursor: help; }
-.ip-blur:hover { filter: blur(0); }
+/* Konsola Roota */
+#consoleWrapper {
+    background: #000;
+    border: 1px solid #00ff0033;
+    padding: 10px;
+    margin-bottom: 20px;
+}
 
-.btn-ban { background: none; border: 1px solid #222; color: #444; border-radius: 5px; cursor: pointer; padding: 4px 8px; font-size: 9px; }
-.btn-ban.unban-mode { border-color: var(--error); color: var(--error); }
+#consoleOutput {
+    color: #0f0;
+    font-size: 12px;
+    line-height: 1.4;
+}
 
-.payout-badge { color: var(--money); font-weight: bold; border: 1px solid var(--money); padding: 3px 8px; font-size: 10px; border-radius: 4px; }
+#consoleInput {
+    background: #050505;
+    border: none;
+    border-top: 1px solid #111;
+    color: #0f0;
+    width: 100%;
+    padding: 5px 0;
+}
 
-.logs-viewport { max-height: 200px; overflow-y: auto; background: #050505; padding: 10px; border-radius: 8px; border: 1px solid #111; }
-.log-entry { font-size: 10px; padding: 6px 0; border-bottom: 1px solid #0d0d0d; display: flex; gap: 8px; font-family: 'Geist Mono'; }
-.log-time { color: #222; }
-.log-user { color: #fff; }
-.log-action { color: #666; }
+/* Tabele i raporty */
+table { width: 100%; border-collapse: collapse; }
+td { padding: 8px; border-bottom: 1px solid #111; font-size: 13px; }
 
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
-.modal-content { width: 90%; max-width: 450px; }
-.logout { color: var(--error) !important; }
+.report-row {
+    background: #111;
+    margin: 5px 0;
+    padding: 10px;
+    border-radius: 4px;
+    font-size: 12px;
+}
+
+.payout-badge { color: #2ecc71; font-weight: bold; margin-right: 10px; }
+
+button {
+    background: #fff;
+    color: #000;
+    border: none;
+    padding: 8px 15px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+button:hover { background: #ccc; }
+
+.btn-ok { background: #2ecc71; color: #fff; padding: 4px 8px; font-size: 10px; }
+.btn-no { background: #e74c3c; color: #fff; padding: 4px 8px; font-size: 10px; }
