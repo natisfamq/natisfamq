@@ -16,6 +16,16 @@ let currentUser = { nick: "", ip: "0.0.0.0", role: "Członek" };
 
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(d => currentUser.ip = d.ip);
 
+// LOSOWANIE HASŁA (8 znaków)
+function generatePass() {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let pass = "";
+    for (let i = 0; i < 8; i++) {
+        pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+    document.getElementById('newUserPass').value = pass;
+}
+
 function toggleExtraFields() {
     const type = document.getElementById('reportType').value;
     document.getElementById('groverPlants').style.display = (type === 'Grover') ? 'block' : 'none';
@@ -162,7 +172,11 @@ function createUser() {
     const p = document.getElementById('newUserPass').value;
     const r = document.getElementById('newUserRole').value;
     if(!n || !p) return alert("Brak danych!");
-    db.ref('accounts').push({ nick: n, pass: p, role: r }).then(() => alert("Konto utworzone!"));
+    db.ref('accounts').push({ nick: n, pass: p, role: r }).then(() => {
+        alert("Konto utworzone!");
+        document.getElementById('newUserName').value = "";
+        document.getElementById('newUserPass').value = "";
+    });
 }
 
 async function deleteUser(n) {

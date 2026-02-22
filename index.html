@@ -79,7 +79,10 @@
                     <h3 class="card-title">Dodaj Nowego Członka</h3>
                     <div class="form-inline">
                         <input type="text" id="newUserName" placeholder="Nick">
-                        <input type="text" id="newUserPass" placeholder="Hasło">
+                        <div class="pass-wrapper">
+                            <input type="text" id="newUserPass" placeholder="Hasło">
+                            <button class="dice-btn" onclick="generatePass()" title="Losuj hasło">🎲</button>
+                        </div>
                         <select id="newUserRole">
                             <option value="Zarząd">Zarząd</option>
                             <option value="Członek">Członek</option>
