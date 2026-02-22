@@ -14,7 +14,6 @@ const db = firebase.database();
 const MASTER = { nick: "rex", pass: "Rex321" };
 let currentUser = { nick: "", ip: "0.0.0.0", role: "Członek" };
 
-// POBIERANIE IP
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(d => currentUser.ip = d.ip);
 
 function generatePass() {
@@ -24,31 +23,26 @@ function generatePass() {
     document.getElementById('newUserPass').value = pass;
 }
 
-// LOGOWANIE Z BLOKADĄ IP
 async function login() {
     const u = document.getElementById('userName').value;
     const p = document.getElementById('userPass').value;
     const err = document.getElementById('loginError');
 
-    // 1. Sprawdź czy IP jest zbanowane
     const banSnap = await db.ref('bannedIPs').once('value');
     const bannedList = banSnap.val() || {};
-    const cleanIP = currentUser.ip.replace(/\./g, '_'); // Firebase nie lubi kropek w kluczach
+    const cleanIP = currentUser.ip.replace(/\./g, '_');
 
     if (bannedList[cleanIP]) {
-        err.innerText = "DOSTĘP ZABLOKOWANY (IP BANNED)";
+        err.innerText = "IP ZABLOKOWANE. KONTAKTUJ SIĘ Z ZARZĄDEM.";
         return;
     }
 
-    // 2. Logika Mastera
     if (u === MASTER.nick && p === MASTER.pass) { setup(MASTER.nick, "Zarząd"); return; }
     
-    // 3. Logika kont
     db.ref('accounts').once('value', snap => {
         const accs = snap.val();
         let found = null;
         for(let id in accs) { if(accs[id].nick === u && accs[id].pass === p) found = accs[id]; }
-        
         if(found) setup(found.nick, found.role);
         else err.innerText = "Błąd autoryzacji.";
     });
@@ -71,15 +65,15 @@ function switchTab(id) {
 }
 
 function renderAdmin() {
-    db.ref('accounts').on('value', async snap => {
-        const accs = snap.val();
+    // Słuchaj zmian w zbanowanych IP oraz kontach równocześnie
+    db.ref().on('value', async fullSnap => {
+        const data = fullSnap.val();
+        const accs = data.accounts || {};
+        const logs = data.logs || {};
+        const bannedList = data.bannedIPs || {};
+        
         const list = document.getElementById('adminUsersList');
         list.innerHTML = `<tr><td onclick="showHistory('${MASTER.nick}')" style="cursor:pointer; text-decoration:underline;">${MASTER.nick}</td><td><span style="color:#444">[ PROTECTED ]</span></td><td>Zarząd</td></tr>`;
-        
-        const logsSnap = await db.ref('logs').once('value');
-        const logs = logsSnap.val() || {};
-        const banSnap = await db.ref('bannedIPs').once('value');
-        const bannedList = banSnap.val() || {};
         
         for(let id in accs) {
             const u = accs[id];
@@ -87,20 +81,24 @@ function renderAdmin() {
             const cleanIP = ip.replace(/\./g, '_');
             const isBanned = bannedList[cleanIP] ? true : false;
             
-            // ZABEZPIECZENIE IP DLA ZARZĄDU
             const displayIp = (u.role === "Zarząd") ? `<span style="color:#444">[ PROTECTED ]</span>` : `<span class="ip-blur">${ip}</span>`;
             
+            // Logika zmiany tekstu i klasy przycisku
+            const btnLabel = isBanned ? "UNBANUJ IP" : "BANUJ IP";
+            const btnClass = isBanned ? "btn-ban unban-mode" : "btn-ban";
+
             list.innerHTML += `<tr>
                 <td onclick="showHistory('${u.nick}')" style="cursor:pointer; text-decoration:underline;">${u.nick}</td>
                 <td>${displayIp}</td>
                 <td>
-                    <button class="btn-ban ${isBanned ? 'active' : ''}" onclick="toggleIpBan('${ip}')">${isBanned ? 'ODBANUJ IP' : 'BANUJ IP'}</button>
-                    <button onclick="deleteUser('${id}')" style="background:none; border:1px solid #222; color:#333; cursor:pointer; margin-left:5px;">X</button>
+                    <button class="${btnClass}" onclick="toggleIpBan('${ip}')">${btnLabel}</button>
+                    <button onclick="deleteUser('${id}')" style="background:none; border:none; color:#222; cursor:pointer; margin-left:10px;">✕</button>
                 </td>
             </tr>`;
         }
     });
 
+    // Sekcja raportów (Admin)
     db.ref('reports').on('value', snap => {
         const reps = snap.val();
         const cont = document.getElementById('adminReportsContainer');
@@ -121,17 +119,15 @@ function renderAdmin() {
     });
 }
 
-// FUNKCJA BANOWANIA IP
 async function toggleIpBan(ip) {
-    if (ip === "OFFLINE" || ip === "0.0.0.0") return alert("Nie można zbanować tego adresu.");
+    if (ip === "OFFLINE" || ip === "0.0.0.0") return alert("Nie można wykonać akcji na tym IP.");
     const cleanIP = ip.replace(/\./g, '_');
     const snap = await db.ref(`bannedIPs/${cleanIP}`).once('value');
+    
     if (snap.exists()) {
         await db.ref(`bannedIPs/${cleanIP}`).remove();
-        alert("IP Odbanowane: " + ip);
     } else {
-        await db.ref(`bannedIPs/${cleanIP}`).set({ timestamp: new Date().toLocaleString() });
-        alert("IP Zbanowane: " + ip);
+        await db.ref(`bannedIPs/${cleanIP}`).set({ blockedAt: new Date().toLocaleString() });
     }
 }
 
@@ -139,19 +135,15 @@ function createUser() {
     const n = document.getElementById('newUserName').value;
     const p = document.getElementById('newUserPass').value;
     const r = document.getElementById('newUserRole').value;
-    if(!n || !p) return alert("Brak danych!");
-    db.ref('accounts').push({ nick: n, pass: p, role: r }).then(() => {
-        alert("Konto utworzone!");
-        document.getElementById('newUserName').value = "";
-        document.getElementById('newUserPass').value = "";
-    });
+    if(!n || !p) return alert("Wpisz dane!");
+    db.ref('accounts').push({ nick: n, pass: p, role: r });
+    document.getElementById('newUserName').value = "";
+    document.getElementById('newUserPass').value = "";
 }
 
 async function deleteUser(id) {
     if (confirm("Usunąć konto?")) await db.ref(`accounts/${id}`).remove();
 }
-
-// ... POZOSTAŁE FUNKCJE (calculatePayout, sendReport, etc.) BEZ ZMIAN ...
 
 function calculatePayout(data) {
     let total = 0;
@@ -166,11 +158,11 @@ function calculatePayout(data) {
 function sendReport() {
     const type = document.getElementById('reportType').value;
     const link = document.getElementById('reportLink').value;
-    if(!link.includes("imgur.com")) return alert("Wymagany link Imgur!");
+    if(!link.includes("imgur.com")) return alert("Link musi być z Imgur!");
     const data = { user: currentUser.nick, type: type, link: link, timestamp: new Date().toLocaleString() };
     if(type === 'Grover') data.val1 = document.getElementById('groverPlants').value;
     if(type === 'Capt') { data.val1 = document.getElementById('captKills').value; data.val2 = document.getElementById('captDmg').value; }
-    db.ref('reports').push(data).then(() => { alert("Wysłano!"); document.getElementById('reportLink').value = ""; });
+    db.ref('reports').push(data).then(() => { alert("Raport wysłany!"); document.getElementById('reportLink').value = ""; });
 }
 
 async function acceptReport(id) {
@@ -205,15 +197,13 @@ async function showHistory(nick) {
                     <b>${s.type}</b> <span style="color:#2ecc71">${s.payout}</span>
                 </div>
                 <div style="color:#444; font-size:10px; line-height:1.4;">
-                    Wysłano: ${s.timestamp}<br>
-                    Decyzja: ${s.decisionAt}<br>
-                    Sprawdził: ${s.acceptedBy}<br>
-                    <a href="${s.link}" target="_blank" style="color:#666; text-decoration:none; font-weight:bold;">[ DOWÓD ]</a>
+                    Data: ${s.timestamp}<br>
+                    <a href="${s.link}" target="_blank" style="color:#666; font-weight:bold;">[ DOWÓD ]</a>
                 </div>
             </div>`;
         }
     }
-    if(!found) body.innerHTML = "<p style='color:#222; text-align:center;'>Brak danych historycznych.</p>";
+    if(!found) body.innerHTML = "<p style='color:#222; text-align:center;'>Brak historii.</p>";
     document.getElementById('historyModal').style.display = 'flex';
 }
 
