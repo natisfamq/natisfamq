@@ -16,37 +16,38 @@ let currentUser = { nick: "", ip: "0.0.0.0", role: "Członek" };
 
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(d => currentUser.ip = d.ip);
 
-// LOGOWANIE DZIAŁAŃ ADMINA
-function logAction(action, target) {
-    db.ref('system_logs').push({
-        admin: currentUser.nick,
-        action: action,
-        target: target,
-        timestamp: new Date().toLocaleString()
-    });
-}
-
-// OBLICZANIE KASY
+// OBLICZENIA FINANSOWE
 function calculatePayout(data) {
     let total = 0;
-    const v1 = parseInt(data.val1) || 0; // krzaki lub kille
-    const v2 = parseInt(data.val2) || 0; // dmg
-    
-    if (data.type === "Paczki" || data.type === "Cenna") {
-        total = 10000;
-    } else if (data.type === "Grover") {
-        total = v1 * 1000;
-    } else if (data.type === "Capt") {
-        total = 2500 + (v1 * 1000) + (v2 * 10);
-    }
+    const v1 = parseInt(data.val1) || 0;
+    const v2 = parseInt(data.val2) || 0;
+    if (data.type === "Paczki" || data.type === "Cenna") total = 10000;
+    else if (data.type === "Grover") total = v1 * 1000;
+    else if (data.type === "Capt") total = 2500 + (v1 * 1000) + (v2 * 10);
     return total.toLocaleString() + "$";
 }
 
-function generatePass() {
-    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
-    let pass = "";
-    for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
-    document.getElementById('newUserPass').value = pass;
+// LOGOWANIE Z OCHRONĄ IP ZARZĄDU
+async function logAction(action, targetValue) {
+    let finalTarget = targetValue;
+    
+    // Sprawdź czy targetValue to IP i czy należy do Zarządu
+    const logsSnap = await db.ref('logs').once('value');
+    const logs = logsSnap.val() || {};
+    
+    for (let user in logs) {
+        if (logs[user].ip === targetValue && logs[user].role === "Zarząd") {
+            finalTarget = "[ PROTECTED IP ]";
+            break;
+        }
+    }
+
+    db.ref('system_logs').push({
+        admin: currentUser.nick,
+        action: action,
+        target: finalTarget,
+        timestamp: new Date().toLocaleString('pl-PL')
+    });
 }
 
 async function login() {
@@ -56,7 +57,7 @@ async function login() {
 
     const banSnap = await db.ref('bannedIPs').once('value');
     if (banSnap.val() && banSnap.val()[cleanIP]) {
-        document.getElementById('loginError').innerText = "IP ZBANOWANE.";
+        alert("TWOJE IP JEST ZBANOWANE.");
         return;
     }
 
@@ -67,7 +68,7 @@ async function login() {
         let found = null;
         for(let id in accs) { if(accs[id].nick === u && accs[id].pass === p) found = accs[id]; }
         if(found) setup(found.nick, found.role);
-        else document.getElementById('loginError').innerText = "Błędne dane.";
+        else document.getElementById('loginError').innerText = "Błąd autoryzacji.";
     });
 }
 
@@ -89,27 +90,27 @@ function switchTab(id) {
 
 function renderAdmin() {
     db.ref().on('value', async snap => {
-        const data = snap.val();
+        const data = snap.val() || {};
         const accs = data.accounts || {};
         const logs = data.logs || {};
         const bans = data.bannedIPs || {};
         
         const list = document.getElementById('adminUsersList');
-        list.innerHTML = `<tr><td>${MASTER.nick}</td><td><span style="color:#444">[ PROTECTED ]</span></td><td>Zarząd</td></tr>`;
+        list.innerHTML = `<tr><td>${MASTER.nick}</td><td><span style="color:#222">[ MASTER ]</span></td><td style="text-align:right; font-size:10px; color:#333;">PROTECTED</td></tr>`;
         
         for(let id in accs) {
             const u = accs[id];
-            const ip = logs[u.nick] ? logs[u.nick].ip : "0.0.0.0";
-            const cleanIP = ip.replace(/\./g, '_');
+            const userLog = logs[u.nick] || { ip: "0.0.0.0" };
+            const cleanIP = userLog.ip.replace(/\./g, '_');
             const isBanned = bans[cleanIP] ? true : false;
-            const displayIp = (u.role === "Zarząd") ? `<span style="color:#444">[ PROTECTED ]</span>` : `<span class="ip-blur">${ip}</span>`;
+            const isZarzad = u.role === "Zarząd";
 
             list.innerHTML += `<tr>
                 <td onclick="showHistory('${u.nick}')" style="cursor:pointer; text-decoration:underline;">${u.nick}</td>
-                <td>${displayIp}</td>
-                <td>
-                    <button class="btn-ban ${isBanned ? 'unban-mode' : ''}" onclick="toggleIpBan('${ip}')">${isBanned ? 'UNBANUJ IP' : 'BANUJ IP'}</button>
-                    <button onclick="deleteUser('${id}')" style="background:none; border:none; color:#333; cursor:pointer; margin-left:10px;">✕</button>
+                <td>${isZarzad ? '<span style="color:#222">[ PROT ]</span>' : '<span class="ip-blur">'+userLog.ip+'</span>'}</td>
+                <td style="text-align:right">
+                    ${isZarzad ? '' : `<button class="btn-ban ${isBanned ? 'unban-mode' : ''}" onclick="toggleIpBan('${userLog.ip}')">${isBanned ? 'UNBAN' : 'BAN'}</button>`}
+                    <button onclick="deleteUser('${id}')" style="background:none; border:none; color:#222; cursor:pointer; margin-left:10px;">✕</button>
                 </td>
             </tr>`;
         }
@@ -125,16 +126,15 @@ function renderAdmin() {
     db.ref('reports').on('value', snap => {
         const reps = snap.val();
         const cont = document.getElementById('adminReportsContainer');
-        cont.innerHTML = reps ? "" : "<p style='color:#222; font-size:11px;'>Brak raportów.</p>";
+        cont.innerHTML = reps ? "" : "<p style='color:#222; font-size:11px;'>Brak nowych raportów.</p>";
         for(let id in reps) {
-            const payout = calculatePayout(reps[id]);
-            cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid #111; align-items:center;">
+            cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid #111; align-items:center;">
                 <span style="font-size:12px;">${reps[id].user} - <b>${reps[id].type}</b></span>
-                <div style="display:flex; gap:10px; align-items:center;">
-                    <a href="${reps[id].link}" target="_blank" style="color:#444; font-size:10px; text-decoration:none;">[ LINK ]</a>
-                    <span class="payout-badge">${payout}</span>
-                    <button onclick="acceptReport('${id}')" style="color:#2ecc71; background:none; border:1px solid #2ecc71; padding:3px 8px; cursor:pointer; font-size:10px; border-radius:5px;">TAK</button>
-                    <button onclick="rejectReport('${id}')" style="color:#ff4444; background:none; border:1px solid #ff4444; padding:3px 8px; cursor:pointer; font-size:10px; border-radius:5px;">NIE</button>
+                <div style="display:flex; gap:8px;">
+                    <a href="${reps[id].link}" target="_blank" style="color:#444; font-size:10px; text-decoration:none; padding-top:5px;">[ LINK ]</a>
+                    <span class="payout-badge">${calculatePayout(reps[id])}</span>
+                    <button onclick="acceptReport('${id}')" style="color:#2ecc71; background:none; border:1px solid #2ecc71; padding:3px 8px; cursor:pointer; font-size:10px; border-radius:4px;">TAK</button>
+                    <button onclick="rejectReport('${id}')" style="color:#ff4444; background:none; border:1px solid #ff4444; padding:3px 8px; cursor:pointer; font-size:10px; border-radius:4px;">NIE</button>
                 </div>
             </div>`;
         }
@@ -142,7 +142,7 @@ function renderAdmin() {
 }
 
 async function toggleIpBan(ip) {
-    if (ip === "0.0.0.0" || ip === "OFFLINE") return;
+    if (ip === "0.0.0.0" || ip === currentUser.ip) return;
     const cleanIP = ip.replace(/\./g, '_');
     const snap = await db.ref(`bannedIPs/${cleanIP}`).once('value');
     if (snap.exists()) {
@@ -169,24 +169,16 @@ function createUser() {
 async function deleteUser(id) {
     const snap = await db.ref(`accounts/${id}`).once('value');
     const name = snap.val().nick;
-    if (confirm("Usunąć konto " + name + "?")) {
+    if (confirm("Usunąć " + name + "?")) {
         logAction("USUNĄŁ KONTO", name);
         await db.ref(`accounts/${id}`).remove();
     }
 }
 
-function toggleExtraFields() {
-    const type = document.getElementById('reportType').value;
-    document.getElementById('groverPlants').style.display = (type === 'Grover') ? 'block' : 'none';
-    document.getElementById('captKills').style.display = (type === 'Capt') ? 'block' : 'none';
-    document.getElementById('captDmg').style.display = (type === 'Capt') ? 'block' : 'none';
-}
-
 function sendReport() {
     let link = document.getElementById('reportLink').value.trim();
-    if(!link) return alert("Podaj link!");
-    if (!link.startsWith('http://') && !link.startsWith('https://')) link = 'https://' + link;
-
+    if(!link) return alert("Brak linku!");
+    if (!link.startsWith('http')) link = 'https://' + link;
     const data = {
         user: currentUser.nick,
         type: document.getElementById('reportType').value,
@@ -199,7 +191,7 @@ function sendReport() {
         data.val2 = document.getElementById('captDmg').value;
     }
     db.ref('reports').push(data).then(() => {
-        alert("Wysłano!");
+        alert("Raport wysłany!");
         document.getElementById('reportLink').value = "";
     });
 }
@@ -207,15 +199,29 @@ function sendReport() {
 async function acceptReport(id) {
     const snap = await db.ref(`reports/${id}`).once('value');
     const data = snap.val();
-    await db.ref('archive').push({ ...data, payout: calculatePayout(data), status: "ZAAKCEPTOWANO", decider: currentUser.nick, decisionAt: new Date().toLocaleString() });
+    await db.ref('archive').push({ ...data, payout: calculatePayout(data), status: "ZAAKCEPTOWANO", decider: currentUser.nick });
     await db.ref(`reports/${id}`).remove();
 }
 
 async function rejectReport(id) {
     const snap = await db.ref(`reports/${id}`).once('value');
     const data = snap.val();
-    await db.ref('archive').push({ ...data, payout: "0$", status: "ODRZUCONO", decider: currentUser.nick, decisionAt: new Date().toLocaleString() });
+    await db.ref('archive').push({ ...data, payout: "0$", status: "ODRZUCONO", decider: currentUser.nick });
     await db.ref(`reports/${id}`).remove();
+}
+
+function generatePass() {
+    const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+    let pass = "";
+    for (let i = 0; i < 8; i++) pass += chars.charAt(Math.floor(Math.random() * chars.length));
+    document.getElementById('newUserPass').value = pass;
+}
+
+function toggleExtraFields() {
+    const type = document.getElementById('reportType').value;
+    document.getElementById('groverPlants').style.display = (type === 'Grover') ? 'block' : 'none';
+    document.getElementById('captKills').style.display = (type === 'Capt') ? 'block' : 'none';
+    document.getElementById('captDmg').style.display = (type === 'Capt') ? 'block' : 'none';
 }
 
 async function showHistory(nick) {
@@ -230,12 +236,12 @@ async function showHistory(nick) {
             const color = item.status === "ZAAKCEPTOWANO" ? "#2ecc71" : "#ff4444";
             body.innerHTML += `<div style="font-size:11px; padding:10px; border-bottom:1px solid #111; border-left: 3px solid ${color}; margin-bottom: 5px; background: rgba(255,255,255,0.02);">
                 <b style="color:#fff">${item.type}</b> <span style="color:${color}; float:right;">${item.payout}</span><br>
-                <span style="color:#444">${item.timestamp}</span><br>
+                <span style="color:#333">${item.timestamp}</span><br>
                 <a href="${item.link}" target="_blank" style="color:cyan; font-size:10px;">[ ZOBACZ DOWÓD ]</a>
             </div>`;
         }
     }
-    if(!found) body.innerHTML = "<p style='color:#333'>Brak historii.</p>";
+    if(!found) body.innerHTML = "<p style='color:#333; font-size:12px;'>Brak historii dla tego gracza.</p>";
     document.getElementById('historyModal').style.display = 'flex';
 }
 

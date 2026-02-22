@@ -17,7 +17,7 @@
                 <input type="password" id="userPass" placeholder="hasło">
                 <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
-            <p id="loginError" class="error" style="color: #ff4444; font-size: 11px; margin-top: 15px; font-weight: bold;"></p>
+            <p id="loginError" class="error"></p>
         </div>
     </div>
 
@@ -49,7 +49,7 @@
                         <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
                         <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
                     </div>
-                    <input type="text" id="reportLink" placeholder="Link Imgur (np. imgur.com/a/xyz)">
+                    <input type="text" id="reportLink" placeholder="Link Imgur">
                     <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                 </div>
             </section>
@@ -57,6 +57,7 @@
             <section id="tab-pracownicy" class="tab-content card" style="display:none;">
                 <h3 class="card-title">Status Rodziny</h3>
                 <table class="minimal-table">
+                    <thead><tr><th style="width:70%">Konto</th><th style="width:30%; text-align:right;">Rola</th></tr></thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
             </section>
@@ -65,7 +66,7 @@
                 <div class="card">
                     <h3 class="card-title">Zarządzanie kontami</h3>
                     <table class="minimal-table">
-                        <thead><tr><th>User</th><th>IP Address</th><th>Opcje</th></tr></thead>
+                        <thead><tr><th style="width:30%">User</th><th style="width:40%">IP Address</th><th style="width:30%; text-align:right;">Opcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
