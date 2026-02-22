@@ -12,7 +12,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const MASTER = { nick: "rex", pass: "Rex321" };
-let currentUser = { nick: "", ip: "0.0.0.0", role: "USER" };
+let currentUser = { nick: "", ip: "0.0.0.0", role: "Członek" };
 
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(d => currentUser.ip = d.ip);
 
@@ -37,7 +37,7 @@ function calculatePayout(data) {
 async function login() {
     const u = document.getElementById('userName').value;
     const p = document.getElementById('userPass').value;
-    if (u === MASTER.nick && p === MASTER.pass) { setup(MASTER.nick, "ADMIN"); return; }
+    if (u === MASTER.nick && p === MASTER.pass) { setup(MASTER.nick, "Zarząd"); return; }
     db.ref('accounts').once('value', snap => {
         const accs = snap.val();
         let found = null;
@@ -51,7 +51,7 @@ function setup(n, r) {
     currentUser.nick = n; currentUser.role = r;
     document.getElementById('loginPage').style.display = 'none';
     document.getElementById('mainPanel').style.display = 'block';
-    if(r === "ADMIN") document.getElementById('adminTab').style.display = 'inline';
+    if(r === "Zarząd") document.getElementById('adminTab').style.display = 'inline';
     db.ref('logs/' + n).set({ ip: currentUser.ip, role: r, last: new Date().toLocaleString() });
     switchTab('tab-aktywnosc');
 }
@@ -67,7 +67,7 @@ function renderAdmin() {
     db.ref('accounts').on('value', async snap => {
         const accs = snap.val();
         const list = document.getElementById('adminUsersList');
-        list.innerHTML = `<tr><td onclick="showHistory('${MASTER.nick}')" style="cursor:pointer; text-decoration:underline;">${MASTER.nick}</td><td>[ PROT ]</td><td>MASTER</td></tr>`;
+        list.innerHTML = `<tr><td onclick="showHistory('${MASTER.nick}')" style="cursor:pointer; text-decoration:underline;">${MASTER.nick}</td><td>[ PROT ]</td><td>Zarząd</td></tr>`;
         const logsSnap = await db.ref('logs').once('value');
         const logs = logsSnap.val() || {};
         for(let id in accs) {
@@ -178,7 +178,13 @@ function renderPublic() {
     db.ref('accounts').on('value', snap => {
         const accs = snap.val();
         const list = document.getElementById('publicUserList');
-        list.innerHTML = "";
-        for(let id in accs) { list.innerHTML += `<tr><td>${accs[id].nick}</td><td style="color:#333; font-size:10px;">${accs[id].role}</td></tr>`; }
+        list.innerHTML = `<tr><td style="padding: 10px 0;">${MASTER.nick}</td><td style="text-align: right; color:#2ecc71; font-weight: bold; font-size:11px;">Zarząd</td></tr>`;
+        for(let id in accs) { 
+            const roleColor = accs[id].role === "Zarząd" ? "#2ecc71" : "#333";
+            list.innerHTML += `<tr>
+                <td style="padding: 10px 0;">${accs[id].nick}</td>
+                <td style="text-align: right; color:${roleColor}; font-size:11px;">${accs[id].role}</td>
+            </tr>`; 
+        }
     });
 }

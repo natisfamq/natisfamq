@@ -57,7 +57,12 @@
             <section id="tab-pracownicy" class="tab-content card" style="display:none;">
                 <h3 class="card-title">Status Rodziny</h3>
                 <table class="minimal-table">
-                    <thead><tr><th>Konto</th><th>Rola</th></tr></thead>
+                    <thead>
+                        <tr>
+                            <th style="text-align: left; color: #444; font-size: 11px; padding-bottom: 10px;">Konto</th>
+                            <th style="text-align: right; color: #444; font-size: 11px; padding-bottom: 10px;">Rola</th>
+                        </tr>
+                    </thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
             </section>
@@ -76,8 +81,8 @@
                         <input type="text" id="newUserName" placeholder="Nick">
                         <input type="text" id="newUserPass" placeholder="Hasło">
                         <select id="newUserRole">
-                            <option value="USER">Member</option>
-                            <option value="ADMIN">Admin</option>
+                            <option value="Zarząd">Zarząd</option>
+                            <option value="Członek">Członek</option>
                         </select>
                         <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
                     </div>
