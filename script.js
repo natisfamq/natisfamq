@@ -16,6 +16,7 @@ let currentUser = { nick: "", ip: "0.0.0.0", role: "Członek" };
 
 fetch('https://api.ipify.org?format=json').then(res => res.json()).then(d => currentUser.ip = d.ip);
 
+// LOGOWANIE DZIAŁAŃ ADMINA
 function logAction(action, target) {
     db.ref('system_logs').push({
         admin: currentUser.nick,
@@ -23,6 +24,22 @@ function logAction(action, target) {
         target: target,
         timestamp: new Date().toLocaleString()
     });
+}
+
+// OBLICZANIE KASY
+function calculatePayout(data) {
+    let total = 0;
+    const v1 = parseInt(data.val1) || 0; // krzaki lub kille
+    const v2 = parseInt(data.val2) || 0; // dmg
+    
+    if (data.type === "Paczki" || data.type === "Cenna") {
+        total = 10000;
+    } else if (data.type === "Grover") {
+        total = v1 * 1000;
+    } else if (data.type === "Capt") {
+        total = 2500 + (v1 * 1000) + (v2 * 10);
+    }
+    return total.toLocaleString() + "$";
 }
 
 function generatePass() {
@@ -39,7 +56,7 @@ async function login() {
 
     const banSnap = await db.ref('bannedIPs').once('value');
     if (banSnap.val() && banSnap.val()[cleanIP]) {
-        document.getElementById('loginError').innerText = "TWOJE IP JEST ZBANOWANE.";
+        document.getElementById('loginError').innerText = "IP ZBANOWANE.";
         return;
     }
 
@@ -50,7 +67,7 @@ async function login() {
         let found = null;
         for(let id in accs) { if(accs[id].nick === u && accs[id].pass === p) found = accs[id]; }
         if(found) setup(found.nick, found.role);
-        else document.getElementById('loginError').innerText = "Błędne dane logowania.";
+        else document.getElementById('loginError').innerText = "Błędne dane.";
     });
 }
 
@@ -101,12 +118,7 @@ function renderAdmin() {
         logCont.innerHTML = "";
         const sLogs = Object.values(data.system_logs || {}).reverse();
         sLogs.forEach(l => {
-            logCont.innerHTML += `<div class="log-entry">
-                <span class="log-time">[${l.timestamp}]</span> 
-                <span class="log-user">${l.admin}</span> 
-                <span class="log-action">${l.action}</span> 
-                <span class="log-target">${l.target}</span>
-            </div>`;
+            logCont.innerHTML += `<div class="log-entry"><span class="log-time">[${l.timestamp}]</span> <span class="log-user">${l.admin}</span> <span class="log-action">${l.action}</span> <span class="log-target">${l.target}</span></div>`;
         });
     });
 
@@ -115,11 +127,14 @@ function renderAdmin() {
         const cont = document.getElementById('adminReportsContainer');
         cont.innerHTML = reps ? "" : "<p style='color:#222; font-size:11px;'>Brak raportów.</p>";
         for(let id in reps) {
-            cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid #111; align-items:center;">
+            const payout = calculatePayout(reps[id]);
+            cont.innerHTML += `<div style="display:flex; justify-content:space-between; padding:15px 0; border-bottom:1px solid #111; align-items:center;">
                 <span style="font-size:12px;">${reps[id].user} - <b>${reps[id].type}</b></span>
                 <div style="display:flex; gap:10px; align-items:center;">
                     <a href="${reps[id].link}" target="_blank" style="color:#444; font-size:10px; text-decoration:none;">[ LINK ]</a>
-                    <button onclick="acceptReport('${id}')" style="color:green; background:none; border:1px solid green; padding:2px 5px; cursor:pointer;">OK</button>
+                    <span class="payout-badge">${payout}</span>
+                    <button onclick="acceptReport('${id}')" style="color:#2ecc71; background:none; border:1px solid #2ecc71; padding:3px 8px; cursor:pointer; font-size:10px; border-radius:5px;">TAK</button>
+                    <button onclick="rejectReport('${id}')" style="color:#ff4444; background:none; border:1px solid #ff4444; padding:3px 8px; cursor:pointer; font-size:10px; border-radius:5px;">NIE</button>
                 </div>
             </div>`;
         }
@@ -127,7 +142,7 @@ function renderAdmin() {
 }
 
 async function toggleIpBan(ip) {
-    if (ip === "0.0.0.0" || ip === "OFFLINE") return alert("Nieprawidłowe IP.");
+    if (ip === "0.0.0.0" || ip === "OFFLINE") return;
     const cleanIP = ip.replace(/\./g, '_');
     const snap = await db.ref(`bannedIPs/${cleanIP}`).once('value');
     if (snap.exists()) {
@@ -143,9 +158,9 @@ function createUser() {
     const n = document.getElementById('newUserName').value;
     const p = document.getElementById('newUserPass').value;
     const r = document.getElementById('newUserRole').value;
-    if(!n || !p) return alert("Wypełnij dane!");
+    if(!n || !p) return;
     db.ref('accounts').push({ nick: n, pass: p, role: r }).then(() => {
-        logAction("DODAŁ KONTO", n + " (" + r + ")");
+        logAction("DODAŁ KONTO", n);
         document.getElementById('newUserName').value = "";
         document.getElementById('newUserPass').value = "";
     });
@@ -167,15 +182,10 @@ function toggleExtraFields() {
     document.getElementById('captDmg').style.display = (type === 'Capt') ? 'block' : 'none';
 }
 
-// NAPRAWIONA FUNKCJA WYSYŁANIA Z LINKIEM
 function sendReport() {
     let link = document.getElementById('reportLink').value.trim();
     if(!link) return alert("Podaj link!");
-
-    // WYMUSZENIE HTTPS (NAPRAWA BŁĘDU NETLIFY)
-    if (!link.startsWith('http://') && !link.startsWith('https://')) {
-        link = 'https://' + link;
-    }
+    if (!link.startsWith('http://') && !link.startsWith('https://')) link = 'https://' + link;
 
     const data = {
         user: currentUser.nick,
@@ -183,15 +193,13 @@ function sendReport() {
         link: link,
         timestamp: new Date().toLocaleString()
     };
-    
     if(data.type === 'Grover') data.val1 = document.getElementById('groverPlants').value;
     if(data.type === 'Capt') {
         data.val1 = document.getElementById('captKills').value;
         data.val2 = document.getElementById('captDmg').value;
     }
-
     db.ref('reports').push(data).then(() => {
-        alert("Raport wysłany!");
+        alert("Wysłano!");
         document.getElementById('reportLink').value = "";
     });
 }
@@ -199,7 +207,14 @@ function sendReport() {
 async function acceptReport(id) {
     const snap = await db.ref(`reports/${id}`).once('value');
     const data = snap.val();
-    await db.ref('archive').push({ ...data, status: "ZAAKCEPTOWANO", decider: currentUser.nick });
+    await db.ref('archive').push({ ...data, payout: calculatePayout(data), status: "ZAAKCEPTOWANO", decider: currentUser.nick, decisionAt: new Date().toLocaleString() });
+    await db.ref(`reports/${id}`).remove();
+}
+
+async function rejectReport(id) {
+    const snap = await db.ref(`reports/${id}`).once('value');
+    const data = snap.val();
+    await db.ref('archive').push({ ...data, payout: "0$", status: "ODRZUCONO", decider: currentUser.nick, decisionAt: new Date().toLocaleString() });
     await db.ref(`reports/${id}`).remove();
 }
 
@@ -212,9 +227,11 @@ async function showHistory(nick) {
         if (snap.val()[id].user === nick) {
             found = true;
             const item = snap.val()[id];
-            body.innerHTML += `<div style="font-size:11px; padding:8px; border-bottom:1px solid #111; color:#888;">
-                <b style="color:#fff">${item.type}</b> - ${item.timestamp}<br>
-                <a href="${item.link}" target="_blank" style="color:cyan;">DOWÓD</a>
+            const color = item.status === "ZAAKCEPTOWANO" ? "#2ecc71" : "#ff4444";
+            body.innerHTML += `<div style="font-size:11px; padding:10px; border-bottom:1px solid #111; border-left: 3px solid ${color}; margin-bottom: 5px; background: rgba(255,255,255,0.02);">
+                <b style="color:#fff">${item.type}</b> <span style="color:${color}; float:right;">${item.payout}</span><br>
+                <span style="color:#444">${item.timestamp}</span><br>
+                <a href="${item.link}" target="_blank" style="color:cyan; font-size:10px;">[ ZOBACZ DOWÓD ]</a>
             </div>`;
         }
     }

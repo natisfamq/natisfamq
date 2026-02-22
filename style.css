@@ -55,6 +55,8 @@ input, select {
 .btn-ban { background: none; border: 1px solid #222; color: #444; border-radius: 5px; cursor: pointer; padding: 3px 8px; font-size: 10px; }
 .btn-ban.unban-mode { border-color: var(--error); color: var(--error); font-weight: bold; }
 
+.payout-badge { color: var(--money); font-weight: bold; border: 1px solid var(--money); padding: 4px 10px; font-size: 11px; border-radius: 50px; }
+
 .logs-viewport { max-height: 200px; overflow-y: auto; background: #070707; padding: 10px; border-radius: 10px; border: 1px solid #111; }
 .log-entry { font-size: 10px; padding: 4px 0; border-bottom: 1px solid #0d0d0d; display: flex; gap: 8px; }
 .log-time { color: #333; }
