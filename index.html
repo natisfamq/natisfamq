@@ -3,110 +3,87 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NATIS OS // PRIVATE</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <title>NATIS | System Panel</title>
+    <link rel="stylesheet" href="style.css"> <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    <div id="loginPage" class="full-screen">
-        <div class="auth-card">
-            <img src="logo.jpg" alt="NATIS" class="login-logo">
-            <div class="auth-inputs">
-                <input type="text" id="userName" placeholder="użytkownik">
-                <input type="password" id="userPass" placeholder="hasło">
-                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
-            </div>
-            <p id="loginError" class="error"></p>
-        </div>
+
+    <div id="loginPage" class="container">
+        <h2>Panel Systemowy</h2>
+        <input type="text" id="userName" placeholder="Login">
+        <input type="password" id="userPass" placeholder="Hasło">
+        <button onclick="login()">ZALOGUJ SYSTEM</button>
+        <p id="loginError" style="color: red; font-size: 12px;"></p>
     </div>
 
-    <div id="mainPanel" style="display: none;">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="brand">NATIS<span>.OS</span></div>
-                <div class="menu">
-                    <span onclick="switchTab('tab-aktywnosc')">Raporty</span>
-                    <span onclick="switchTab('tab-pracownicy')">Członkowie</span>
-                    <span id="adminTab" style="display:none;" onclick="switchTab('tab-admin')">Admin</span>
-                    <span onclick="location.reload()" class="logout">Wyloguj</span>
-                </div>
-            </div>
+    <div id="mainPanel" class="container" style="display:none;">
+        <nav>
+            <button onclick="switchTab('tab-aktywnosc')">Aktywność</button>
+            <button onclick="switchTab('tab-pracownicy')">Pracownicy</button>
+            <button id="adminTab" onclick="switchTab('tab-admin')" style="display:none; color: gold;">ZARZĄD</button>
         </nav>
 
-        <main class="content">
-            <section id="tab-aktywnosc" class="tab-content card">
-                <h3 class="card-title">Nowy Raport</h3>
-                <div class="form-group">
-                    <select id="reportType" onchange="toggleExtraFields()">
-                        <option value="Paczki">Paczki</option>
-                        <option value="Cenna">Cenna</option>
-                        <option value="Grover">Grover</option>
-                        <option value="Capt">Capt</option>
-                    </select>
-                    <div id="extraFields">
-                        <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
-                        <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
-                        <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
-                    </div>
-                    <input type="text" id="reportLink" placeholder="Link Imgur">
-                    <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
-                </div>
-            </section>
+        <div id="tab-aktywnosc" class="tab-content">
+            <h3>Wyślij Raport (IMGUR ONLY)</h3>
+            <select id="reportType" onchange="toggleExtraFields()">
+                <option value="Paczki">Paczki</option>
+                <option value="Cenna">Cenna</option>
+                <option value="Grover">Grover</option>
+                <option value="Capt">Capt</option>
+            </select>
+            <input type="text" id="reportLink" placeholder="Link do Imgur">
+            <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none;">
+            <input type="number" id="captKills" placeholder="Zabójstwa" style="display:none;">
+            <input type="number" id="captDmg" placeholder="Obrażenia" style="display:none;">
+            <button onclick="sendReport()">WYŚLIJ</button>
+        </div>
 
-            <section id="tab-pracownicy" class="tab-content card" style="display:none;">
-                <h3 class="card-title">Status Rodziny</h3>
-                <table class="minimal-table">
-                    <thead><tr><th style="width:70%">Konto</th><th style="width:30%; text-align:right;">Rola</th></tr></thead>
-                    <tbody id="publicUserList"></tbody>
-                </table>
-            </section>
+        <div id="tab-pracownicy" class="tab-content" style="display:none;">
+            <h3>Lista Pracowników</h3>
+            <table width="100%">
+                <tbody id="publicUserList"></tbody>
+            </table>
+        </div>
 
-            <section id="tab-admin" class="tab-content" style="display:none;">
-                <div class="card">
-                    <h3 class="card-title">Zarządzanie kontami</h3>
-                    <table class="minimal-table">
-                        <thead><tr><th style="width:30%">User</th><th style="width:40%">IP Address</th><th style="width:30%; text-align:right;">Opcje</th></tr></thead>
-                        <tbody id="adminUsersList"></tbody>
-                    </table>
-                </div>
+        <div id="tab-admin" class="tab-content" style="display:none;">
+            <div id="consoleWrapper" style="display:none; background:#000; color:#0f0; padding:10px; font-family:monospace; border-radius: 5px; margin-bottom: 20px;">
+                <div style="font-size: 10px; color: #555; margin-bottom: 5px;">NATIS_OS_CONSOLE v5.0</div>
+                <div id="consoleOutput" style="height:120px; overflow-y:auto; margin-bottom:5px; font-size: 12px;"></div>
+                <input type="text" id="consoleInput" placeholder="Wpisz 'help'..." style="width:100%; background:#111; color:#0f0; border:1px solid #333; outline:none; font-family:monospace;">
+            </div>
 
-                <div class="card mt-15">
-                    <h3 class="card-title">Dodaj Nowego Członka</h3>
-                    <div class="form-inline">
-                        <input type="text" id="newUserName" placeholder="Nick">
-                        <div class="pass-wrapper">
-                            <input type="text" id="newUserPass" placeholder="Hasło">
-                            <button class="dice-btn" onclick="generatePass()">🎲</button>
-                        </div>
-                        <select id="newUserRole">
-                            <option value="Zarząd">Zarząd</option>
-                            <option value="Członek">Członek</option>
-                        </select>
-                        <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
-                    </div>
-                </div>
+            <h3>Zarządzanie kontami</h3>
+            <div style="background: rgba(255,255,255,0.05); padding: 10px; border-radius: 5px;">
+                <input type="text" id="newUserName" placeholder="Nick">
+                <input type="text" id="newUserPass" placeholder="Hasło">
+                <button onclick="generatePass()">LOSUJ</button>
+                <select id="newUserRole">
+                    <option value="Członek">Członek</option>
+                    <option value="Zarząd">Zarząd</option>
+                </select>
+                <button onclick="createUser()">DODAJ KONTO</button>
+            </div>
 
-                <div class="card mt-15">
-                    <h3 class="card-title">Oczekujące Raporty</h3>
-                    <div id="adminReportsContainer"></div>
-                </div>
+            <h4>Aktywne konta / Logi IP</h4>
+            <table width="100%" id="adminUsersList"></table>
 
-                <div class="card mt-15">
-                    <h3 class="card-title">Dziennik Zdarzeń</h3>
-                    <div id="systemLogsContainer" class="logs-viewport"></div>
-                </div>
-            </section>
-        </main>
-    </div>
+            <h4>Oczekujące raporty</h4>
+            <div id="adminReportsContainer"></div>
 
-    <div id="historyModal" class="modal" style="display:none;">
-        <div class="modal-content card">
-            <h3 id="historyTitle" class="card-title">Historia</h3>
-            <div id="historyBody"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
+            <h4>Logi systemowe</h4>
+            <div id="systemLogsContainer" style="font-size: 10px; background: #000; padding: 10px; max-height: 200px; overflow-y: auto;"></div>
         </div>
     </div>
+
+    <div id="historyModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.9); align-items:center; justify-content:center; z-index:999;">
+        <div style="background:#111; padding:20px; width:90%; max-width:500px; border-radius:10px;">
+            <h3 id="historyTitle">Historia gracza</h3>
+            <div id="historyBody" style="max-height:400px; overflow-y:auto;"></div>
+            <button onclick="closeHistory()" style="margin-top:10px;">ZAMKNIJ</button>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>
