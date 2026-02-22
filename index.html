@@ -17,7 +17,7 @@
                 <input type="password" id="userPass" placeholder="hasło">
                 <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
-            <p id="loginError" class="error" style="color: #ff4444; font-size: 11px; margin-top: 15px; font-weight: bold;"></p>
+            <p id="loginError" class="error"></p>
         </div>
     </div>
 
@@ -57,12 +57,6 @@
             <section id="tab-pracownicy" class="tab-content card" style="display:none;">
                 <h3 class="card-title">Status Rodziny</h3>
                 <table class="minimal-table">
-                    <thead>
-                        <tr>
-                            <th style="text-align: left; color: #444; font-size: 11px; padding-bottom: 10px;">Konto</th>
-                            <th style="text-align: right; color: #444; font-size: 11px; padding-bottom: 10px;">Rola</th>
-                        </tr>
-                    </thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
             </section>
@@ -75,13 +69,14 @@
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
+
                 <div class="card mt-15">
                     <h3 class="card-title">Dodaj Nowego Członka</h3>
                     <div class="form-inline">
                         <input type="text" id="newUserName" placeholder="Nick">
                         <div class="pass-wrapper">
                             <input type="text" id="newUserPass" placeholder="Hasło">
-                            <button class="dice-btn" onclick="generatePass()" title="Losuj hasło">🎲</button>
+                            <button class="dice-btn" onclick="generatePass()">🎲</button>
                         </div>
                         <select id="newUserRole">
                             <option value="Zarząd">Zarząd</option>
@@ -90,9 +85,15 @@
                         <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
                     </div>
                 </div>
+
                 <div class="card mt-15">
-                    <h3 class="card-title">Raporty (Kwoty do wypłaty)</h3>
+                    <h3 class="card-title">Oczekujące Raporty</h3>
                     <div id="adminReportsContainer"></div>
+                </div>
+
+                <div class="card mt-15">
+                    <h3 class="card-title">Dziennik Zdarzeń</h3>
+                    <div id="systemLogsContainer" class="logs-viewport"></div>
                 </div>
             </section>
         </main>
@@ -100,11 +101,12 @@
 
     <div id="historyModal" class="modal" style="display:none;">
         <div class="modal-content card">
-            <h3 id="historyTitle" class="card-title" style="color:#fff; margin-top:0;">Historia</h3>
-            <div id="historyBody" class="history-list"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
+            <h3 id="historyTitle" class="card-title">Historia</h3>
+            <div id="historyBody"></div>
+            <button class="btn-action" onclick="closeHistory()">ZAMKNIJ</button>
         </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>

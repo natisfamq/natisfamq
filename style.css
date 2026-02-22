@@ -13,9 +13,9 @@
 }
 
 body { background-color: var(--bg); color: var(--text); font-family: 'Geist Mono', monospace; margin: 0; }
-.login-logo { width: 150px; border-radius: var(--radius); margin-bottom: 20px; }
 .full-screen { height: 100vh; display: flex; justify-content: center; align-items: center; }
 .auth-card { width: 300px; text-align: center; }
+.login-logo { width: 150px; border-radius: var(--radius); margin-bottom: 20px; }
 
 input, select { 
     width: 100%; background: var(--card-bg); border: 1px solid var(--border); 
@@ -26,47 +26,43 @@ input, select {
 
 .pass-wrapper { position: relative; width: 100%; }
 .dice-btn { 
-    position: absolute; right: 10px; top: 12px; background: none; border: none; 
+    position: absolute; right: 10px; top: 11px; background: none; border: none; 
     color: var(--dim); cursor: pointer; font-size: 16px;
 }
+.dice-btn:hover { color: #fff; }
 
 .btn-primary, .btn-action { 
     width: 100%; padding: 12px; background: var(--accent); color: #000; 
     border: none; font-weight: 700; cursor: pointer; font-size: 11px; 
-    border-radius: var(--radius);
+    border-radius: var(--radius); text-transform: uppercase;
 }
 
 .navbar { border-bottom: 1px solid var(--border); padding: 20px 0; background: #000; }
 .nav-container { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 20px; }
-.brand { font-weight: 700; font-size: 14px; }
-.menu span { cursor: pointer; color: var(--dim); padding: 8px 15px; }
+.brand { font-weight: 700; }
+.menu span { cursor: pointer; color: var(--dim); padding: 8px 15px; transition: 0.3s; }
+.menu span:hover { color: #fff; }
 
 .content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
 .card { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; margin-bottom: 15px; border-radius: 20px; }
+.card-title { margin-top: 0; font-size: 14px; color: var(--dim); text-transform: uppercase; margin-bottom: 20px; }
 
 .minimal-table { width: 100%; border-collapse: collapse; }
 .minimal-table td { padding: 12px 0; font-size: 13px; border-bottom: 1px solid #0d0d0d; }
 
-.ip-blur { filter: blur(5px); transition: 0.3s ease; cursor: help; display: inline-block; }
+.ip-blur { filter: blur(5px); cursor: help; }
 .ip-blur:hover { filter: blur(0); }
 
-/* STYLE DLA PRZYCISKU BANA */
-.btn-ban { 
-    background: none; border: 1px solid #333; color: #444; 
-    border-radius: 5px; cursor: pointer; padding: 3px 8px; font-size: 10px; 
-    transition: 0.3s;
-}
-.btn-ban.unban-mode { 
-    border-color: var(--error); color: var(--error); 
-    font-weight: bold;
-}
-.btn-ban.unban-mode:hover {
-    background: var(--error); color: #000;
-}
+.btn-ban { background: none; border: 1px solid #222; color: #444; border-radius: 5px; cursor: pointer; padding: 3px 8px; font-size: 10px; }
+.btn-ban.unban-mode { border-color: var(--error); color: var(--error); font-weight: bold; }
 
-.payout-badge { color: var(--money); font-weight: bold; border: 1px solid var(--money); padding: 4px 10px; font-size: 11px; border-radius: 50px; }
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 1000; justify-content: center; align-items: center; }
-.modal-content { width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; padding: 30px; border-radius: 25px; }
-.history-item { background: rgba(255,255,255,0.02); padding: 15px; border-radius: 15px; margin-bottom: 12px; font-size: 12px; border: 1px solid #111; }
-.logout { color: #662222 !important; }
+.logs-viewport { max-height: 200px; overflow-y: auto; background: #070707; padding: 10px; border-radius: 10px; }
+.log-entry { font-size: 10px; padding: 4px 0; border-bottom: 1px solid #0d0d0d; display: flex; gap: 8px; }
+.log-time { color: #333; }
+.log-user { color: #fff; }
+.log-action { color: #888; }
+
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
+.modal-content { width: 90%; max-width: 500px; }
+.logout { color: #ff4444 !important; }
 .mt-15 { margin-top: 15px; }
