@@ -29,7 +29,6 @@ input, select {
     position: absolute; right: 10px; top: 11px; background: none; border: none; 
     color: var(--dim); cursor: pointer; font-size: 16px;
 }
-.dice-btn:hover { color: #fff; }
 
 .btn-primary, .btn-action { 
     width: 100%; padding: 12px; background: var(--accent); color: #000; 
@@ -39,30 +38,30 @@ input, select {
 
 .navbar { border-bottom: 1px solid var(--border); padding: 20px 0; background: #000; }
 .nav-container { max-width: 800px; margin: 0 auto; display: flex; justify-content: space-between; padding: 0 20px; }
-.brand { font-weight: 700; }
+.brand { font-weight: 700; font-size: 14px; }
 .menu span { cursor: pointer; color: var(--dim); padding: 8px 15px; transition: 0.3s; }
 .menu span:hover { color: #fff; }
 
 .content { max-width: 800px; margin: 40px auto; padding: 0 20px; }
 .card { background: var(--card-bg); border: 1px solid var(--border); padding: 25px; margin-bottom: 15px; border-radius: 20px; }
-.card-title { margin-top: 0; font-size: 14px; color: var(--dim); text-transform: uppercase; margin-bottom: 20px; }
+.card-title { margin-top: 0; font-size: 12px; color: var(--dim); text-transform: uppercase; letter-spacing: 1px; }
 
 .minimal-table { width: 100%; border-collapse: collapse; }
 .minimal-table td { padding: 12px 0; font-size: 13px; border-bottom: 1px solid #0d0d0d; }
 
-.ip-blur { filter: blur(5px); cursor: help; }
+.ip-blur { filter: blur(5px); transition: 0.3s ease; cursor: help; }
 .ip-blur:hover { filter: blur(0); }
 
 .btn-ban { background: none; border: 1px solid #222; color: #444; border-radius: 5px; cursor: pointer; padding: 3px 8px; font-size: 10px; }
 .btn-ban.unban-mode { border-color: var(--error); color: var(--error); font-weight: bold; }
 
-.logs-viewport { max-height: 200px; overflow-y: auto; background: #070707; padding: 10px; border-radius: 10px; }
+.logs-viewport { max-height: 200px; overflow-y: auto; background: #070707; padding: 10px; border-radius: 10px; border: 1px solid #111; }
 .log-entry { font-size: 10px; padding: 4px 0; border-bottom: 1px solid #0d0d0d; display: flex; gap: 8px; }
 .log-time { color: #333; }
-.log-user { color: #fff; }
+.log-user { color: #fff; font-weight: bold; }
 .log-action { color: #888; }
 
-.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 100; justify-content: center; align-items: center; }
-.modal-content { width: 90%; max-width: 500px; }
+.modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); z-index: 100; justify-content: center; align-items: center; }
+.modal-content { width: 90%; max-width: 500px; max-height: 80vh; overflow-y: auto; }
 .logout { color: #ff4444 !important; }
 .mt-15 { margin-top: 15px; }

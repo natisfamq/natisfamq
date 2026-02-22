@@ -17,7 +17,7 @@
                 <input type="password" id="userPass" placeholder="hasło">
                 <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
-            <p id="loginError" class="error"></p>
+            <p id="loginError" class="error" style="color: #ff4444; font-size: 11px; margin-top: 15px; font-weight: bold;"></p>
         </div>
     </div>
 
@@ -49,7 +49,7 @@
                         <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
                         <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
                     </div>
-                    <input type="url" id="reportLink" placeholder="Link Imgur (Dowód)">
+                    <input type="text" id="reportLink" placeholder="Link Imgur (np. imgur.com/a/xyz)">
                     <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                 </div>
             </section>
@@ -103,10 +103,9 @@
         <div class="modal-content card">
             <h3 id="historyTitle" class="card-title">Historia</h3>
             <div id="historyBody"></div>
-            <button class="btn-action" onclick="closeHistory()">ZAMKNIJ</button>
+            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>
