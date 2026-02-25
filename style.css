@@ -1,214 +1,166 @@
-/* --- 1. Global Setup --- */
+/* --- 1. Variables & Global Depth --- */
 :root {
-    --bg-color: #050505;
-    --card-bg: rgba(20, 20, 20, 0.8);
-    --accent: #00ff88; /* Cyber Green */
-    --accent-dim: rgba(0, 255, 136, 0.1);
-    --text-main: #e0e0e0;
-    --text-dim: #888;
-    --border: 1px solid rgba(255, 255, 255, 0.08);
-    --radius: 8px;
-    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --glass-shimmer: rgba(255, 255, 255, 0.05);
+    --accent: #00ff88; /* Matrix/Cyber Green */
+    --text-primary: #ffffff;
+    --text-secondary: rgba(255, 255, 255, 0.6);
+    --bg-depth: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-main);
-    overflow-x: hidden;
+    background: var(--bg-depth);
+    background-attachment: fixed;
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, sans-serif;
+    min-height: 100vh;
 }
 
-/* --- 2. Login Page (Auth Card) --- */
+/* --- 2. The Glass Effect --- */
+.auth-card, .card, .navbar, .modal-content {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px); /* Safari support */
+    border: 1px solid var(--glass-border) !important;
+    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+}
+
+/* --- 3. Login Page Specifics --- */
 .full-screen {
     height: 100vh;
     display: flex;
-    align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at center, #111 0%, #050505 100%);
+    align-items: center;
 }
 
 .auth-card {
-    background: var(--card-bg);
-    padding: 40px;
-    border-radius: var(--radius);
-    border: var(--border);
+    padding: 3rem;
+    border-radius: 24px;
+    width: 380px;
     text-align: center;
-    width: 100%;
-    max-width: 380px;
-    backdrop-filter: blur(10px);
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
 }
 
 .login-logo {
-    width: 80px;
-    height: 80px;
+    width: 100px;
+    filter: drop-shadow(0 0 15px var(--accent));
+    margin-bottom: 1.5rem;
     border-radius: 50%;
-    margin-bottom: 20px;
-    border: 2px solid var(--accent);
-    filter: drop-shadow(0 0 10px var(--accent-dim));
 }
 
-.brand span {
-    color: var(--accent);
-    text-transform: uppercase;
-    font-weight: 800;
-}
-
-/* --- 3. Inputs & Buttons --- */
-input, select {
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 15px;
-    background: #000;
-    border: var(--border);
-    border-radius: 4px;
-    color: #fff;
-    transition: 0.3s;
-}
-
-input:focus {
-    outline: none;
-    border-color: var(--accent);
-    box-shadow: 0 0 10px var(--accent-dim);
-}
-
-.btn-primary, .btn-action {
-    width: 100%;
-    padding: 12px;
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: 4px;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: 0.2s;
-}
-
-.btn-primary:hover, .btn-action:hover {
-    filter: brightness(1.2);
-    transform: translateY(-1px);
-}
-
-/* --- 4. Main Panel & Navigation --- */
+/* --- 4. Navigation (Floating Glass) --- */
 .navbar {
-    background: rgba(0, 0, 0, 0.8);
-    border-bottom: var(--border);
-    padding: 15px 0;
+    margin: 20px auto;
+    width: 95%;
+    max-width: 1100px;
+    border-radius: 100px; /* Pill shape */
+    padding: 10px 30px;
     position: sticky;
-    top: 0;
-    z-index: 100;
-    backdrop-filter: blur(10px);
+    top: 20px;
+    z-index: 1000;
 }
 
 .nav-container {
-    max-width: 1100px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 20px;
 }
 
 .menu span {
-    margin-left: 20px;
+    color: var(--text-secondary);
+    margin-left: 25px;
     cursor: pointer;
-    font-size: 14px;
-    color: var(--text-dim);
-    transition: 0.2s;
+    font-size: 0.9rem;
+    font-weight: 500;
+    transition: 0.3s;
 }
 
 .menu span:hover {
     color: var(--accent);
+    text-shadow: 0 0 8px var(--accent);
 }
 
-.logout {
-    color: #ff4444 !important;
+/* --- 5. Inputs & Interactive Elements --- */
+input, select {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--glass-border);
+    border-radius: 12px;
+    padding: 12px 15px;
+    color: white;
+    margin-bottom: 15px;
+    transition: all 0.3s ease;
 }
 
-/* --- 5. Content & Cards --- */
+input:focus {
+    outline: none;
+    background: rgba(255, 255, 255, 0.1);
+    border-color: var(--accent);
+}
+
+.btn-primary, .btn-action {
+    background: var(--accent);
+    color: #000;
+    border: none;
+    border-radius: 12px;
+    font-weight: 800;
+    padding: 14px;
+    cursor: pointer;
+    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.btn-primary:hover, .btn-action:hover {
+    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
+    transform: scale(1.02);
+}
+
+/* --- 6. Content Section --- */
 .content {
     max-width: 1100px;
-    margin: 30px auto;
+    margin: 60px auto;
     padding: 0 20px;
 }
 
 .card {
-    background: var(--card-bg);
-    border: var(--border);
-    border-radius: var(--radius);
-    padding: 25px;
-    margin-bottom: 20px;
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 25px;
 }
 
 .card-title {
-    font-size: 12px;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    color: var(--text-dim);
+    letter-spacing: 3px;
+    color: var(--accent);
     margin-bottom: 20px;
-    border-left: 3px solid var(--accent);
-    padding-left: 10px;
 }
 
-/* --- 6. Tables & Lists --- */
+/* --- 7. Table Styling --- */
 .minimal-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 .minimal-table th {
+    color: var(--text-secondary);
+    font-size: 0.8rem;
     text-align: left;
-    font-size: 12px;
-    color: var(--text-dim);
-    padding-bottom: 10px;
-    border-bottom: var(--border);
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--glass-border);
 }
 
 .minimal-table td {
-    padding: 12px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.03);
-    font-size: 14px;
-}
-
-/* --- 7. Terminal Section --- */
-.logs-viewport {
-    font-family: var(--font-mono);
-    overflow-y: auto;
-    padding: 10px;
-    border-radius: 4px;
-}
-
-#consoleInput {
-    font-family: var(--font-mono);
+    padding: 15px 0;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
 }
 
 /* --- 8. Modals --- */
 .modal {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0,0,0,0.9);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(5px);
 }
-
-.modal-content {
-    width: 90%;
-    max-width: 600px;
-}
-
-/* Utilities */
-.mt-15 { margin-top: 15px; }
-.error { color: #ff4444; font-size: 12px; margin-top: 10px; }
