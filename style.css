@@ -1,160 +1,310 @@
-/* NATIS OS // PRIVATE 
-   FINAL NOIR REFINEMENT
-*/
+/* =========================
+   NATIS OS // PRIVATE UI
+   Advanced Glass System
+========================= */
 
 :root {
-    --bg-pure: #000000;
-    --text-main: #ffffff;
-    --text-dim: rgba(255, 255, 255, 0.5);
-    --glass-bg: rgba(255, 255, 255, 0.04);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --radius-lg: 28px;
-    --radius-md: 16px;
-    --font-main: 'Inter', system-ui, -apple-system, sans-serif;
+    --bg-dark: #0f111a;
+    --bg-card: rgba(255, 255, 255, 0.06);
+    --bg-card-strong: rgba(255, 255, 255, 0.12);
+    --border-glass: rgba(255, 255, 255, 0.15);
+    --primary: #5b8cff;
+    --primary-glow: rgba(91, 140, 255, 0.6);
+    --danger: #ff4d6d;
+    --success: #00ff99;
+    --text-main: #e6e9f2;
+    --text-muted: #9aa4c7;
 }
+
+/* =========================
+   GLOBAL
+========================= */
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-font-smoothing: antialiased;
+    font-family: "Segoe UI", system-ui, -apple-system, sans-serif;
 }
 
 body {
-    background-color: var(--bg-pure);
-    color: var(--text-main);
-    font-family: var(--font-main);
     min-height: 100vh;
+    background: radial-gradient(circle at 20% 20%, #1b1f3a, #0f111a 60%);
+    color: var(--text-main);
+    overflow-x: hidden;
 }
 
-/* --- 1. LOGIN PAGE (Centering & Logo Fix) --- */
-#loginPage.full-screen {
-    display: flex;
-    justify-content: center;
-    align-items: center;
+/* Animated background overlay */
+body::before {
+    content: "";
     position: fixed;
     inset: 0;
-    z-index: 1000;
-    background: #000;
+    background: linear-gradient(130deg, #5b8cff33, #00ffcc22, #ff4d6d22);
+    background-size: 300% 300%;
+    animation: gradientShift 12s ease infinite;
+    z-index: -1;
+    filter: blur(120px);
+}
+
+@keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* =========================
+   GLASS CARD
+========================= */
+
+.card,
+.auth-card,
+.modal-content {
+    background: var(--bg-card);
+    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px);
+    border: 1px solid var(--border-glass);
+    border-radius: 20px;
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.6),
+        inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+    padding: 25px;
+    transition: 0.3s ease;
+}
+
+.card:hover,
+.auth-card:hover {
+    background: var(--bg-card-strong);
+    transform: translateY(-4px);
+    box-shadow:
+        0 12px 40px rgba(0, 0, 0, 0.7),
+        0 0 20px var(--primary-glow);
+}
+
+/* =========================
+   LOGIN PAGE
+========================= */
+
+.full-screen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100vh;
 }
 
 .auth-card {
-    background: var(--glass-bg) !important;
-    backdrop-filter: blur(30px);
-    border: 1px solid var(--glass-border) !important;
-    padding: 40px !important;
-    width: 90%;
-    max-width: 400px;
-    border-radius: var(--radius-lg);
-    display: flex;
-    flex-direction: column;
-    align-items: center; /* Centers items inside the card */
-    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    width: 380px;
+    text-align: center;
 }
 
-/* FIXED MASSIVE LOGO */
 .login-logo {
-    width: 100px;  /* Controlled size */
-    height: 100px; /* Controlled size */
-    object-fit: cover;
-    margin-bottom: 25px;
-    border-radius: 12px;
-    border: 1px solid var(--glass-border);
+    width: 90px;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 0 10px var(--primary));
 }
 
 .brand {
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.3em;
-    margin-bottom: 30px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-size: 20px;
-    width: 100%;
+    font-weight: 600;
+    letter-spacing: 1px;
 }
 
 .brand span {
-    background: var(--text-main);
-    color: var(--bg-pure);
-    padding: 2px 10px;
-    margin-left: 12px;
-    border-radius: 6px;
+    color: var(--primary);
+    text-shadow: 0 0 12px var(--primary-glow);
 }
 
-/* --- 2. INPUTS & BLACK DROPDOWNS --- */
-input, select, option {
+/* =========================
+   INPUTS
+========================= */
+
+input, select {
     width: 100%;
-    background: #000000 !important; /* Fix for white background */
-    border: 1px solid var(--glass-border) !important;
-    padding: 16px 20px;
-    margin-bottom: 15px;
-    color: #fff !important;
-    font-size: 14px;
-    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    margin-bottom: 14px;
+    border-radius: 12px;
+    border: 1px solid var(--border-glass);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-main);
+    outline: none;
+    transition: 0.2s ease;
 }
 
-/* --- 3. CENTERED USER LIST & TABLES --- */
-.content {
-    max-width: 1100px;
-    margin: 60px auto;
-    padding: 0 20px;
+input:focus,
+select:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 12px var(--primary-glow);
 }
 
-.card {
-    background: var(--glass-bg);
-    border: 1px solid var(--glass-border);
-    padding: 35px;
-    margin-bottom: 25px;
-    border-radius: var(--radius-lg);
+/* =========================
+   BUTTONS
+========================= */
+
+button {
+    cursor: pointer;
+    border: none;
+    border-radius: 12px;
+    padding: 12px 16px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+    transition: 0.25s ease;
 }
 
-.minimal-table {
-    width: 100%;
-    border-collapse: collapse;
+.btn-primary,
+.btn-action {
+    background: linear-gradient(135deg, var(--primary), #7c4dff);
+    color: white;
+    box-shadow: 0 0 15px var(--primary-glow);
 }
 
-/* Centering the user list headers and rows */
-.minimal-table th, 
-.minimal-table td {
-    text-align: center !important; 
-    padding: 15px 10px;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
+.btn-primary:hover,
+.btn-action:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 25px var(--primary);
 }
 
-.minimal-table th {
-    color: var(--text-dim);
-    font-size: 11px;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+.logout {
+    color: var(--danger);
 }
 
-/* --- 4. NAVIGATION --- */
+.logout:hover {
+    text-shadow: 0 0 10px var(--danger);
+}
+
+/* =========================
+   NAVBAR
+========================= */
+
 .navbar {
-    margin-top: 20px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    width: 95%;
-    max-width: 1100px;
-    margin-left: auto;
-    margin-right: auto;
-    border-radius: 50px;
-    padding: 12px 30px;
+    background: rgba(15, 17, 26, 0.6);
+    backdrop-filter: blur(14px);
+    border-bottom: 1px solid var(--border-glass);
+    padding: 14px 0;
 }
 
 .nav-container {
+    width: 92%;
+    margin: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
 .menu span {
-    font-size: 12px;
-    font-weight: 600;
-    margin-left: 20px;
-    color: var(--text-dim);
+    margin-left: 25px;
     cursor: pointer;
+    color: var(--text-muted);
+    transition: 0.2s;
 }
 
-.logout { color: #ff4444 !important; }
+.menu span:hover {
+    color: var(--primary);
+    text-shadow: 0 0 8px var(--primary-glow);
+}
+
+/* =========================
+   CONTENT
+========================= */
+
+.content {
+    width: 92%;
+    margin: 30px auto;
+}
+
+.tab-content {
+    animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* =========================
+   TABLE
+========================= */
+
+.minimal-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.minimal-table th,
+.minimal-table td {
+    padding: 12px;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+}
+
+.minimal-table tr:hover {
+    background: rgba(255,255,255,0.05);
+}
+
+/* =========================
+   TERMINAL
+========================= */
+
+.logs-viewport {
+    background: rgba(0, 0, 0, 0.7);
+    backdrop-filter: blur(10px);
+    border-radius: 12px;
+    padding: 10px;
+    font-family: monospace;
+    font-size: 12px;
+    overflow-y: auto;
+    max-height: 200px;
+}
+
+/* =========================
+   MODAL
+========================= */
+
+.modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* =========================
+   UTILITIES
+========================= */
+
+.mt-15 {
+    margin-top: 15px;
+}
+
+.form-inline {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.pass-wrapper {
+    display: flex;
+    gap: 5px;
+}
+
+.dice-btn {
+    background: rgba(255,255,255,0.1);
+    backdrop-filter: blur(10px);
+}
+
+.error {
+    color: var(--danger);
+    font-size: 13px;
+    margin-top: 5px;
+}
+
+/* =========================
+   SCROLLBAR
+========================= */
+
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(var(--primary), #7c4dff);
+    border-radius: 20px;
+}
