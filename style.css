@@ -1,166 +1,254 @@
-/* --- 1. Variables & Global Depth --- */
+/* --- 1. ARCHITECTURAL LAYER (Root & Global) --- */
 :root {
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --glass-shimmer: rgba(255, 255, 255, 0.05);
-    --accent: #00ff88; /* Matrix/Cyber Green */
-    --text-primary: #ffffff;
-    --text-secondary: rgba(255, 255, 255, 0.6);
-    --bg-depth: radial-gradient(circle at 50% 50%, #1a1a1a 0%, #050505 100%);
+    /* Pure Monochrome Scale */
+    --p-0: #000000;
+    --p-100: #ffffff;
+    
+    /* Functional Opacities */
+    --glass-surface: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    --glass-shine: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
+    
+    /* Layout Variables */
+    --sys-gap: clamp(10px, 2vw, 24px);
+    --sys-radius: 12px;
+    --sys-blur: 25px;
+    
+    /* Animation Timing */
+    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
+    cursor: crosshair; /* Advanced OS feel */
 }
 
 body {
-    background: var(--bg-depth);
-    background-attachment: fixed;
-    color: var(--text-primary);
-    font-family: 'Inter', -apple-system, sans-serif;
-    min-height: 100vh;
+    background: var(--p-0);
+    color: var(--p-100);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.5;
+    -webkit-font-smoothing: antialiased;
+    overflow-x: hidden;
 }
 
-/* --- 2. The Glass Effect --- */
-.auth-card, .card, .navbar, .modal-content {
-    background: var(--glass-bg) !important;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px); /* Safari support */
+/* --- 2. DEPTH & ATMOSPHERE (Background) --- */
+body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    background: 
+        radial-gradient(circle at 50% -20%, rgba(255,255,255,0.08) 0%, transparent 50%),
+        repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 2px);
+    background-size: 100% 100%, 100% 3px;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* --- 3. COMPONENT ARCHITECTURE (Glassmorphism) --- */
+.card, .navbar, .auth-card, .modal-content {
+    position: relative;
+    background: var(--glass-surface) !important;
+    backdrop-filter: blur(var(--sys-blur)) saturate(0%);
+    -webkit-backdrop-filter: blur(var(--sys-blur)) saturate(0%);
     border: 1px solid var(--glass-border) !important;
-    box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.8);
+    border-radius: var(--sys-radius);
+    overflow: hidden;
+    z-index: 2;
 }
 
-/* --- 3. Login Page Specifics --- */
-.full-screen {
-    height: 100vh;
+/* Subtle Shimmer Overlay */
+.card::after, .auth-card::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: var(--glass-shine);
+    pointer-events: none;
+}
+
+/* --- 4. NAVIGATION (Floating Interface) --- */
+.navbar {
+    margin: var(--sys-gap) auto;
+    width: calc(100% - (var(--sys-gap) * 2));
+    max-width: 1200px;
+    padding: 12px 24px;
+    position: sticky;
+    top: var(--sys-gap);
     display: flex;
     justify-content: center;
-    align-items: center;
-}
-
-.auth-card {
-    padding: 3rem;
-    border-radius: 24px;
-    width: 380px;
-    text-align: center;
-}
-
-.login-logo {
-    width: 100px;
-    filter: drop-shadow(0 0 15px var(--accent));
-    margin-bottom: 1.5rem;
-    border-radius: 50%;
-}
-
-/* --- 4. Navigation (Floating Glass) --- */
-.navbar {
-    margin: 20px auto;
-    width: 95%;
-    max-width: 1100px;
-    border-radius: 100px; /* Pill shape */
-    padding: 10px 30px;
-    position: sticky;
-    top: 20px;
-    z-index: 1000;
 }
 
 .nav-container {
+    width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
 }
 
+.menu {
+    display: flex;
+    gap: 24px;
+}
+
 .menu span {
-    color: var(--text-secondary);
-    margin-left: 25px;
-    cursor: pointer;
-    font-size: 0.9rem;
-    font-weight: 500;
-    transition: 0.3s;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--p-100);
+    opacity: 0.5;
+    transition: opacity 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo);
 }
 
 .menu span:hover {
-    color: var(--accent);
-    text-shadow: 0 0 8px var(--accent);
+    opacity: 1;
+    transform: translateY(-1px);
 }
 
-/* --- 5. Inputs & Interactive Elements --- */
+/* --- 5. AUTHENTICATION (The Login Portal) --- */
+.auth-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 48px;
+    box-shadow: 0 40px 100px rgba(0,0,0,1);
+    animation: fadeInScale 0.8s var(--ease-out-expo);
+}
+
+.login-logo {
+    width: 64px;
+    height: 64px;
+    border: 1px solid var(--p-100);
+    padding: 4px;
+    margin-bottom: 32px;
+    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+}
+
+.brand {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    margin-bottom: 40px;
+}
+
+.brand span {
+    background: var(--p-100);
+    color: var(--p-0);
+    padding: 2px 8px;
+}
+
+/* --- 6. DATA & INPUTS (High Contrast) --- */
 input, select {
-    background: rgba(255, 255, 255, 0.05);
+    width: 100%;
+    background: rgba(255,255,255,0.03);
     border: 1px solid var(--glass-border);
-    border-radius: 12px;
-    padding: 12px 15px;
-    color: white;
-    margin-bottom: 15px;
-    transition: all 0.3s ease;
+    border-radius: 4px;
+    padding: 14px;
+    color: var(--p-100);
+    font-family: 'JetBrains Mono', monospace; /* Technical feel */
+    font-size: 12px;
+    margin-bottom: 16px;
+    transition: all 0.2s ease;
 }
 
 input:focus {
     outline: none;
-    background: rgba(255, 255, 255, 0.1);
-    border-color: var(--accent);
+    border-color: var(--p-100);
+    background: rgba(255,255,255,0.08);
 }
 
 .btn-primary, .btn-action {
-    background: var(--accent);
-    color: #000;
-    border: none;
-    border-radius: 12px;
-    font-weight: 800;
-    padding: 14px;
-    cursor: pointer;
-    transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background: var(--p-100);
+    color: var(--p-0);
+    border: 1px solid var(--p-100);
+    padding: 16px;
+    font-weight: 900;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    border-radius: 4px;
+    width: 100%;
+    transition: all 0.4s var(--ease-out-expo);
 }
 
-.btn-primary:hover, .btn-action:hover {
-    box-shadow: 0 0 20px rgba(0, 255, 136, 0.4);
-    transform: scale(1.02);
+.btn-primary:hover {
+    background: transparent;
+    color: var(--p-100);
+    box-shadow: 0 0 30px rgba(255,255,255,0.1);
 }
 
-/* --- 6. Content Section --- */
+/* --- 7. CONTENT STRUCTURE (Bento Depth) --- */
 .content {
-    max-width: 1100px;
-    margin: 60px auto;
-    padding: 0 20px;
-}
-
-.card {
-    border-radius: 20px;
-    padding: 30px;
-    margin-bottom: 25px;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 var(--sys-gap);
 }
 
 .card-title {
-    font-size: 0.75rem;
+    font-size: 10px;
+    font-weight: 800;
+    color: var(--p-100);
     text-transform: uppercase;
-    letter-spacing: 3px;
-    color: var(--accent);
-    margin-bottom: 20px;
+    letter-spacing: 0.4em;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
 }
 
-/* --- 7. Table Styling --- */
+.card-title::after {
+    content: "";
+    height: 1px;
+    flex-grow: 1;
+    background: var(--glass-border);
+}
+
+/* --- 8. TERMINAL SYSTEM (Hardware Emulation) --- */
+#terminalSection {
+    background: #000 !important;
+    border: 1px solid #333 !important;
+    box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
+}
+
+.logs-viewport {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    line-height: 1.8;
+    color: rgba(255,255,255,0.7);
+}
+
+/* --- 9. TABLES --- */
 .minimal-table {
     width: 100%;
     border-collapse: collapse;
 }
 
 .minimal-table th {
-    color: var(--text-secondary);
-    font-size: 0.8rem;
     text-align: left;
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--glass-border);
+    font-size: 10px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    padding: 12px 0;
+    border-bottom: 2px solid var(--p-100);
 }
 
 .minimal-table td {
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+    padding: 16px 0;
+    border-bottom: 1px solid var(--glass-border);
+    font-size: 13px;
 }
 
-/* --- 8. Modals --- */
-.modal {
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(5px);
+/* --- 10. ANIMATIONS --- */
+@keyframes fadeInScale {
+    from { opacity: 0; transform: scale(0.98) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
+
+/* Custom Scrollbar for OS Feel */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--p-0); }
+::-webkit-scrollbar-thumb { background: var(--p-100); border-radius: 10px; }
