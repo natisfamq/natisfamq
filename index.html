@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pl"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NATIS OS // PRIVATE</title>
+    <title>ɴᴀᴛɪs ғᴀᴍǫ ◉ ᴘʀɪᴠᴀᴛᴇ</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script></head><body>
@@ -10,20 +10,21 @@
         <div class="auth-card">
             <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
         
-            <div class="brand" style="font-size: 24px; margin-bottom: 20px;">Natis <span>FamQ</span></div>
+            <div class="brand-large">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
+            
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
-            	<input type="password" id="userPass" placeholder="hasło">
-            	<button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
+                <input type="password" id="userPass" placeholder="hasło">
+                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
-            <p id="loginError" class="error"></p>
-    	</div>
+            <p id="loginError" class="error" style="color: var(--error); font-size: 10px; margin-top: 10px;"></p>
+        </div>
     </div>
 
     <div id="mainPanel" style="display: none;">
         <nav class="navbar">
             <div class="nav-container">
-                <div class="brand">Natis <span>FamQ</span></div>
+                <div class="brand">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
                 <div class="menu">
                     <span onclick="switchTab('tab-aktywnosc')">Raporty</span>
                     <span onclick="switchTab('tab-pracownicy')">Członkowie</span>
@@ -34,10 +35,10 @@
         </nav>
 
         <main class="content">
-            <section id="terminalSection" class="card" style="display:none; background: #000; border-color: #00ff0033;">
-                <h3 class="card-title" style="color: #00ff00;">System Console</h3>
-                <div id="consoleOutput" class="logs-viewport" style="color: #00ff00; height: 150px; background: #000; border: none; font-size: 11px;"></div>
-                <input type="text" id="consoleInput" placeholder="Wpisz 'help'..." style="background: #050505; border: 1px solid #00ff0033; color: #00ff00; margin-top: 10px;">
+            <section id="terminalSection" class="card" style="display:none; background: #000; border-color: #ffffff22;">
+                <h3 class="card-title" style="color: #fff;">System Console</h3>
+                <div id="consoleOutput" class="logs-viewport" style="color: #fff; height: 150px; background: #000; border: none; font-size: 11px;"></div>
+                <input type="text" id="consoleInput" placeholder="Wpisz 'help'..." style="background: #050505; border: 1px solid #ffffff33; color: #fff; margin-top: 10px;">
             </section>
 
             <section id="tab-aktywnosc" class="tab-content card">
