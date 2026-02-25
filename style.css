@@ -1,6 +1,5 @@
 /* =========================
-   NATIS OS // MONOCHROME ULTRA
-   Black • White • Grey Glass UI
+   NATIS OS // MONO ULTRA CENTERED
 ========================= */
 
 :root {
@@ -29,10 +28,9 @@ body {
     min-height: 100vh;
     background: radial-gradient(circle at 30% 30%, #1a1a1a, #000000 60%);
     color: var(--text-main);
-    overflow-x: hidden;
 }
 
-/* Subtle animated depth background */
+/* Subtle animated depth */
 body::before {
     content: "";
     position: fixed;
@@ -53,6 +51,22 @@ body::before {
     0% { background-position: 0% 50%; }
     50% { background-position: 100% 50%; }
     100% { background-position: 0% 50%; }
+}
+
+/* =========================
+   CENTERED LAYOUT SYSTEM
+========================= */
+
+.nav-container,
+.content {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Add spacing below navbar */
+.content {
+    margin-top: 40px;
 }
 
 /* =========================
@@ -100,10 +114,18 @@ body::before {
     text-align: center;
 }
 
+/* ROUND LOGO */
 .login-logo {
-    width: 90px;
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+    border-radius: 50%;
     margin-bottom: 20px;
-    filter: grayscale(100%) brightness(1.3);
+    filter: grayscale(100%) brightness(1.2);
+    border: 2px solid rgba(255,255,255,0.3);
+    box-shadow:
+        0 0 25px rgba(255,255,255,0.2),
+        inset 0 0 10px rgba(255,255,255,0.1);
 }
 
 .brand {
@@ -133,7 +155,7 @@ select {
     transition: 0.25s ease;
 }
 
-/* FIXED SELECT (Raporty tab readable) */
+/* DARK SELECT FIX */
 select {
     background: #1a1a1a;
     color: #ffffff;
@@ -188,7 +210,6 @@ button {
 
 .logout:hover {
     color: white;
-    text-shadow: 0 0 10px rgba(255,255,255,0.4);
 }
 
 /* =========================
@@ -203,8 +224,6 @@ button {
 }
 
 .nav-container {
-    width: 92%;
-    margin: auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -222,24 +241,6 @@ button {
 }
 
 /* =========================
-   CONTENT
-========================= */
-
-.content {
-    width: 92%;
-    margin: 30px auto;
-}
-
-.tab-content {
-    animation: fadeIn 0.4s ease;
-}
-
-@keyframes fadeIn {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
-}
-
-/* =========================
    TABLE
 ========================= */
 
@@ -254,13 +255,13 @@ button {
     border-bottom: 1px solid rgba(255,255,255,0.06);
 }
 
-/* Konto always LEFT */
+/* Konto LEFT */
 .minimal-table th:first-child,
 .minimal-table td:first-child {
     text-align: left !important;
 }
 
-/* Role always RIGHT */
+/* Role RIGHT */
 .minimal-table th:last-child,
 .minimal-table td:last-child {
     text-align: right;
