@@ -1,203 +1,208 @@
-/* --- 1. ARCHITECTURAL LAYER (Root & Global) --- */
+/* NATIS OS // PRIVATE 
+    META: NOIR-GLASS ADVANCED SYSTEM
+*/
+
+/* --- 1. SYSTEM CORE & VARIABLES --- */
 :root {
-    /* Pure Monochrome Scale */
-    --p-0: #000000;
-    --p-100: #ffffff;
-    
-    /* Functional Opacities */
-    --glass-surface: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.12);
-    --glass-shine: linear-gradient(135deg, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 50%);
-    
-    /* Layout Variables */
-    --sys-gap: clamp(10px, 2vw, 24px);
-    --sys-radius: 12px;
-    --sys-blur: 25px;
-    
-    /* Animation Timing */
-    --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
+    --bg-pure: #000000;
+    --text-main: #ffffff;
+    --text-dim: rgba(255, 255, 255, 0.4);
+    --glass-bg: rgba(255, 255, 255, 0.03);
+    --glass-border: rgba(255, 255, 255, 0.1);
+    --accent-glow: rgba(255, 255, 255, 0.05);
+    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
+    --ease: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    cursor: crosshair; /* Advanced OS feel */
+    cursor: crosshair;
 }
 
 body {
-    background: var(--p-0);
-    color: var(--p-100);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.5;
-    -webkit-font-smoothing: antialiased;
+    background-color: var(--bg-pure);
+    color: var(--text-main);
+    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    min-height: 100vh;
     overflow-x: hidden;
+    /* Subtle scanline effect overlay */
+    background-image: repeating-linear-gradient(
+        0deg,
+        rgba(255, 255, 255, 0.01) 0px,
+        rgba(255, 255, 255, 0.01) 1px,
+        transparent 1px,
+        transparent 2px
+    );
 }
 
-/* --- 2. DEPTH & ATMOSPHERE (Background) --- */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: 
-        radial-gradient(circle at 50% -20%, rgba(255,255,255,0.08) 0%, transparent 50%),
-        repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 2px);
-    background-size: 100% 100%, 100% 3px;
-    pointer-events: none;
-    z-index: 1;
-}
-
-/* --- 3. COMPONENT ARCHITECTURE (Glassmorphism) --- */
-.card, .navbar, .auth-card, .modal-content {
-    position: relative;
-    background: var(--glass-surface) !important;
-    backdrop-filter: blur(var(--sys-blur)) saturate(0%);
-    -webkit-backdrop-filter: blur(var(--sys-blur)) saturate(0%);
-    border: 1px solid var(--glass-border) !important;
-    border-radius: var(--sys-radius);
-    overflow: hidden;
-    z-index: 2;
-}
-
-/* Subtle Shimmer Overlay */
-.card::after, .auth-card::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: var(--glass-shine);
-    pointer-events: none;
-}
-
-/* --- 4. NAVIGATION (Floating Interface) --- */
-.navbar {
-    margin: var(--sys-gap) auto;
-    width: calc(100% - (var(--sys-gap) * 2));
-    max-width: 1200px;
-    padding: 12px 24px;
-    position: sticky;
-    top: var(--sys-gap);
+/* --- 2. THE PERFECT CENTER (LOGIN PAGE) --- */
+#loginPage.full-screen {
     display: flex;
     justify-content: center;
-}
-
-.nav-container {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
     align-items: center;
+    position: fixed;
+    inset: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 1000;
+    background: radial-gradient(circle at center, #0f0f0f 0%, #000 100%);
 }
 
-.menu {
-    display: flex;
-    gap: 24px;
-}
-
-.menu span {
-    font-size: 11px;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.15em;
-    color: var(--p-100);
-    opacity: 0.5;
-    transition: opacity 0.3s var(--ease-out-expo), transform 0.3s var(--ease-out-expo);
-}
-
-.menu span:hover {
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-/* --- 5. AUTHENTICATION (The Login Portal) --- */
 .auth-card {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(25px) saturate(0%);
+    -webkit-backdrop-filter: blur(25px) saturate(0%);
+    border: 1px solid var(--glass-border) !important;
+    padding: 60px 45px !important;
     width: 100%;
-    max-width: 400px;
-    padding: 48px;
-    box-shadow: 0 40px 100px rgba(0,0,0,1);
-    animation: fadeInScale 0.8s var(--ease-out-expo);
+    max-width: 420px;
+    border-radius: 4px;
+    text-align: center;
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
+    animation: systemBoot 1.2s var(--ease) forwards;
 }
 
+/* --- 3. BRANDING & LOGO --- */
 .login-logo {
-    width: 64px;
-    height: 64px;
-    border: 1px solid var(--p-100);
-    padding: 4px;
-    margin-bottom: 32px;
-    filter: drop-shadow(0 0 10px rgba(255,255,255,0.2));
+    width: 80px;
+    height: 80px;
+    margin-bottom: 35px;
+    filter: grayscale(1) contrast(1.1);
+    border: 1px solid var(--glass-border);
+    padding: 8px;
+    transition: 0.5s var(--ease);
+}
+
+.auth-card:hover .login-logo {
+    border-color: var(--text-main);
+    transform: rotate(5deg) scale(1.05);
 }
 
 .brand {
-    font-size: 18px;
-    font-weight: 800;
-    letter-spacing: 0.3em;
+    font-weight: 900;
     text-transform: uppercase;
-    margin-bottom: 40px;
+    letter-spacing: 0.5em; /* Extreme spacing for premium look */
+    text-indent: 0.5em; /* Offsets letter-spacing to keep it centered */
+    margin-bottom: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 22px;
 }
 
 .brand span {
-    background: var(--p-100);
-    color: var(--p-0);
-    padding: 2px 8px;
+    background: var(--text-main);
+    color: var(--bg-pure);
+    padding: 0 8px;
+    margin-left: 10px;
+    font-weight: 950;
 }
 
-/* --- 6. DATA & INPUTS (High Contrast) --- */
-input, select {
+/* --- 4. FORM ELEMENTS --- */
+.auth-inputs input, .form-group input, .form-group select {
     width: 100%;
-    background: rgba(255,255,255,0.03);
+    background: rgba(255, 255, 255, 0.02);
     border: 1px solid var(--glass-border);
-    border-radius: 4px;
-    padding: 14px;
-    color: var(--p-100);
-    font-family: 'JetBrains Mono', monospace; /* Technical feel */
+    padding: 16px;
+    margin-bottom: 15px;
+    color: #fff;
+    font-family: var(--font-mono);
     font-size: 12px;
-    margin-bottom: 16px;
-    transition: all 0.2s ease;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    transition: 0.3s var(--ease);
 }
 
-input:focus {
+.auth-inputs input:focus {
     outline: none;
-    border-color: var(--p-100);
-    background: rgba(255,255,255,0.08);
+    border-color: var(--text-main);
+    background: rgba(255, 255, 255, 0.05);
 }
 
 .btn-primary, .btn-action {
-    background: var(--p-100);
-    color: var(--p-0);
-    border: 1px solid var(--p-100);
-    padding: 16px;
+    width: 100%;
+    padding: 18px;
+    background: var(--text-main);
+    color: var(--bg-pure);
+    border: 1px solid var(--text-main);
     font-weight: 900;
     font-size: 11px;
     text-transform: uppercase;
-    letter-spacing: 0.2em;
-    border-radius: 4px;
-    width: 100%;
-    transition: all 0.4s var(--ease-out-expo);
+    letter-spacing: 3px;
+    cursor: pointer;
+    transition: 0.4s var(--ease);
+    margin-top: 10px;
 }
 
-.btn-primary:hover {
+.btn-primary:hover, .btn-action:hover {
     background: transparent;
-    color: var(--p-100);
-    box-shadow: 0 0 30px rgba(255,255,255,0.1);
+    color: var(--text-main);
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
 }
 
-/* --- 7. CONTENT STRUCTURE (Bento Depth) --- */
+/* --- 5. MAIN INTERFACE (DASHBOARD) --- */
+.navbar {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border-bottom: 1px solid var(--glass-border);
+    padding: 20px 0;
+    position: sticky;
+    top: 0;
+    z-index: 500;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 30px;
+}
+
+.menu span {
+    font-size: 10px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-left: 25px;
+    color: var(--text-dim);
+    transition: 0.3s;
+}
+
+.menu span:hover {
+    color: var(--text-main);
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.logout { color: #ff3e3e !important; }
+
+/* --- 6. CARDS & CONTENT --- */
 .content {
     max-width: 1200px;
     margin: 40px auto;
-    padding: 0 var(--sys-gap);
+    padding: 0 30px;
+}
+
+.card {
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    padding: 30px;
+    margin-bottom: 25px;
+    border-radius: 2px;
 }
 
 .card-title {
     font-size: 10px;
-    font-weight: 800;
-    color: var(--p-100);
     text-transform: uppercase;
-    letter-spacing: 0.4em;
-    margin-bottom: 24px;
+    letter-spacing: 4px;
+    color: var(--text-dim);
+    margin-bottom: 25px;
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 15px;
 }
 
 .card-title::after {
@@ -207,21 +212,7 @@ input:focus {
     background: var(--glass-border);
 }
 
-/* --- 8. TERMINAL SYSTEM (Hardware Emulation) --- */
-#terminalSection {
-    background: #000 !important;
-    border: 1px solid #333 !important;
-    box-shadow: inset 0 0 20px rgba(255,255,255,0.05);
-}
-
-.logs-viewport {
-    font-family: 'JetBrains Mono', monospace;
-    font-size: 11px;
-    line-height: 1.8;
-    color: rgba(255,255,255,0.7);
-}
-
-/* --- 9. TABLES --- */
+/* --- 7. DATA TABLES --- */
 .minimal-table {
     width: 100%;
     border-collapse: collapse;
@@ -229,26 +220,35 @@ input:focus {
 
 .minimal-table th {
     text-align: left;
-    font-size: 10px;
+    font-size: 9px;
     text-transform: uppercase;
     color: var(--text-dim);
-    padding: 12px 0;
-    border-bottom: 2px solid var(--p-100);
+    padding-bottom: 15px;
+    border-bottom: 1px solid var(--text-main);
 }
 
 .minimal-table td {
-    padding: 16px 0;
+    padding: 18px 0;
     border-bottom: 1px solid var(--glass-border);
     font-size: 13px;
 }
 
-/* --- 10. ANIMATIONS --- */
-@keyframes fadeInScale {
-    from { opacity: 0; transform: scale(0.98) translateY(10px); }
-    to { opacity: 1; transform: scale(1) translateY(0); }
+/* --- 8. TERMINAL OUTPUT --- */
+.logs-viewport {
+    background: #000;
+    font-family: var(--font-mono);
+    padding: 15px;
+    border: 1px solid var(--glass-border);
+    overflow-y: auto;
 }
 
-/* Custom Scrollbar for OS Feel */
-::-webkit-scrollbar { width: 4px; }
-::-webkit-scrollbar-track { background: var(--p-0); }
-::-webkit-scrollbar-thumb { background: var(--p-100); border-radius: 10px; }
+/* --- 9. ANIMATIONS --- */
+@keyframes systemBoot {
+    0% { opacity: 0; transform: scale(0.96) translateY(20px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: var(--bg-pure); }
+::-webkit-scrollbar-thumb { background: var(--text-main); }
