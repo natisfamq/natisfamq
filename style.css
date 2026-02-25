@@ -1,43 +1,46 @@
 /* NATIS OS // PRIVATE 
-    META: NOIR-GLASS ADVANCED SYSTEM
+   META: SMOOTH GLASS & HIGH-END TYPOGRAPHY
 */
 
-/* --- 1. SYSTEM CORE & VARIABLES --- */
+/* --- 1. SYSTEM CORE & SMOOTHING --- */
 :root {
     --bg-pure: #000000;
     --text-main: #ffffff;
-    --text-dim: rgba(255, 255, 255, 0.4);
-    --glass-bg: rgba(255, 255, 255, 0.03);
-    --glass-border: rgba(255, 255, 255, 0.1);
-    --accent-glow: rgba(255, 255, 255, 0.05);
-    --font-mono: 'JetBrains Mono', 'Fira Code', monospace;
-    --ease: cubic-bezier(0.16, 1, 0.3, 1);
+    --text-dim: rgba(255, 255, 255, 0.5);
+    --glass-bg: rgba(255, 255, 255, 0.04);
+    --glass-border: rgba(255, 255, 255, 0.12);
+    
+    /* Smoother Geometry */
+    --radius-lg: 28px;
+    --radius-md: 16px;
+    --radius-sm: 10px;
+    
+    /* Premium Font Stack */
+    --font-main: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-mono: 'SF Mono', 'JetBrains Mono', monospace;
+    --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    cursor: crosshair;
+    /* Text Smoothing */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
 }
 
 body {
     background-color: var(--bg-pure);
     color: var(--text-main);
-    font-family: 'Inter', -apple-system, system-ui, sans-serif;
+    font-family: var(--font-main);
     min-height: 100vh;
+    line-height: 1.6;
     overflow-x: hidden;
-    /* Subtle scanline effect overlay */
-    background-image: repeating-linear-gradient(
-        0deg,
-        rgba(255, 255, 255, 0.01) 0px,
-        rgba(255, 255, 255, 0.01) 1px,
-        transparent 1px,
-        transparent 2px
-    );
 }
 
-/* --- 2. THE PERFECT CENTER (LOGIN PAGE) --- */
+/* --- 2. PERFECT CENTERING --- */
 #loginPage.full-screen {
     display: flex;
     justify-content: center;
@@ -47,78 +50,71 @@ body {
     width: 100vw;
     height: 100vh;
     z-index: 1000;
-    background: radial-gradient(circle at center, #0f0f0f 0%, #000 100%);
+    background: radial-gradient(circle at center, #111111 0%, #000 100%);
 }
 
 .auth-card {
     background: var(--glass-bg) !important;
-    backdrop-filter: blur(25px) saturate(0%);
-    -webkit-backdrop-filter: blur(25px) saturate(0%);
+    backdrop-filter: blur(30px) saturate(120%);
+    -webkit-backdrop-filter: blur(30px) saturate(120%);
     border: 1px solid var(--glass-border) !important;
-    padding: 60px 45px !important;
-    width: 100%;
-    max-width: 420px;
-    border-radius: 4px;
+    padding: 50px 40px !important;
+    width: 90%;
+    max-width: 400px;
+    border-radius: var(--radius-lg); /* Rounded Corners */
     text-align: center;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.8);
-    animation: systemBoot 1.2s var(--ease) forwards;
+    box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6);
+    animation: smoothEntrance 0.8s var(--ease-smooth) forwards;
 }
 
-/* --- 3. BRANDING & LOGO --- */
+/* --- 3. LOGO & BRANDING --- */
 .login-logo {
-    width: 80px;
-    height: 80px;
-    margin-bottom: 35px;
-    filter: grayscale(1) contrast(1.1);
+    width: 75px;
+    height: 75px;
+    margin-bottom: 25px;
+    border-radius: 20px; /* Matching corner softness */
+    filter: brightness(1.1);
     border: 1px solid var(--glass-border);
-    padding: 8px;
-    transition: 0.5s var(--ease);
-}
-
-.auth-card:hover .login-logo {
-    border-color: var(--text-main);
-    transform: rotate(5deg) scale(1.05);
+    padding: 10px;
 }
 
 .brand {
-    font-weight: 900;
+    font-weight: 700; /* Slightly lighter for "smoother" look */
     text-transform: uppercase;
-    letter-spacing: 0.5em; /* Extreme spacing for premium look */
-    text-indent: 0.5em; /* Offsets letter-spacing to keep it centered */
-    margin-bottom: 45px;
+    letter-spacing: 0.3em;
+    margin-bottom: 40px;
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 22px;
+    font-size: 20px;
 }
 
 .brand span {
     background: var(--text-main);
     color: var(--bg-pure);
-    padding: 0 8px;
-    margin-left: 10px;
-    font-weight: 950;
+    padding: 2px 10px;
+    margin-left: 12px;
+    border-radius: 6px; /* Rounded brand block */
+    font-weight: 800;
 }
 
-/* --- 4. FORM ELEMENTS --- */
+/* --- 4. SMOOTH INPUTS & BUTTONS --- */
 .auth-inputs input, .form-group input, .form-group select {
     width: 100%;
-    background: rgba(255, 255, 255, 0.02);
+    background: rgba(255, 255, 255, 0.03);
     border: 1px solid var(--glass-border);
-    padding: 16px;
+    padding: 16px 20px;
     margin-bottom: 15px;
     color: #fff;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    transition: 0.3s var(--ease);
+    font-size: 14px;
+    border-radius: var(--radius-md); /* Smooth rounded inputs */
+    transition: all 0.3s var(--ease-smooth);
 }
 
 .auth-inputs input:focus {
     outline: none;
-    border-color: var(--text-main);
-    background: rgba(255, 255, 255, 0.05);
+    border-color: rgba(255,255,255,0.4);
+    background: rgba(255, 255, 255, 0.07);
 }
 
 .btn-primary, .btn-action {
@@ -126,36 +122,39 @@ body {
     padding: 18px;
     background: var(--text-main);
     color: var(--bg-pure);
-    border: 1px solid var(--text-main);
-    font-weight: 900;
-    font-size: 11px;
+    border: none;
+    border-radius: var(--radius-md); /* Smooth rounded buttons */
+    font-weight: 700;
+    font-size: 13px;
     text-transform: uppercase;
-    letter-spacing: 3px;
+    letter-spacing: 1.5px;
     cursor: pointer;
-    transition: 0.4s var(--ease);
-    margin-top: 10px;
+    transition: transform 0.2s, filter 0.2s;
 }
 
 .btn-primary:hover, .btn-action:hover {
-    background: transparent;
-    color: var(--text-main);
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.1);
+    filter: brightness(0.9);
+    transform: scale(0.98); /* Tactile press effect */
 }
 
-/* --- 5. MAIN INTERFACE (DASHBOARD) --- */
+/* --- 5. DASHBOARD & INTERFACE --- */
 .navbar {
+    margin-top: 20px;
     background: var(--glass-bg);
-    backdrop-filter: blur(15px);
-    border-bottom: 1px solid var(--glass-border);
-    padding: 20px 0;
+    backdrop-filter: blur(20px);
+    border: 1px solid var(--glass-border);
+    margin-left: auto;
+    margin-right: auto;
+    width: 95%;
+    max-width: 1100px;
+    border-radius: 50px; /* Pill shape */
+    padding: 12px 0;
     position: sticky;
-    top: 0;
+    top: 20px;
     z-index: 500;
 }
 
 .nav-container {
-    max-width: 1200px;
-    margin: 0 auto;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -163,92 +162,58 @@ body {
 }
 
 .menu span {
-    font-size: 10px;
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 2px;
+    font-size: 12px;
+    font-weight: 600;
     margin-left: 25px;
     color: var(--text-dim);
-    transition: 0.3s;
+    cursor: pointer;
+    transition: color 0.3s;
 }
 
 .menu span:hover {
     color: var(--text-main);
-    text-shadow: 0 0 10px rgba(255,255,255,0.5);
 }
 
-.logout { color: #ff3e3e !important; }
-
-/* --- 6. CARDS & CONTENT --- */
+/* --- 6. CONTENT CARDS --- */
 .content {
-    max-width: 1200px;
-    margin: 40px auto;
-    padding: 0 30px;
+    max-width: 1100px;
+    margin: 60px auto;
+    padding: 0 20px;
 }
 
 .card {
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
-    padding: 30px;
+    padding: 35px;
     margin-bottom: 25px;
-    border-radius: 2px;
+    border-radius: var(--radius-lg);
 }
 
 .card-title {
-    font-size: 10px;
+    font-size: 12px;
+    font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 4px;
+    letter-spacing: 2px;
     color: var(--text-dim);
     margin-bottom: 25px;
-    display: flex;
-    align-items: center;
-    gap: 15px;
 }
 
-.card-title::after {
-    content: "";
-    height: 1px;
-    flex-grow: 1;
-    background: var(--glass-border);
-}
-
-/* --- 7. DATA TABLES --- */
-.minimal-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.minimal-table th {
-    text-align: left;
-    font-size: 9px;
-    text-transform: uppercase;
-    color: var(--text-dim);
-    padding-bottom: 15px;
-    border-bottom: 1px solid var(--text-main);
-}
-
+/* --- 7. TABLES & SCROLLBAR --- */
 .minimal-table td {
-    padding: 18px 0;
-    border-bottom: 1px solid var(--glass-border);
-    font-size: 13px;
+    padding: 20px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 14px;
 }
 
-/* --- 8. TERMINAL OUTPUT --- */
-.logs-viewport {
-    background: #000;
-    font-family: var(--font-mono);
-    padding: 15px;
-    border: 1px solid var(--glass-border);
-    overflow-y: auto;
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { 
+    background: rgba(255,255,255,0.2); 
+    border-radius: 10px; 
 }
 
-/* --- 9. ANIMATIONS --- */
-@keyframes systemBoot {
-    0% { opacity: 0; transform: scale(0.96) translateY(20px); }
-    100% { opacity: 1; transform: scale(1) translateY(0); }
+/* --- 8. ANIMATIONS --- */
+@keyframes smoothEntrance {
+    from { opacity: 0; transform: scale(0.97) translateY(10px); }
+    to { opacity: 1; transform: scale(1) translateY(0); }
 }
-
-/* Custom Scrollbar */
-::-webkit-scrollbar { width: 3px; }
-::-webkit-scrollbar-track { background: var(--bg-pure); }
-::-webkit-scrollbar-thumb { background: var(--text-main); }
