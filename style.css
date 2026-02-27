@@ -342,3 +342,21 @@ button {
     background: linear-gradient(#ffffff, #888888);
     border-radius: 20px;
 }
+
+/* BIAŁA DIODA LED */
+.led-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background-color: #fff;
+    border-radius: 50%;
+    margin-left: 8px;
+    vertical-align: middle;
+    box-shadow: 0 0 8px #fff;
+    animation: led-pulse 2s infinite ease-in-out;
+}
+@keyframes led-pulse {
+    0% { opacity: 1; box-shadow: 0 0 8px #fff; }
+    50% { opacity: 0.3; box-shadow: 0 0 2px #fff; }
+    100% { opacity: 1; box-shadow: 0 0 8px #fff; }
+}
