@@ -45,13 +45,11 @@
                         <option value="Grover">Grover</option>
                         <option value="Capt">Capt</option>
                     </select>
-                    
                     <div id="extraFieldsContainer">
                         <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
                         <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
                         <input type="number" id="captDmg" placeholder="Ilość DMG" style="display:none;">
                     </div>
-
                     <input type="text" id="reportLink" placeholder="Link Imgur">
                     <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                 </div>
@@ -75,24 +73,7 @@
                     <h3 class="card-title">System Awansów</h3>
                     <div class="form-inline" style="flex-direction: column; align-items: stretch; gap: 10px;">
                         <select id="promoteUserList"></select>
-                        <select id="promoteNewRole">
-                            <option value="15 | Bosik">15 | Bosik</option>
-                            <option value="14 | V-Lider">14 | V-Lider</option>
-                            <option value="13 | Prawa ręka">13 | Prawa ręka</option>
-                            <option value="12 | Lewe jadro">12 | Lewe jadro</option>
-                            <option value="11 | Klapmistsz">11 | Klapmistsz</option>
-                            <option value="10 | Main">10 | Main</option>
-                            <option value="9 | Porucznik">9 | Porucznik</option>
-                            <option value="8 | Weteran">8 | Weteran</option>
-                            <option value="7 | Hunter">7 | Hunter</option>
-                            <option value="6 | Egzekutor">6 | Egzekutor</option>
-                            <option value="5 | Torpeda">5 | Torpeda</option>
-                            <option value="4 | Mlody">4 | Mlody</option>
-                            <option value="3 | Jopek">3 | Jopek</option>
-                            <option value="2 | Klapek">2 | Klapek</option>
-                            <option value="1 | Zawieszony">1 | Zawieszony</option>
-                        </select>
-                        <button class="btn-action" onclick="promoteUser()">ZATWIERDŹ AWANS</button>
+                        <select id="promoteNewRole"></select> <button class="btn-action" onclick="promoteUser()">ZATWIERDŹ AWANS</button>
                     </div>
                 </div>
 
@@ -109,24 +90,7 @@
                     <div class="form-inline">
                         <input type="text" id="newUserName" placeholder="Nick">
                         <input type="text" id="newUserPass" placeholder="Hasło">
-                        <select id="newUserRole">
-                            <option value="15 | Bosik">15 | Bosik</option>
-                            <option value="14 | V-Lider">14 | V-Lider</option>
-                            <option value="13 | Prawa ręka">13 | Prawa ręka</option>
-                            <option value="12 | Lewe jadro">12 | Lewe jadro</option>
-                            <option value="11 | Klapmistsz">11 | Klapmistsz</option>
-                            <option value="10 | Main">10 | Main</option>
-                            <option value="9 | Porucznik">9 | Porucznik</option>
-                            <option value="8 | Weteran">8 | Weteran</option>
-                            <option value="7 | Hunter">7 | Hunter</option>
-                            <option value="6 | Egzekutor">6 | Egzekutor</option>
-                            <option value="5 | Torpeda">5 | Torpeda</option>
-                            <option value="4 | Mlody">4 | Mlody</option>
-                            <option value="3 | Jopek">3 | Jopek</option>
-                            <option value="2 | Klapek">2 | Klapek</option>
-                            <option value="1 | Zawieszony">1 | Zawieszony</option>
-                        </select>
-                        <button class="btn-action" onclick="createUser()">DODAJ</button>
+                        <select id="newUserRole"></select> <button class="btn-action" onclick="createUser()">DODAJ</button>
                     </div>
                 </div>
             </section>
