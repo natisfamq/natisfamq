@@ -49,7 +49,7 @@
                         <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
                     </div>
 
-                    <input type="text" id="reportLink" placeholder="Link Imgur">
+                    <input type="text" id="reportLink" placeholder="Link Imgur (np. https://imgur.com/...)">
                     <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                 </div>
             </section>
@@ -64,6 +64,13 @@
 
             <section id="tab-admin" class="tab-content" style="display:none;">
                 <div class="card">
+                    <h3 class="card-title">Oczekujące Raporty</h3>
+                    <div id="adminReportsContainer" class="logs-viewport" style="max-height: 400px; background: none;">
+                        <p style="color: #666; font-size: 12px;">Brak nowych raportów...</p>
+                    </div>
+                </div>
+
+                <div class="card mt-15">
                     <h3 class="card-title">System Awansów</h3>
                     <div class="form-inline" style="flex-direction: column; align-items: stretch; gap: 10px;">
                         <select id="promoteUserList"><option>Ładowanie...</option></select>
@@ -107,17 +114,6 @@
                         <select id="newUserRole">
                             <option value="15 | Bosik">15 | Bosik</option>
                             <option value="14 | V-Lider">14 | V-Lider</option>
-                            <option value="13 | Prawa ręka">13 | Prawa ręka</option>
-                            <option value="12 | Lewe jadro">12 | Lewe jadro</option>
-                            <option value="11 | Klapmistsz">11 | Klapmistsz</option>
-                            <option value="10 | Main">10 | Main</option>
-                            <option value="9 | Porucznik">9 | Porucznik</option>
-                            <option value="8 | Weteran">8 | Weteran</option>
-                            <option value="7 | Hunter">7 | Hunter</option>
-                            <option value="6 | Egzekutor">6 | Egzekutor</option>
-                            <option value="5 | Torpeda">5 | Torpeda</option>
-                            <option value="4 | Mlody">4 | Mlody</option>
-                            <option value="3 | Jopek">3 | Jopek</option>
                             <option value="2 | Klapek">2 | Klapek</option>
                             <option value="1 | Zawieszony">1 | Zawieszony</option>
                         </select>
