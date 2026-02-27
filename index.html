@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="pl"><head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ɴᴀᴛɪs ғᴀᴍǫ ◉</title>
+    <title>ɴᴀᴛɪs</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script></head><body>
@@ -9,21 +9,20 @@
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
             <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-        
-            <div class="brand" style="font-size: 24px; margin-bottom: 20px;">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
+            <div class="brand" style="font-size: 24px; margin-bottom: 20px;">Natis <span>FamQ</span></div>
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
-            	<input type="password" id="userPass" placeholder="hasło">
-            	<button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
+                <input type="password" id="userPass" placeholder="hasło">
+                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
             <p id="loginError" class="error"></p>
-    	</div>
+        </div>
     </div>
 
     <div id="mainPanel" style="display: none;">
         <nav class="navbar">
             <div class="nav-container">
-                <div class="brand">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
+                <div class="brand">Natis <span>FamQ</span></div>
                 <div class="menu">
                     <span onclick="switchTab('tab-aktywnosc')">Raporty</span>
                     <span onclick="switchTab('tab-pracownicy')">Członkowie</span>
@@ -62,7 +61,7 @@
             <section id="tab-pracownicy" class="tab-content card" style="display:none;">
                 <h3 class="card-title">Status Rodziny</h3>
                 <table class="minimal-table">
-                    <thead><tr><th style="width:70%">Konto</th><th style="width:30%; text-align:right;">Ranga</th></tr></thead>
+                    <thead><tr><th style="width:70%">Konto</th><th style="width:30%; text-align:right;">Rola</th></tr></thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
             </section>
@@ -70,10 +69,8 @@
             <section id="tab-admin" class="tab-content" style="display:none;">
                 <div class="card">
                     <h3 class="card-title">System Awansów</h3>
-                    <div class="form-inline" style="flex-direction: column; align-items: stretch;">
-                        <select id="promoteUserList">
-                            <option>Ładowanie użytkowników...</option>
-                        </select>
+                    <div class="form-inline" style="flex-direction: column; align-items: stretch; gap: 10px;">
+                        <select id="promoteUserList"><option>Ładowanie...</option></select>
                         <select id="promoteNewRole">
                             <option value="14 | V-Lider">14 | V-Lider</option>
                             <option value="13 | Prawa ręka">13 | Prawa ręka</option>
@@ -97,7 +94,7 @@
                 <div class="card mt-15">
                     <h3 class="card-title">Zarządzanie kontami</h3>
                     <table class="minimal-table">
-                        <thead><tr><th style="width:30%">User</th><th style="width:40%">IP Address</th><th style="width:30%; text-align:right;">Opcje</th></tr></thead>
+                        <thead><tr><th style="width:40%">Użytkownik</th><th style="width:30%">IP Address</th><th style="width:30%; text-align:right;">Opcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
@@ -113,29 +110,12 @@
                         <select id="newUserRole">
                             <option value="14 | V-Lider">14 | V-Lider</option>
                             <option value="2 | Klapek">2 | Klapek (Nowy)</option>
+                            <option value="1 | Zawieszony">1 | Zawieszony</option>
                         </select>
                         <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
                     </div>
                 </div>
-
-                <div class="card mt-15">
-                    <h3 class="card-title">Oczekujące Raporty</h3>
-                    <div id="adminReportsContainer"></div>
-                </div>
-
-                <div class="card mt-15">
-                    <h3 class="card-title">Dziennik Zdarzeń</h3>
-                    <div id="systemLogsContainer" class="logs-viewport"></div>
-                </div>
             </section>
         </main>
-    </div>
-
-    <div id="historyModal" class="modal" style="display:none;">
-        <div class="modal-content card">
-            <h3 id="historyTitle" class="card-title">Historia</h3>
-            <div id="historyBody"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
-        </div>
     </div>
     <script src="script.js"></script></body></html>
