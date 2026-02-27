@@ -9,11 +9,10 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
             <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-            <div class="brand" style="font-size: 24px; margin-bottom: 20px;">Natis <span>FamQ</span></div>
+            <div class="brand">Natis <span>FamQ</span></div>
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
                 <input type="password" id="userPass" placeholder="hasło">
@@ -41,8 +40,8 @@
                 <h3 class="card-title">Nowy Raport</h3>
                 <div class="form-group">
                     <select id="reportType" onchange="toggleExtraFields()">
-                        <option value="Paczki">Paczki</option>
-                        <option value="Cenna">Cenna</option>
+                        <option value="Paczki">Paczki (10.000$)</option>
+                        <option value="Cenna">Cenna (10.000$)</option>
                         <option value="Grover">Grover</option>
                         <option value="Capt">Capt</option>
                     </select>
@@ -50,10 +49,10 @@
                     <div id="extraFieldsContainer">
                         <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
                         <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
-                        <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
+                        <input type="number" id="captDmg" placeholder="Ilość DMG" style="display:none;">
                     </div>
 
-                    <input type="text" id="reportLink" placeholder="Link Imgur (np. https://imgur.com/...)">
+                    <input type="text" id="reportLink" placeholder="Link Imgur">
                     <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                 </div>
             </section>
@@ -69,15 +68,13 @@
             <section id="tab-admin" class="tab-content" style="display:none;">
                 <div class="card">
                     <h3 class="card-title">Oczekujące Raporty</h3>
-                    <div id="adminReportsContainer" class="reports-grid">
-                        <p style="color: #666; font-size: 12px; padding: 10px;">Brak nowych raportów.</p>
-                    </div>
+                    <div id="adminReportsContainer" class="reports-grid"></div>
                 </div>
 
                 <div class="card mt-15">
                     <h3 class="card-title">System Awansów</h3>
                     <div class="form-inline" style="flex-direction: column; align-items: stretch; gap: 10px;">
-                        <select id="promoteUserList"><option>Ładowanie...</option></select>
+                        <select id="promoteUserList"></select>
                         <select id="promoteNewRole">
                             <option value="15 | Bosik">15 | Bosik</option>
                             <option value="14 | V-Lider">14 | V-Lider</option>
@@ -102,7 +99,7 @@
                 <div class="card mt-15">
                     <h3 class="card-title">Zarządzanie kontami</h3>
                     <table class="minimal-table">
-                        <thead><tr><th style="width:30%">User</th><th style="width:40%">IP Address</th><th style="width:30%; text-align:right;">Opcje</th></tr></thead>
+                        <thead><tr><th>User</th><th>IP Address</th><th style="text-align:right;">Opcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
@@ -111,10 +108,7 @@
                     <h3 class="card-title">Dodaj Nowego Członka</h3>
                     <div class="form-inline">
                         <input type="text" id="newUserName" placeholder="Nick">
-                        <div class="pass-wrapper">
-                            <input type="text" id="newUserPass" placeholder="Hasło">
-                            <button class="dice-btn" onclick="generatePass()">🎲</button>
-                        </div>
+                        <input type="text" id="newUserPass" placeholder="Hasło">
                         <select id="newUserRole">
                             <option value="15 | Bosik">15 | Bosik</option>
                             <option value="14 | V-Lider">14 | V-Lider</option>
@@ -132,7 +126,7 @@
                             <option value="2 | Klapek">2 | Klapek</option>
                             <option value="1 | Zawieszony">1 | Zawieszony</option>
                         </select>
-                        <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
+                        <button class="btn-action" onclick="createUser()">DODAJ</button>
                     </div>
                 </div>
             </section>
