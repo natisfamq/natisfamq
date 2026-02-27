@@ -1,10 +1,14 @@
-<!DOCTYPE html><html lang="pl"><head>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ɴᴀᴛɪs</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script></head><body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
     
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
@@ -65,8 +69,8 @@
             <section id="tab-admin" class="tab-content" style="display:none;">
                 <div class="card">
                     <h3 class="card-title">Oczekujące Raporty</h3>
-                    <div id="adminReportsContainer" class="logs-viewport" style="max-height: 400px; background: none;">
-                        <p style="color: #666; font-size: 12px;">Brak nowych raportów...</p>
+                    <div id="adminReportsContainer" class="reports-grid">
+                        <p style="color: #666; font-size: 12px; padding: 10px;">Brak nowych raportów.</p>
                     </div>
                 </div>
 
@@ -114,6 +118,17 @@
                         <select id="newUserRole">
                             <option value="15 | Bosik">15 | Bosik</option>
                             <option value="14 | V-Lider">14 | V-Lider</option>
+                            <option value="13 | Prawa ręka">13 | Prawa ręka</option>
+                            <option value="12 | Lewe jadro">12 | Lewe jadro</option>
+                            <option value="11 | Klapmistsz">11 | Klapmistsz</option>
+                            <option value="10 | Main">10 | Main</option>
+                            <option value="9 | Porucznik">9 | Porucznik</option>
+                            <option value="8 | Weteran">8 | Weteran</option>
+                            <option value="7 | Hunter">7 | Hunter</option>
+                            <option value="6 | Egzekutor">6 | Egzekutor</option>
+                            <option value="5 | Torpeda">5 | Torpeda</option>
+                            <option value="4 | Mlody">4 | Mlody</option>
+                            <option value="3 | Jopek">3 | Jopek</option>
                             <option value="2 | Klapek">2 | Klapek</option>
                             <option value="1 | Zawieszony">1 | Zawieszony</option>
                         </select>
@@ -123,4 +138,6 @@
             </section>
         </main>
     </div>
-    <script src="script.js"></script></body></html>
+    <script src="script.js"></script>
+</body>
+</html>
