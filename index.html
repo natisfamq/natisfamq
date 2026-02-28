@@ -1,264 +1,160 @@
-/* =========================
-  ss
-========================= */
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NATIS FAMQ</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { background-color: #000; color: #fff; font-family: 'Segoe UI', sans-serif; }
+        
+        /* Logowanie */
+        #loginPage { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; }
+        input { padding: 10px; margin: 5px; border-radius: 5px; border: 1px solid #333; background: #111; color: #fff; width: 250px; }
+        button { padding: 10px 20px; margin-top: 10px; cursor: pointer; background: #fff; color: #000; border: none; font-weight: bold; border-radius: 5px; }
 
-const firebaseConfig = {
-    apiKey: "AIzaSyDyTpY2vGcvM8Sz5B1TCdDeNUObQ6yZF4o",
-    authDomain: "natis-add35.firebaseapp.com",
-    databaseURL: "https://natis-add35-default-rtdb.europe-west1.firebasedatabase.app",
-    projectId: "natis-add35",
-    storageBucket: "natis-add35.firebasestorage.app",
-    messagingSenderId: "303875422065",
-    appId: "1:303875422065:web:c142a191607606e01a28d0"
-};
+        /* Panel Główny */
+        #mainPanel { display: none; padding: 40px 20px; max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 50px; }
+        .logo { font-weight: 800; text-transform: uppercase; }
+        .logo span { color: #fff; } /* Zmienione z zielonego */
+        
+        nav a { color: #666; text-decoration: none; margin-left: 20px; font-size: 14px; cursor: pointer; }
+        .logout { color: #b00 !important; }
 
-if (!firebase.apps.length) { firebase.initializeApp(firebaseConfig); }
-const db = firebase.database();
-const ROOT_USER = "rex"; 
-let currentUser = { nick: "", role: "", ip: "0.0.0.0" };
+        .status-card { background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 15px; padding: 35px; }
+        .title { font-size: 22px; font-weight: bold; margin-bottom: 30px; }
+        .title span { color: #fff; } /* Zmienione z zielonego */
 
-const ALL_ROLES = [
-    "15 | Bosik", "14 | V-Lider", "13 | Prawa ręka", "12 | Lewe jadro", "11 | Klapmistsz",
-    "10 | Main", "9 | Porucznik", "8 | Weteran", "7 | Hunter", "6 | Egzekutor",
-    "5 | Torpeda", "4 | Mlody", "3 | Jopek", "2 | Klapek", "1 | Zawieszony"
-];
+        table { width: 100%; border-collapse: collapse; }
+        th { color: #444; font-size: 12px; text-transform: uppercase; padding-bottom: 15px; text-align: left; }
+        .col-role { text-align: right; }
+        td { padding: 14px 0; border-top: 1px solid #111; font-size: 15px; color: #ccc; }
+        .role-data { text-align: right; } /* Przesunięcie roli pod nagłówek */
+        .is-root { font-weight: bold; color: #fff; }
+    </style>
+</head>
+<body>
 
-// Pobieranie adresu IP
-fetch('https://api.ipify.org?format=json').then(r => r.json()).then(d => currentUser.ip = d.ip);
+    <div id="loginPage">
+        <h2 style="margin-bottom: 20px;">NATIS FAMQ</h2>
+        <input type="text" id="userName" placeholder="Nick">
+        <input type="password" id="userPass" placeholder="Hasło">
+        <button onclick="login()">Zaloguj</button>
+    </div>
 
-function getRoleLevel(r) {
-    if (r === "Root") return 99;
-    const m = r.match(/^(\d+)/);
-    return m ? parseInt(m[1]) : 0;
-}
+    <div id="mainPanel">
+        <div class="header">
+            <div class="logo">NATIS <span>FAMQ</span></div>
+            <nav>
+                <a onclick="location.reload()">Raporty</a>
+                <a>Członkowie</a>
+                <a id="adminTab" style="display:none;">Admin</a>
+                <a onclick="location.reload()" class="logout">Wyloguj</a>
+            </nav>
+        </div>
 
-// --- LOGOWANIE ---
-async function login() {
-    const u = document.getElementById('userName').value.trim();
-    const p = document.getElementById('userPass').value.trim();
+        <div class="status-card">
+            <div class="title">STATUS <span>RODZINY</span></div>
+            <table>
+                <thead>
+                    <tr>
+                        <th>KONTO</th>
+                        <th class="col-role">ROLA</th>
+                    </tr>
+                </thead>
+                <tbody id="publicUserList">
+                    <tr><td colspan="2" style="text-align:center; color:#444;">Wczytywanie...</td></tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+<script>
+    // Twoja konfiguracja Firebase z obrazka
+    const firebaseConfig = {
+        apiKey: "AIzaSyDyTpY2vGcvM8sZ5B1TCdDENUObQ6yZF4o",
+        authDomain: "natis-ad35.firebaseapp.com",
+        databaseURL: "https://natis-ad35-default-rtdb.europe-west1.firebasedatabase.app",
+        projectId: "natis-ad35",
+        storageBucket: "natis-ad35.appspot.com",
+        messagingSenderId: "303875422065",
+        appId: "1:303875422065:web:c142a191607606e01a28d0"
+    };
     
-    if (u === ROOT_USER && p === "Rex1234") { 
-        setup(u, "Root"); 
-        return; 
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.database();
+    const ROOT_USER = "rex";
+    let currentUser = { nick: "", role: "" };
+
+    function getRoleLevel(r) {
+        const m = r.match(/^(\d+)/);
+        return m ? parseInt(m[1]) : 0;
     }
-    
-    db.ref('accounts').once('value', snap => {
-        const accs = snap.val();
-        for (let id in accs) {
-            if (accs[id].nick === u && accs[id].pass === p) {
-                db.ref(`accounts/${id}/lastIp`).set(currentUser.ip);
-                setup(accs[id].nick, accs[id].role);
-                return;
+
+    async function login() {
+        const u = document.getElementById('userName').value;
+        const p = document.getElementById('userPass').value;
+
+        if (u === ROOT_USER && p === "Rex1234") {
+            setup(u, "Root");
+            return;
+        }
+
+        db.ref('accounts').once('value', snap => {
+            const accs = snap.val();
+            let found = false;
+            for (let id in accs) {
+                if (accs[id].nick === u && accs[id].pass === p) {
+                    setup(u, accs[id].role);
+                    found = true;
+                    break;
+                }
             }
-        }
-        alert("Błędne dane logowania!");
-    });
-}
-
-function setup(n, r) {
-    currentUser.nick = n; 
-    currentUser.role = r;
-    
-    document.getElementById('loginPage').style.display = 'none';
-    document.getElementById('mainPanel').style.display = 'block';
-    
-    populateRoleSelects();
-
-    // Rangi 11-15 oraz Root mają dostęp do panelu admina
-    if (r === "Root" || getRoleLevel(r) >= 11) {
-        document.getElementById('adminTab').style.display = 'inline';
-        renderReports();
-    }
-    
-    renderPublic();
-    renderAdminUsers();
-}
-
-// --- ZARZĄDZANIE RANGAMI ---
-function populateRoleSelects() {
-    const pSel = document.getElementById('promoteNewRole');
-    const cSel = document.getElementById('newUserRole');
-    
-    [pSel, cSel].forEach(s => {
-        if (!s) return;
-        s.innerHTML = "";
-        ALL_ROLES.forEach(r => {
-            // Tylko Root (rex) może nadawać rangę 15
-            if (r.startsWith("15") && currentUser.nick !== ROOT_USER) return;
-            
-            let o = document.createElement('option');
-            o.value = r; 
-            o.innerText = r; 
-            s.appendChild(o);
+            if (!found) alert("Błędne dane logowania!");
         });
-    });
-}
-
-// --- SYSTEM RAPORTÓW ---
-async function sendReport() {
-    const type = document.getElementById('reportType').value;
-    const link = document.getElementById('reportLink').value.trim();
-    const gr = parseInt(document.getElementById('groverPlants').value) || 0;
-    const kl = parseInt(document.getElementById('captKills').value) || 0;
-    const dm = parseInt(document.getElementById('captDmg').value) || 0;
-
-    if (!link.includes('imgur.com')) return alert("Musisz podać poprawny link do Imgur!");
-    
-    let payout = 0;
-    let detailsTxt = "";
-
-    // Logika naliczania wypłat
-    if (type === "Paczki" || type === "Cenna") { 
-        payout = 10000; 
-        detailsTxt = "Zadanie wykonane"; 
-    } else if (type === "Grover") { 
-        payout = gr * 1000; 
-        detailsTxt = `Krzaki: ${gr}`; 
-    } else if (type === "Capt") { 
-        payout = 2500 + (kl * 1000) + (dm * 10); 
-        detailsTxt = `Kills: ${kl}, DMG: ${dm}`; 
     }
 
-    await db.ref('reports').push({
-        sender: currentUser.nick || "Nieznany",
-        type: type,
-        link: link,
-        payout: payout,
-        details: detailsTxt,
-        timestamp: new Date().toLocaleString()
-    });
-    
-    alert(`Raport wysłany! Naliczona wypłata: ${payout}$`);
-    document.getElementById('reportLink').value = "";
-}
-
-function renderReports() {
-    db.ref('reports').on('value', snap => {
-        const reports = snap.val() || {};
-        const container = document.getElementById('adminReportsContainer');
-        if (!container) return;
-        container.innerHTML = "";
+    function setup(u, r) {
+        currentUser.nick = u;
+        currentUser.role = r;
+        document.getElementById('loginPage').style.display = 'none';
+        document.getElementById('mainPanel').style.display = 'block';
         
-        Object.keys(reports).reverse().forEach(id => {
-            const r = reports[id];
-            container.innerHTML += `
-                <div class="report-card mt-15">
-                    <div class="report-header">
-                        <span class="report-user">${r.sender}</span>
-                        <span class="report-date">${r.timestamp}</span>
-                    </div>
-                    <div class="report-body">
-                        <span class="badge">${r.type}</span> 
-                        <span style="color: var(--text-muted); font-size: 13px;">${r.details}</span>
-                        <div class="payout-text">WYPŁATA: ${r.payout}$</div>
-                        <a href="${r.link}" target="_blank" class="report-link">DOWÓD (IMGUR)</a>
-                    </div>
-                    <div class="report-actions">
-                        <button class="btn-approve" onclick="finalizeReport('${id}', 'Zaakceptowano')">AKCEPTUJ</button>
-                        <button class="btn-reject" onclick="finalizeReport('${id}', 'Odrzucono')">ODRZUĆ</button>
-                    </div>
-                </div>`;
-        });
-    });
-}
-
-function finalizeReport(id, status) {
-    if(confirm(`Czy na pewno chcesz oznaczyć raport jako: ${status}?`)) {
-        db.ref(`reports/${id}`).remove();
+        if (u === ROOT_USER || getRoleLevel(r) >= 11) {
+            document.getElementById('adminTab').style.display = 'inline';
+        }
+        renderPublic();
     }
-}
 
-// --- PANEL CZŁONKÓW I ADMINA ---
-function renderAdminUsers() {
-    db.ref('accounts').on('value', snap => {
-        const accs = snap.val() || {};
-        const list = document.getElementById('adminUsersList');
-        if (!list) return;
-        list.innerHTML = "";
-        
-        for (let id in accs) {
-            const u = accs[id]; 
-            if (u.nick === ROOT_USER) continue;
+    function renderPublic() {
+        db.ref('accounts').on('value', snap => {
+            const accs = snap.val() || {};
+            let users = [];
+            for (let id in accs) { users.push(accs[id]); }
             
-            const lvl = getRoleLevel(u.role);
-            // Ochrona IP dla rang 11-15
-            const ipDisplay = lvl >= 11 
-                ? `<span class="protected-text">Protected</span>` 
-                : `<span class="ip-blur">${u.lastIp || '0.0.0.0'}</span>`;
-            
-            list.innerHTML += `
-                <tr>
-                    <td>${u.nick}<br><small style="color: var(--text-muted)">${u.role}</small></td>
-                    <td>${ipDisplay}</td>
-                    <td align="right">
-                        ${lvl < 11 ? `<button class="btn-reject" style="padding: 5px 10px;" onclick="deleteUser('${id}')">USUŃ</button>` : ''}
-                    </td>
-                </tr>`;
-        }
-    });
-}
+            // Sortowanie od najwyższej rangi
+            users.sort((a, b) => getRoleLevel(b.role) - getRoleLevel(a.role));
 
-function renderPublic() {
-    db.ref('accounts').on('value', snap => {
-        const accs = snap.val() || {};
-        let users = []; 
-        for (let id in accs) users.push(accs[id]);
-        
-        users.sort((a, b) => getRoleLevel(b.role) - getRoleLevel(a.role));
-        
-        const list = document.getElementById('publicUserList');
-        const pList = document.getElementById('promoteUserList');
-        if (!list) return;
-        
-        list.innerHTML = `<tr><td>${ROOT_USER}</td><td align="right"><b>Root</b></td></tr>`;
-        if (pList) pList.innerHTML = "";
-        
-        users.forEach(u => {
-            if (u.nick === ROOT_USER) return;
-            list.innerHTML += `<tr><td>${u.nick}</td><td align="right">${u.role}</td></tr>`;
-            if (pList) pList.innerHTML += `<option value="${u.nick}">${u.nick}</option>`;
+            const list = document.getElementById('publicUserList');
+            list.innerHTML = "";
+            
+            // Dodaj Roota na górę
+            list.innerHTML += `<tr class="is-root"><td>${ROOT_USER}</td><td class="role-data">Root</td></tr>`;
+
+            users.forEach(u => {
+                if (u.nick === ROOT_USER) return;
+                list.innerHTML += `
+                    <tr>
+                        <td>${u.nick}</td>
+                        <td class="role-data">${u.role}</td>
+                    </tr>
+                `;
+            });
         });
-    });
-}
-
-// --- UTILS ---
-function toggleExtraFields() {
-    const t = document.getElementById('reportType').value;
-    document.getElementById('groverPlants').style.display = t === "Grover" ? 'block' : 'none';
-    document.getElementById('captKills').style.display = t === "Capt" ? 'block' : 'none';
-    document.getElementById('captDmg').style.display = t === "Capt" ? 'block' : 'none';
-}
-
-function switchTab(id) {
-    document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
-    document.getElementById(id).style.display = 'block';
-}
-
-function deleteUser(id) { if(confirm("Usunąć użytkownika?")) db.ref(`accounts/${id}`).remove(); }
-
-async function createUser() {
-    const n = document.getElementById('newUserName').value.trim();
-    const p = document.getElementById('newUserPass').value.trim();
-    const r = document.getElementById('newUserRole').value;
-    if(!n || !p) return alert("Uzupełnij nick i hasło!");
-    
-    db.ref('accounts').push({ nick: n, pass: p, role: r, lastIp: "0.0.0.0" });
-    alert("Dodano nowego członka!");
-    document.getElementById('newUserName').value = "";
-    document.getElementById('newUserPass').value = "";
-}
-
-function promoteUser() {
-    const n = document.getElementById('promoteUserList').value;
-    const r = document.getElementById('promoteNewRole').value;
-    db.ref('accounts').once('value', snap => {
-        const accs = snap.val();
-        for (let id in accs) { 
-            if(accs[id].nick === n) { 
-                db.ref(`accounts/${id}/role`).set(r); 
-                alert("Zaktualizowano rangę!");
-                break; 
-            } 
-        }
-    });
-}
+    }
+</script>
+</body>
+</html>
