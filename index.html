@@ -1,131 +1,107 @@
-<!DOCTYPE html><html lang="pl"><head>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ɴᴀᴛɪs ғᴀᴍǫ ◉</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script></head><body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <style>
+        /* NAPRAWA KOLORÓW: Zielony na Biały */
+        .brand span, .card-title span, .logo span, .status-header span {
+            color: #ffffff !important;
+        }
+        
+        /* PRZESUNIĘCIE ROLI POD NAGŁÓWEK (Do prawej) */
+        .status-table th:last-child, 
+        #publicUserList td:last-child {
+            text-align: right !important;
+        }
+
+        /* Styl dla klikalnego nicku w Adminie */
+        .clickable-nick {
+            cursor: pointer;
+            text-decoration: underline;
+            color: #fff;
+        }
+        .clickable-nick:hover { color: #ccc; }
+    </style>
+</head>
+<body>
     
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
-            <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-        
-            <div class="brand" style="font-size: 24px; margin-bottom: 20px;">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
+            <div class="brand">NATIS <span>FAMQ</span></div>
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
-            	<input type="password" id="userPass" placeholder="hasło">
-            	<button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
+                <input type="password" id="userPass" placeholder="hasło">
+                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
-            <p id="loginError" class="error"></p>
-    	</div>
+        </div>
     </div>
 
     <div id="mainPanel" style="display: none;">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="brand">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
-                <div class="menu">
-                    <span onclick="switchTab('tab-aktywnosc')">Raporty</span>
-                    <span onclick="switchTab('tab-pracownicy')">Członkowie</span>
-                    <span id="adminTab" style="display:none;" onclick="switchTab('tab-admin')">Admin</span>
-                    <span onclick="location.reload()" class="logout">Wyloguj</span>
-                </div>
+        <nav class="top-nav">
+            <div class="brand">NATIS <span>FAMQ</span></div>
+            <div class="nav-menu">
+                <button class="nav-link" onclick="switchTab('publicTab')">Status</button>
+                <button class="nav-link" onclick="switchTab('membersTab')">Raporty</button>
+                <button id="adminTab" class="nav-link" style="display:none;" onclick="switchTab('adminTabContent')">Admin</button>
+                <button class="nav-link logout" onclick="location.reload()">Wyloguj</button>
             </div>
         </nav>
 
-        <main class="content">
-            <section id="terminalSection" class="card" style="display:none; background: #000; border-color: rgba(255,255,255,0.1);">
-                <h3 class="card-title" style="color: #fff;">System Console</h3>
-                <div id="consoleOutput" class="logs-viewport" style="color: #fff; height: 150px; background: #000; border: none; font-size: 11px;"></div>
-                <input type="text" id="consoleInput" placeholder="Wpisz 'help'..." style="background: #050505; border: 1px solid rgba(255,255,255,0.1); color: #fff; margin-top: 10px;">
+        <main class="content-wrapper">
+            <section id="publicTab" class="tab-content">
+                <div class="card">
+                    <h2 class="card-title">STATUS <span>RODZINY</span></h2>
+                    <table class="status-table">
+                        <thead>
+                            <tr>
+                                <th>KONTO</th>
+                                <th style="text-align: right;">ROLA</th>
+                            </tr>
+                        </thead>
+                        <tbody id="publicUserList"></tbody>
+                    </table>
+                </div>
             </section>
 
-            <section id="tab-aktywnosc" class="tab-content card">
-                <h3 class="card-title">Nowy Raport</h3>
-                <div class="form-group">
+            <section id="membersTab" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3 class="card-title">Wyślij Raport</h3>
                     <select id="reportType" onchange="toggleExtraFields()">
                         <option value="Paczki">Paczki</option>
                         <option value="Cenna">Cenna</option>
                         <option value="Grover">Grover</option>
                         <option value="Capt">Capt</option>
                     </select>
-                    <div id="extraFields">
-                        <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
-                        <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
-                        <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
-                    </div>
+                    <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none;">
+                    <input type="number" id="captKills" placeholder="Kills" style="display:none;">
+                    <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
                     <input type="text" id="reportLink" placeholder="Link Imgur">
-                    <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
+                    <button class="btn-action" onclick="sendReport()">WYŚLIJ</button>
                 </div>
             </section>
 
-            <section id="tab-pracownicy" class="tab-content card" style="display:none;">
-                <h3 class="card-title">Status Rodziny</h3>
-                <table class="minimal-table">
-                    <thead><tr><th style="width:70%">Konto</th><th style="width:30%; text-align:right;">Ranga</th></tr></thead>
-                    <tbody id="publicUserList"></tbody>
-                </table>
-            </section>
-
-            <section id="tab-admin" class="tab-content" style="display:none;">
+            <section id="adminTabContent" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3 class="card-title">System Awansów</h3>
-                    <div class="form-inline" style="flex-direction: column; align-items: stretch;">
-                        <select id="promoteUserList">
-                            <option>Ładowanie użytkowników...</option>
-                        </select>
-                        <select id="promoteNewRole">
-                            <option value="14 | V-Lider">14 | V-Lider</option>
-                            <option value="13 | Prawa ręka">13 | Prawa ręka</option>
-                            <option value="12 | Lewe jadro">12 | Lewe jadro</option>
-                            <option value="11 | Klapmistsz">11 | Klapmistsz</option>
-                            <option value="10 | Main">10 | Main</option>
-                            <option value="9 | Porucznik">9 | Porucznik</option>
-                            <option value="8 | Weteran">8 | Weteran</option>
-                            <option value="7 | Hunter">7 | Hunter</option>
-                            <option value="6 | Egzekutor">6 | Egzekutor</option>
-                            <option value="5 | Torpeda">5 | Torpeda</option>
-                            <option value="4 | Mlody">4 | Mlody</option>
-                            <option value="3 | Jopek">3 | Jopek</option>
-                            <option value="2 | Klapek">2 | Klapek</option>
-                            <option value="1 | Zawieszony">1 | Zawieszony</option>
-                        </select>
-                        <button class="btn-action" onclick="promoteUser()">ZATWIERDŹ AWANS</button>
-                    </div>
-                </div>
-
-                <div class="card mt-15">
                     <h3 class="card-title">Zarządzanie kontami</h3>
-                    <table class="minimal-table">
-                        <thead><tr><th style="width:30%">User</th><th style="width:40%">IP Address</th><th style="width:30%; text-align:right;">Opcje</th></tr></thead>
+                    <table class="status-table">
+                        <thead>
+                            <tr>
+                                <th>NICK / ROLA</th>
+                                <th>IP</th>
+                                <th style="text-align: right;">AKCJA</th>
+                            </tr>
+                        </thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
-
-                <div class="card mt-15">
-                    <h3 class="card-title">Dodaj Nowego Członka</h3>
-                    <div class="form-inline">
-                        <input type="text" id="newUserName" placeholder="Nick">
-                        <div class="pass-wrapper">
-                            <input type="text" id="newUserPass" placeholder="Hasło">
-                            <button class="dice-btn" onclick="generatePass()">🎲</button>
-                        </div>
-                        <select id="newUserRole">
-                            <option value="14 | V-Lider">14 | V-Lider</option>
-                            <option value="2 | Klapek">2 | Klapek (Nowy)</option>
-                        </select>
-                        <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
-                    </div>
-                </div>
-
                 <div class="card mt-15">
                     <h3 class="card-title">Oczekujące Raporty</h3>
                     <div id="adminReportsContainer"></div>
-                </div>
-
-                <div class="card mt-15">
-                    <h3 class="card-title">Dziennik Zdarzeń</h3>
-                    <div id="systemLogsContainer" class="logs-viewport"></div>
                 </div>
             </section>
         </main>
@@ -133,9 +109,12 @@
 
     <div id="historyModal" class="modal" style="display:none;">
         <div class="modal-content card">
-            <h3 id="historyTitle" class="card-title">Historia</h3>
-            <div id="historyBody"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
+            <h3 id="historyTitle" class="card-title">Historia użytkownika</h3>
+            <div id="historyBody" style="max-height: 300px; overflow-y: auto; font-size: 13px;"></div>
+            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ</button>
         </div>
     </div>
-    <script src="script.js"></script></body></html>
+
+    <script src="script.js"></script>
+</body>
+</html>
