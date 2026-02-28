@@ -32,19 +32,22 @@
             text-transform: uppercase;
         }
 
-        .logo span { color: #2ecc71; }
+        .logo span { color: #fff; }
 
         nav a {
             color: #666;
             text-decoration: none;
             margin-left: 20px;
             font-size: 14px;
+            transition: 0.3s;
         }
 
+        nav a:hover { color: #fff; }
         .logout { color: #b00 !important; }
 
         .status-card {
             background: #0a0a0a;
+            border: 1px solid #1a1a1a;
             border-radius: 15px;
             padding: 35px;
         }
@@ -55,7 +58,7 @@
             margin-bottom: 30px;
         }
 
-        .title span { color: #2ecc71; }
+        .title span { color: #fff; }
 
         table {
             width: 100%;
@@ -70,6 +73,8 @@
             text-align: left;
         }
 
+        .col-role { text-align: right; }
+
         td {
             padding: 14px 0;
             border-top: 1px solid #111;
@@ -78,9 +83,11 @@
         }
 
         .role-data {
-            text-align: left;
+            text-align: right;
         }
 
+        tr:first-child td { border-top: none; }
+        
         .is-root { font-weight: bold; color: #fff; }
     </style>
 </head>
@@ -90,10 +97,10 @@
     <div class="header">
         <div class="logo">NATIS <span>FAMQ</span></div>
         <nav>
-            <a href="#">Raporty</a>
-            <a href="#">Członkowie</a>
-            <a href="#">Admin</a>
-            <a href="#" class="logout">Wyloguj</a>
+            <a href="raporty.php">Raporty</a>
+            <a href="czlonkowie.php">Członkowie</a>
+            <a href="admin.php">Admin</a>
+            <a href="logout.php" class="logout">Wyloguj</a>
         </nav>
     </div>
 
@@ -104,11 +111,11 @@
             <thead>
                 <tr>
                     <th>KONTO</th>
-                    <th>ROLA</th>
+                    <th class="col-role">ROLA</th>
                 </tr>
             </thead>
             <tbody id="member-list">
-                <tr><td colspan="2">Wczytywanie...</td></tr>
+                <tr><td colspan="2" style="text-align:center; color:#444; padding: 20px;">Wczytywanie danych...</td></tr>
             </tbody>
         </table>
     </div>
@@ -117,11 +124,21 @@
 <script>
     async function loadMembers() {
         try {
-            const response = await fetch('data.php'); 
-            const data = await response.json();
+            const response = await fetch('data.php');
             
+            if (response.status === 401 || response.status === 403) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            const data = await response.json();
             const list = document.getElementById('member-list');
             list.innerHTML = '';
+
+            if (data.length === 0) {
+                list.innerHTML = '<tr><td colspan="2" style="text-align:center;">Brak danych do wyświetlenia</td></tr>';
+                return;
+            }
 
             data.forEach(user => {
                 const isRoot = user.role.toLowerCase() === 'root' ? 'is-root' : '';
@@ -133,7 +150,8 @@
                 `;
             });
         } catch (error) {
-            console.error(error);
+            const list = document.getElementById('member-list');
+            list.innerHTML = '<tr><td colspan="2" style="text-align:center; color: #600;">Błąd połączenia z bazą danych</td></tr>';
         }
     }
 
