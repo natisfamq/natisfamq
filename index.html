@@ -11,12 +11,10 @@
         .brand span, .card-title span, .logo span {
             color: #ffffff !important;
         }
-        
         .status-table th:last-child, 
         #publicUserList td:last-child {
             text-align: right !important;
         }
-
         .led-dot {
             background: #ffffff !important;
             box-shadow: 0 0 5px #ffffff !important;
@@ -24,11 +22,10 @@
     </style>
 </head>
 <body>
-    
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
             <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-            <div class="brand">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
+            <div class="brand" style="font-size: 24px; margin-bottom: 20px;">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
                 <input type="password" id="userPass" placeholder="hasło">
@@ -60,9 +57,7 @@
                                 <th style="text-align: right;">ROLA</th>
                             </tr>
                         </thead>
-                        <tbody id="publicUserList">
-                            <tr><td colspan="2" class="loading">Wczytywanie...</td></tr>
-                        </tbody>
+                        <tbody id="publicUserList"></tbody>
                     </table>
                 </div>
             </section>
@@ -77,18 +72,30 @@
                             <option value="Grover">Grover (Rośliny)</option>
                             <option value="Capt">Przejmowanie (Capt)</option>
                         </select>
-                        <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none; margin-top: 10px;">
-                        <input type="number" id="captKills" placeholder="Kills" style="display:none; margin-top: 10px;">
-                        <input type="number" id="captDmg" placeholder="Obrażenia" style="display:none; margin-top: 10px;">
-                        <input type="text" id="reportLink" placeholder="Link do Imgur (Dowód)" style="margin-top: 10px;">
-                        <button class="btn-action" style="margin-top: 10px;" onclick="sendReport()">WYŚLIJ RAPORT</button>
+                        <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none;">
+                        <input type="number" id="captKills" placeholder="Kills" style="display:none;">
+                        <input type="number" id="captDmg" placeholder="Obrażenia" style="display:none;">
+                        <input type="text" id="reportLink" placeholder="Link do Imgur (Dowód)">
+                        <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                     </div>
                 </div>
             </section>
 
             <section id="adminTabContent" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3 class="card-title">Zarządzanie</h3>
+                    <h3 class="card-title">Dodaj konto</h3>
+                    <div class="form-group">
+                        <input type="text" id="newUserName" placeholder="Nick">
+                        <div class="pass-wrapper">
+                            <input type="text" id="newUserPass" placeholder="Hasło">
+                            <button class="dice-btn" onclick="generateRandomPass()">🎲</button>
+                        </div>
+                        <select id="newUserRole"></select>
+                        <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
+                    </div>
+                </div>
+                <div class="card mt-15">
+                    <h3 class="card-title">Zarządzanie kontami</h3>
                     <table class="status-table">
                         <thead>
                             <tr>
@@ -100,22 +107,9 @@
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
-                <div class="card mt-15">
-                    <h3 class="card-title">Oczekujące Raporty</h3>
-                    <div id="adminReportsContainer"></div>
-                </div>
             </section>
         </main>
     </div>
-
-    <div id="historyModal" class="modal" style="display:none;">
-        <div class="modal-content card">
-            <h3 id="historyTitle" class="card-title">Historia</h3>
-            <div id="historyBody"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
-        </div>
-    </div>
-
     <script src="script.js"></script>
 </body>
 </html>
