@@ -1,23 +1,26 @@
-<!DOCTYPE html><html lang="pl"><head>
+<!DOCTYPE html>
+<html lang="pl">
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ɴᴀᴛɪs ғᴀᴍǫ ◉</title>
     <link rel="stylesheet" href="style.css">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script></head><body>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+</head>
+<body>
     
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
             <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-        
             <div class="brand" style="font-size: 24px; margin-bottom: 20px;">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
-            	<input type="password" id="userPass" placeholder="hasło">
-            	<button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
+                <input type="password" id="userPass" placeholder="hasło">
+                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
             <p id="loginError" class="error"></p>
-    	</div>
+        </div>
     </div>
 
     <div id="mainPanel" style="display: none;">
@@ -34,12 +37,6 @@
         </nav>
 
         <main class="content">
-            <section id="terminalSection" class="card" style="display:none; background: #000; border-color: rgba(255,255,255,0.1);">
-                <h3 class="card-title" style="color: #fff;">System Console</h3>
-                <div id="consoleOutput" class="logs-viewport" style="color: #fff; height: 150px; background: #000; border: none; font-size: 11px;"></div>
-                <input type="text" id="consoleInput" placeholder="Wpisz 'help'..." style="background: #050505; border: 1px solid rgba(255,255,255,0.1); color: #fff; margin-top: 10px;">
-            </section>
-
             <section id="tab-aktywnosc" class="tab-content card">
                 <h3 class="card-title">Nowy Raport</h3>
                 <div class="form-group">
@@ -71,33 +68,17 @@
                 <div class="card">
                     <h3 class="card-title">System Awansów</h3>
                     <div class="form-inline" style="flex-direction: column; align-items: stretch;">
-                        <select id="promoteUserList">
-                            <option>Ładowanie użytkowników...</option>
-                        </select>
-                        <select id="promoteNewRole">
-                            <option value="14 | V-Lider">14 | V-Lider</option>
-                            <option value="13 | Prawa ręka">13 | Prawa ręka</option>
-                            <option value="12 | Lewe jadro">12 | Lewe jadro</option>
-                            <option value="11 | Klapmistsz">11 | Klapmistsz</option>
-                            <option value="10 | Main">10 | Main</option>
-                            <option value="9 | Porucznik">9 | Porucznik</option>
-                            <option value="8 | Weteran">8 | Weteran</option>
-                            <option value="7 | Hunter">7 | Hunter</option>
-                            <option value="6 | Egzekutor">6 | Egzekutor</option>
-                            <option value="5 | Torpeda">5 | Torpeda</option>
-                            <option value="4 | Mlody">4 | Mlody</option>
-                            <option value="3 | Jopek">3 | Jopek</option>
-                            <option value="2 | Klapek">2 | Klapek</option>
-                            <option value="1 | Zawieszony">1 | Zawieszony</option>
-                        </select>
+                        <select id="promoteUserList"><option>Ładowanie...</option></select>
+                        <select id="promoteNewRole"></select>
                         <button class="btn-action" onclick="promoteUser()">ZATWIERDŹ AWANS</button>
                     </div>
                 </div>
 
                 <div class="card mt-15">
                     <h3 class="card-title">Zarządzanie kontami</h3>
+                    <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 10px;">Kliknij w nick, aby zobaczyć historię raportów.</p>
                     <table class="minimal-table">
-                        <thead><tr><th style="width:30%">User</th><th style="width:40%">IP Address</th><th style="width:30%; text-align:right;">Opcje</th></tr></thead>
+                        <thead><tr><th>User</th><th>IP Address</th><th align="right">Opcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
@@ -108,12 +89,9 @@
                         <input type="text" id="newUserName" placeholder="Nick">
                         <div class="pass-wrapper">
                             <input type="text" id="newUserPass" placeholder="Hasło">
-                            <button class="dice-btn" onclick="generatePass()">🎲</button>
+                            <button class="dice-btn" onclick="generateRandomPass()">🎲</button>
                         </div>
-                        <select id="newUserRole">
-                            <option value="14 | V-Lider">14 | V-Lider</option>
-                            <option value="2 | Klapek">2 | Klapek (Nowy)</option>
-                        </select>
+                        <select id="newUserRole"></select>
                         <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
                     </div>
                 </div>
@@ -122,20 +100,18 @@
                     <h3 class="card-title">Oczekujące Raporty</h3>
                     <div id="adminReportsContainer"></div>
                 </div>
-
-                <div class="card mt-15">
-                    <h3 class="card-title">Dziennik Zdarzeń</h3>
-                    <div id="systemLogsContainer" class="logs-viewport"></div>
-                </div>
             </section>
         </main>
     </div>
 
     <div id="historyModal" class="modal" style="display:none;">
-        <div class="modal-content card">
+        <div class="modal-content card" style="width: 90%; max-width: 800px; max-height: 80vh; overflow-y: auto;">
             <h3 id="historyTitle" class="card-title">Historia</h3>
             <div id="historyBody"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
+            <button class="btn-action" style="margin-top:20px; width: 100%;" onclick="closeHistory()">ZAMKNIJ OKNO</button>
         </div>
     </div>
-    <script src="script.js"></script></body></html>
+
+    <script src="script.js"></script>
+</body>
+</html>
