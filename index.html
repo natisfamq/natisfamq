@@ -8,36 +8,33 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
     <style>
-        /* NAPRAWA KOLORÓW: Zielony na Biały */
-        .brand span, .card-title span, .logo span, .status-header span {
+        .brand span, .card-title span, .logo span {
             color: #ffffff !important;
         }
         
-        /* PRZESUNIĘCIE ROLI POD NAGŁÓWEK (Do prawej) */
         .status-table th:last-child, 
         #publicUserList td:last-child {
             text-align: right !important;
         }
 
-        /* Styl dla klikalnego nicku w Adminie */
-        .clickable-nick {
-            cursor: pointer;
-            text-decoration: underline;
-            color: #fff;
+        .led-dot {
+            background: #ffffff !important;
+            box-shadow: 0 0 5px #ffffff !important;
         }
-        .clickable-nick:hover { color: #ccc; }
     </style>
 </head>
 <body>
     
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
-            <div class="brand">NATIS <span>FAMQ</span></div>
+            <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
+            <div class="brand">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
             <div class="auth-inputs">
                 <input type="text" id="userName" placeholder="użytkownik">
                 <input type="password" id="userPass" placeholder="hasło">
                 <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
             </div>
+            <p id="loginError" class="error"></p>
         </div>
     </div>
 
@@ -45,7 +42,7 @@
         <nav class="top-nav">
             <div class="brand">NATIS <span>FAMQ</span></div>
             <div class="nav-menu">
-                <button class="nav-link" onclick="switchTab('publicTab')">Status</button>
+                <button class="nav-link active" onclick="switchTab('publicTab')">Status</button>
                 <button class="nav-link" onclick="switchTab('membersTab')">Raporty</button>
                 <button id="adminTab" class="nav-link" style="display:none;" onclick="switchTab('adminTabContent')">Admin</button>
                 <button class="nav-link logout" onclick="location.reload()">Wyloguj</button>
@@ -63,7 +60,9 @@
                                 <th style="text-align: right;">ROLA</th>
                             </tr>
                         </thead>
-                        <tbody id="publicUserList"></tbody>
+                        <tbody id="publicUserList">
+                            <tr><td colspan="2" class="loading">Wczytywanie...</td></tr>
+                        </tbody>
                     </table>
                 </div>
             </section>
@@ -71,23 +70,25 @@
             <section id="membersTab" class="tab-content" style="display:none;">
                 <div class="card">
                     <h3 class="card-title">Wyślij Raport</h3>
-                    <select id="reportType" onchange="toggleExtraFields()">
-                        <option value="Paczki">Paczki</option>
-                        <option value="Cenna">Cenna</option>
-                        <option value="Grover">Grover</option>
-                        <option value="Capt">Capt</option>
-                    </select>
-                    <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none;">
-                    <input type="number" id="captKills" placeholder="Kills" style="display:none;">
-                    <input type="number" id="captDmg" placeholder="DMG" style="display:none;">
-                    <input type="text" id="reportLink" placeholder="Link Imgur">
-                    <button class="btn-action" onclick="sendReport()">WYŚLIJ</button>
+                    <div class="form-group">
+                        <select id="reportType" onchange="toggleExtraFields()">
+                            <option value="Paczki">Dostawa Paczek</option>
+                            <option value="Cenna">Dostawa Cennej</option>
+                            <option value="Grover">Grover (Rośliny)</option>
+                            <option value="Capt">Przejmowanie (Capt)</option>
+                        </select>
+                        <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none; margin-top: 10px;">
+                        <input type="number" id="captKills" placeholder="Kills" style="display:none; margin-top: 10px;">
+                        <input type="number" id="captDmg" placeholder="Obrażenia" style="display:none; margin-top: 10px;">
+                        <input type="text" id="reportLink" placeholder="Link do Imgur (Dowód)" style="margin-top: 10px;">
+                        <button class="btn-action" style="margin-top: 10px;" onclick="sendReport()">WYŚLIJ RAPORT</button>
+                    </div>
                 </div>
             </section>
 
             <section id="adminTabContent" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3 class="card-title">Zarządzanie kontami</h3>
+                    <h3 class="card-title">Zarządzanie</h3>
                     <table class="status-table">
                         <thead>
                             <tr>
@@ -109,9 +110,9 @@
 
     <div id="historyModal" class="modal" style="display:none;">
         <div class="modal-content card">
-            <h3 id="historyTitle" class="card-title">Historia użytkownika</h3>
-            <div id="historyBody" style="max-height: 300px; overflow-y: auto; font-size: 13px;"></div>
-            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ</button>
+            <h3 id="historyTitle" class="card-title">Historia</h3>
+            <div id="historyBody"></div>
+            <button class="btn-action" style="margin-top:20px" onclick="closeHistory()">ZAMKNIJ OKNO</button>
         </div>
     </div>
 
