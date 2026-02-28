@@ -32,22 +32,19 @@
             text-transform: uppercase;
         }
 
-        .logo span { color: #fff; }
+        .logo span { color: #2ecc71; }
 
         nav a {
             color: #666;
             text-decoration: none;
             margin-left: 20px;
             font-size: 14px;
-            transition: 0.3s;
         }
 
-        nav a:hover { color: #fff; }
         .logout { color: #b00 !important; }
 
         .status-card {
             background: #0a0a0a;
-            border: 1px solid #1a1a1a;
             border-radius: 15px;
             padding: 35px;
         }
@@ -58,7 +55,7 @@
             margin-bottom: 30px;
         }
 
-        .title span { color: #fff; }
+        .title span { color: #2ecc71; }
 
         table {
             width: 100%;
@@ -73,8 +70,6 @@
             text-align: left;
         }
 
-        .col-role { text-align: right; }
-
         td {
             padding: 14px 0;
             border-top: 1px solid #111;
@@ -83,11 +78,9 @@
         }
 
         .role-data {
-            text-align: right;
+            text-align: left;
         }
 
-        tr:first-child td { border-top: none; }
-        
         .is-root { font-weight: bold; color: #fff; }
     </style>
 </head>
@@ -111,11 +104,11 @@
             <thead>
                 <tr>
                     <th>KONTO</th>
-                    <th class="col-role">ROLA</th>
+                    <th>ROLA</th>
                 </tr>
             </thead>
             <tbody id="member-list">
-                <tr><td colspan="2" style="text-align:center; color:#444;">Wczytywanie...</td></tr>
+                <tr><td colspan="2">Wczytywanie...</td></tr>
             </tbody>
         </table>
     </div>
