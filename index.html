@@ -3,104 +3,149 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ɴᴀᴛɪs</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <title>NATIS FAMQ</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        body {
+            background-color: #000;
+            color: #fff;
+            font-family: 'Segoe UI', sans-serif;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 50px;
+        }
+
+        .logo {
+            font-weight: 800;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        .logo span { color: #fff; }
+
+        nav a {
+            color: #666;
+            text-decoration: none;
+            margin-left: 20px;
+            font-size: 14px;
+            transition: 0.3s;
+        }
+
+        nav a:hover { color: #fff; }
+        .logout { color: #b00 !important; }
+
+        .status-card {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            border-radius: 15px;
+            padding: 35px;
+        }
+
+        .title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .title span { color: #fff; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th {
+            color: #444;
+            font-size: 12px;
+            text-transform: uppercase;
+            padding-bottom: 15px;
+            text-align: left;
+        }
+
+        .col-role { text-align: right; }
+
+        td {
+            padding: 14px 0;
+            border-top: 1px solid #111;
+            font-size: 15px;
+            color: #ccc;
+        }
+
+        .role-data {
+            text-align: right;
+        }
+
+        tr:first-child td { border-top: none; }
+        
+        .is-root { font-weight: bold; color: #fff; }
+    </style>
 </head>
 <body>
-    <div id="loginPage" class="full-screen">
-        <div class="auth-card">
-            <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-            <div class="brand">Natis <span>FamQ</span></div>
-            <div class="auth-inputs">
-                <input type="text" id="userName" placeholder="użytkownik">
-                <input type="password" id="userPass" placeholder="hasło">
-                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
-            </div>
-            <p id="loginError" class="error"></p>
-        </div>
-    </div>
 
-    <div id="mainPanel" style="display: none;">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="brand">Natis <span>FamQ</span></div>
-                <div class="menu">
-                    <span onclick="switchTab('tab-aktywnosc')">Raporty</span>
-                    <span onclick="switchTab('tab-pracownicy')">Członkowie</span>
-                    <span id="adminTab" style="display:none;" onclick="switchTab('tab-admin')">Admin</span>
-                    <span onclick="location.reload()" class="logout">Wyloguj</span>
-                </div>
-            </div>
+<div class="container">
+    <div class="header">
+        <div class="logo">NATIS <span>FAMQ</span></div>
+        <nav>
+            <a href="#">Raporty</a>
+            <a href="#">Członkowie</a>
+            <a href="#">Admin</a>
+            <a href="#" class="logout">Wyloguj</a>
         </nav>
-
-        <main class="content">
-            <section id="tab-aktywnosc" class="tab-content">
-                <div class="card">
-                    <h3 class="brand" style="margin-bottom: 20px;">Nowy <span>Raport</span></h3>
-                    <select id="reportType" onchange="toggleExtraFields()">
-                        <option value="Paczki">Paczki (10.000$)</option>
-                        <option value="Cenna">Cenna (10.000$)</option>
-                        <option value="Grover">Grover (1k / krzak)</option>
-                        <option value="Capt">Capt (Podstawa + Bonus)</option>
-                    </select>
-                    <div id="extraFields">
-                        <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
-                        <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
-                        <input type="number" id="captDmg" placeholder="Ilość DMG" style="display:none;">
-                    </div>
-                    <input type="text" id="reportLink" placeholder="Link do Imgur">
-                    <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
-                </div>
-            </section>
-
-            <section id="tab-pracownicy" class="tab-content card" style="display:none;">
-                <h3 class="brand" style="margin-bottom: 20px;">Status <span>Rodziny</span></h3>
-                <table class="minimal-table">
-                    <thead><tr><th>Konto</th><th style="text-align:right;">Rola</th></tr></thead>
-                    <tbody id="publicUserList"></tbody>
-                </table>
-            </section>
-
-            <section id="tab-admin" class="tab-content" style="display:none;">
-                <div class="card">
-                    <h3 class="brand">Oczekujące <span>Raporty</span></h3>
-                    <div id="adminReportsContainer" class="reports-grid"></div>
-                </div>
-
-                <div class="card mt-15">
-                    <h3 class="brand">System <span>Awansów</span></h3>
-                    <div class="form-inline">
-                        <select id="promoteUserList"></select>
-                        <select id="promoteNewRole"></select>
-                        <button class="btn-action" onclick="promoteUser()">ZATWIERDŹ AWANS</button>
-                    </div>
-                </div>
-
-                <div class="card mt-15">
-                    <h3 class="brand">Zarządzanie <span>Kontami</span></h3>
-                    <table class="minimal-table">
-                        <thead><tr><th>User</th><th>IP Address</th><th style="text-align:right;">Opcje</th></tr></thead>
-                        <tbody id="adminUsersList"></tbody>
-                    </table>
-                </div>
-
-                <div class="card mt-15">
-                    <h3 class="brand">Dodaj Nowego <span>Członka</span></h3>
-                    <div class="form-inline">
-                        <input type="text" id="newUserName" placeholder="Nick">
-                        <div class="pass-wrapper">
-                            <input type="text" id="newUserPass" placeholder="Hasło" style="margin-bottom:0;">
-                            <button class="dice-btn" onclick="generateRandomPass()">🎲</button>
-                        </div>
-                        <select id="newUserRole"></select>
-                        <button class="btn-action" onclick="createUser()">DODAJ</button>
-                    </div>
-                </div>
-            </section>
-        </main>
     </div>
-    <script src="script.js"></script>
+
+    <div class="status-card">
+        <div class="title">STATUS <span>RODZINY</span></div>
+        
+        <table>
+            <thead>
+                <tr>
+                    <th>KONTO</th>
+                    <th class="col-role">ROLA</th>
+                </tr>
+            </thead>
+            <tbody id="member-list">
+                <tr><td colspan="2" style="text-align:center; color:#444;">Wczytywanie...</td></tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    async function loadMembers() {
+        try {
+            const response = await fetch('data.php'); 
+            const data = await response.json();
+            
+            const list = document.getElementById('member-list');
+            list.innerHTML = '';
+
+            data.forEach(user => {
+                const isRoot = user.role.toLowerCase() === 'root' ? 'is-root' : '';
+                list.innerHTML += `
+                    <tr class="${isRoot}">
+                        <td>${user.username}</td>
+                        <td class="role-data">${user.role}</td>
+                    </tr>
+                `;
+            });
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    loadMembers();
+</script>
+
 </body>
 </html>
