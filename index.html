@@ -9,7 +9,6 @@
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
-    
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
             <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
@@ -37,44 +36,42 @@
         </nav>
 
         <main class="content">
-            <section id="tab-aktywnosc" class="tab-content card">
-                <h3 class="card-title">Nowy Raport</h3>
-                <div class="form-group">
+            <section id="tab-aktywnosc" class="tab-content">
+                <div class="card">
+                    <h3 class="brand" style="margin-bottom: 20px;">Nowy <span>Raport</span></h3>
                     <select id="reportType" onchange="toggleExtraFields()">
                         <option value="Paczki">Paczki (10.000$)</option>
                         <option value="Cenna">Cenna (10.000$)</option>
-                        <option value="Grover">Grover (1.000$/szt)</option>
-                        <option value="Capt">Capt (Podstawa + Bonusy)</option>
+                        <option value="Grover">Grover (1k / krzak)</option>
+                        <option value="Capt">Capt (Podstawa + Bonus)</option>
                     </select>
-                    
-                    <div id="extraFieldsContainer">
+                    <div id="extraFields">
                         <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
                         <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
                         <input type="number" id="captDmg" placeholder="Ilość DMG" style="display:none;">
                     </div>
-
-                    <input type="text" id="reportLink" placeholder="Link Imgur">
+                    <input type="text" id="reportLink" placeholder="Link do Imgur">
                     <button class="btn-action" onclick="sendReport()">WYŚLIJ RAPORT</button>
                 </div>
             </section>
 
             <section id="tab-pracownicy" class="tab-content card" style="display:none;">
-                <h3 class="card-title">Status Rodziny</h3>
+                <h3 class="brand" style="margin-bottom: 20px;">Status <span>Rodziny</span></h3>
                 <table class="minimal-table">
-                    <thead><tr><th style="width:70%">Konto</th><th style="width:30%; text-align:right;">Rola</th></tr></thead>
+                    <thead><tr><th>Konto</th><th style="text-align:right;">Rola</th></tr></thead>
                     <tbody id="publicUserList"></tbody>
                 </table>
             </section>
 
             <section id="tab-admin" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3 class="card-title">Oczekujące Raporty</h3>
+                    <h3 class="brand">Oczekujące <span>Raporty</span></h3>
                     <div id="adminReportsContainer" class="reports-grid"></div>
                 </div>
 
                 <div class="card mt-15">
-                    <h3 class="card-title">System Awansów</h3>
-                    <div class="form-inline" style="flex-direction: column; align-items: stretch; gap: 10px;">
+                    <h3 class="brand">System <span>Awansów</span></h3>
+                    <div class="form-inline">
                         <select id="promoteUserList"></select>
                         <select id="promoteNewRole"></select>
                         <button class="btn-action" onclick="promoteUser()">ZATWIERDŹ AWANS</button>
@@ -82,7 +79,7 @@
                 </div>
 
                 <div class="card mt-15">
-                    <h3 class="card-title">Zarządzanie kontami</h3>
+                    <h3 class="brand">Zarządzanie <span>Kontami</span></h3>
                     <table class="minimal-table">
                         <thead><tr><th>User</th><th>IP Address</th><th style="text-align:right;">Opcje</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
@@ -90,10 +87,13 @@
                 </div>
 
                 <div class="card mt-15">
-                    <h3 class="card-title">Dodaj Nowego Członka</h3>
+                    <h3 class="brand">Dodaj Nowego <span>Członka</span></h3>
                     <div class="form-inline">
                         <input type="text" id="newUserName" placeholder="Nick">
-                        <input type="text" id="newUserPass" placeholder="Hasło">
+                        <div class="pass-wrapper">
+                            <input type="text" id="newUserPass" placeholder="Hasło" style="margin-bottom:0;">
+                            <button class="dice-btn" onclick="generateRandomPass()">🎲</button>
+                        </div>
                         <select id="newUserRole"></select>
                         <button class="btn-action" onclick="createUser()">DODAJ</button>
                     </div>
