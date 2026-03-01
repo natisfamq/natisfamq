@@ -48,26 +48,43 @@
                 </div>
             </section>
 
+            <section id="membersTab" class="tab-content" style="display:none;">
+                <div class="card">
+                    <h3 class="card-title">Wyślij Raport</h3>
+                    <div class="form-group">
+                        <select id="reportType" onchange="toggleExtraFields()">
+                            <option value="Paczki">Paczki</option>
+                            <option value="Cenna">Cenna</option>
+                            <option value="Grover">Grover</option>
+                            <option value="Capt">Capt</option>
+                        </select>
+                        <input type="number" id="groverPlants" placeholder="Rośliny" style="display:none; margin-top:10px;">
+                        <input type="number" id="captKills" placeholder="Kills" style="display:none; margin-top:10px;">
+                        <input type="number" id="captDmg" placeholder="DMG" style="display:none; margin-top:10px;">
+                        <input type="text" id="reportLink" placeholder="Link Imgur" style="margin-top:10px;">
+                        <button class="btn-action" onclick="sendReport()" style="margin-top:10px;">WYŚLIJ</button>
+                    </div>
+                </div>
+            </section>
+
             <section id="adminTabContent" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3 class="card-title">Zarządzanie kontami</h3>
-                    <div class="form-group">
-                        <input type="text" id="newUserName" placeholder="Nick">
-                        <input type="text" id="newUserPass" placeholder="Hasło">
-                        <select id="newUserRole"></select> <button class="btn-action" onclick="createUser()">DODAJ KONTO</button>
-                    </div>
+                    <h3 class="card-title">Dodaj konto</h3>
+                    <input type="text" id="newUserName" placeholder="Nick">
+                    <input type="text" id="newUserPass" placeholder="Hasło">
+                    <select id="newUserRole"></select>
+                    <button class="btn-action" onclick="createUser()">DODAJ</button>
                 </div>
 
                 <div class="card mt-15">
                     <h3 class="card-title">Awansuj / Degraduj</h3>
-                    <div class="form-group">
-                        <select id="promoteUserList"></select>
-                        <select id="promoteNewRole"></select> <button class="btn-action" onclick="promoteUser()">ZMIEŃ RANGĘ</button>
-                    </div>
+                    <select id="promoteUserList"></select>
+                    <select id="promoteNewRole"></select>
+                    <button class="btn-action" onclick="promoteUser()">ZMIEŃ RANGĘ</button>
                 </div>
 
                 <div class="card mt-15">
-                    <h3 class="card-title">Lista Użytkowników</h3>
+                    <h3 class="card-title">Zarządzanie</h3>
                     <table class="status-table">
                         <thead><tr><th>NICK</th><th>IP</th><th align="right">AKCJA</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
