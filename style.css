@@ -1,20 +1,13 @@
-/* =========================
-   NATIS OS - WHITE ACCENT EDITION
-========================= */
-
 :root {
     --bg-main: #000000;
-    --bg-soft: #0a0a0a;
+    --bg-soft: #0c0c0c;
+    --bg-input: #151515;
     --accent: #ffffff;
     --text-main: #ffffff;
-    --text-muted: #888888;
-    --border-soft: #1a1a1a;
-    --glass: rgba(255, 255, 255, 0.03);
+    --text-muted: #777777;
+    --border-soft: #1f1f1f;
+    --border-hover: #333333;
 }
-
-/* =========================
-   GLOBAL & LAYOUT
-========================= */
 
 * {
     margin: 0;
@@ -27,19 +20,94 @@ body {
     background: var(--bg-main);
     color: var(--text-main);
     min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-}
-
-/* Centrowanie kontenera głównego */
-.content-wrapper {
-    max-width: 1000px;
-    width: 95%;
-    margin: 40px auto;
 }
 
 /* =========================
-   STRONA LOGOWANIA (NAPRAWA)
+   NAWIGACJA (PRZYCISKI W PRAWYM GÓRNYM)
+========================= */
+
+.top-nav {
+    display: flex;
+    justify-content: space-between; /* To spycha menu na prawo */
+    align-items: center;
+    padding: 15px 40px;
+    background: rgba(10, 10, 10, 0.95);
+    border-bottom: 1px solid var(--border-soft);
+    backdrop-filter: blur(10px);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 10px; /* Odstęp między przyciskami */
+}
+
+.nav-link {
+    background: transparent;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+    color: #fff;
+    background: var(--bg-input);
+    border-color: var(--border-soft);
+}
+
+.nav-link.active {
+    color: #000;
+    background: #fff;
+}
+
+.logout {
+    color: #ff4444 !important;
+}
+
+.logout:hover {
+    background: rgba(255, 68, 68, 0.1) !important;
+    border-color: rgba(255, 68, 68, 0.2) !important;
+}
+
+/* =========================
+   SMOOTH INPUTS & SELECTS
+========================= */
+
+input, select {
+    width: 100%;
+    padding: 12px 15px;
+    background: var(--bg-input);
+    border: 1px solid var(--border-soft);
+    color: #fff;
+    border-radius: 10px;
+    outline: none;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    appearance: none; /* Usuwa standardową strzałkę dla selectów */
+}
+
+/* Przywrócenie strzałki w select w sposób "smooth" */
+select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='white' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: calc(100% - 15px) center;
+}
+
+input:focus, select:focus {
+    border-color: var(--border-hover);
+    background: #1a1a1a;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.05);
+}
+
+/* =========================
+   UKŁAD STRONY LOGOWANIA
 ========================= */
 
 .full-screen {
@@ -47,100 +115,118 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: radial-gradient(circle at center, #111 0%, #000 100%);
 }
 
 .auth-card {
     background: var(--bg-soft);
     border: 1px solid var(--border-soft);
     padding: 40px;
-    border-radius: 20px;
+    border-radius: 24px;
     width: 100%;
     max-width: 380px;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
 }
 
-/* Naprawa logo - teraz jest małym kółkiem */
 .login-logo {
-    width: 85px;
-    height: 85px;
-    object-fit: cover;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
-    margin: 0 auto 20px auto;
-    border: 2px solid var(--accent);
-    display: block;
+    object-fit: cover;
+    margin: 0 auto 20px;
+    border: 1px solid var(--border-soft);
 }
 
 .brand {
-    font-size: 22px;
+    font-size: 20px;
     font-weight: 800;
-    letter-spacing: 3px;
     text-transform: uppercase;
-    margin-bottom: 25px;
+    letter-spacing: 2px;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-.brand span {
-    color: var(--accent);
-}
+.brand span { color: var(--accent); }
 
-/* Efekt Glow na kropce LED */
 .led-dot {
-    width: 8px;
-    height: 8px;
-    background: var(--accent);
+    width: 6px;
+    height: 6px;
+    background: #fff;
     border-radius: 50%;
     margin-left: 10px;
-    box-shadow: 0 0 12px var(--accent), 0 0 4px var(--accent);
+    box-shadow: 0 0 10px #fff;
 }
 
 /* =========================
-   PRZYCISKI I INPUTY
+   STRUKTURA PANELU
 ========================= */
 
-.auth-inputs input {
-    width: 100%;
-    padding: 14px;
-    margin-bottom: 12px;
-    background: #111;
-    border: 1px solid #222;
-    color: #fff;
-    border-radius: 10px;
-    outline: none;
-    transition: 0.3s;
+.content-wrapper {
+    max-width: 900px;
+    margin: 40px auto;
+    padding: 0 20px;
 }
 
-.auth-inputs input:focus {
-    border-color: var(--accent);
-    background: #151515;
+.card {
+    background: var(--bg-soft);
+    border: 1px solid var(--border-soft);
+    border-radius: 16px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
+
+.card-title {
+    font-size: 14px;
+    font-weight: 700;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-bottom: 20px;
+    letter-spacing: 1px;
+}
+
+.card-title span { color: #fff; }
+
+.status-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.status-table td {
+    padding: 16px 0;
+    border-bottom: 1px solid #080808;
+    font-size: 14px;
+}
+
+.status-table th {
+    text-align: left;
+    font-size: 11px;
+    color: var(--text-muted);
+    padding-bottom: 10px;
+    text-transform: uppercase;
+}
+
+.status-table tr td:last-child {
+    text-align: right;
 }
 
 .btn-primary {
     width: 100%;
     padding: 14px;
-    background: var(--accent);
+    background: #fff;
     color: #000;
     border: none;
     border-radius: 10px;
     font-weight: 700;
-    text-transform: uppercase;
     cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(255,255,255,0.2);
+    margin-top: 10px;
 }
 
 .btn-action {
-    padding: 10px 20px;
-    background: #1a1a1a;
+    background: var(--bg-input);
+    border: 1px solid var(--border-soft);
     color: #fff;
-    border: 1px solid #333;
+    padding: 10px 20px;
     border-radius: 8px;
     cursor: pointer;
     font-size: 13px;
@@ -148,87 +234,24 @@ body {
 }
 
 .btn-action:hover {
-    background: #252525;
-    border-color: var(--accent);
+    background: #222;
+    border-color: #444;
 }
 
-/* =========================
-   PANEL GŁÓWNY & TABELE
-========================= */
-
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 5%;
-    background: rgba(10, 10, 10, 0.9);
-    border-bottom: 1px solid var(--border-soft);
-    backdrop-filter: blur(10px);
-}
-
-.card {
-    background: var(--bg-soft);
-    border: 1px solid var(--border-soft);
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 20px;
-}
-
-.card-title {
-    font-size: 16px;
-    margin-bottom: 20px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-.card-title span {
-    color: var(--accent);
-}
-
-.status-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.status-table th {
-    text-align: left;
-    font-size: 11px;
-    color: var(--text-muted);
-    padding-bottom: 15px;
-    text-transform: uppercase;
-}
-
-.status-table td {
-    padding: 12px 0;
-    border-top: 1px solid #111;
-    font-size: 14px;
-}
-
-/* Rola wyrównana do prawej */
-.status-table th:last-child, 
-.status-table td:last-child {
-    text-align: right;
-}
+.mt-15 { margin-top: 15px; }
 
 /* Kostka do haseł */
 .pass-wrapper {
     display: flex;
     gap: 8px;
-    margin-bottom: 10px;
+    margin: 10px 0;
 }
 
 .dice-btn {
-    background: #1a1a1a;
-    border: 1px solid #333;
+    background: var(--bg-input);
+    border: 1px solid var(--border-soft);
     color: white;
-    padding: 10px;
+    padding: 10px 15px;
     border-radius: 8px;
     cursor: pointer;
-}
-
-.error {
-    color: #ff4444;
-    font-size: 12px;
-    margin-top: 10px;
 }
