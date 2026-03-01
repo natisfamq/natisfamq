@@ -12,14 +12,15 @@
 
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
-            <img src="https://i.imgur.com/4E9D9S6.png" class="login-logo" alt="Logo">
+            <img src="https://i.imgur.com/83p1V6p.png" class="login-logo" alt="NATIS LOGO">
             <h2 class="brand">NATIS <span>OS</span></h2>
-            <p style="color: var(--text-muted); font-size: 12px; margin-bottom: 20px;">SYSTEM ZARZĄDZANIA</p>
             
-            <input type="text" id="userName" placeholder="Identyfikator">
-            <input type="password" id="userPass" placeholder="Hasło dostępu">
-            <button class="btn-primary" onclick="login()" style="width: 100%;">AUTORYZUJ</button>
-            <p id="loginError" class="error"></p>
+            <div style="margin-top: 25px;">
+                <input type="text" id="userName" placeholder="Identyfikator">
+                <input type="password" id="userPass" placeholder="Hasło dostępu">
+                <button class="btn-primary" onclick="login()">AUTORYZUJ</button>
+                <p id="loginError" class="error"></p>
+            </div>
         </div>
     </div>
 
@@ -30,7 +31,7 @@
                 <div class="menu">
                     <span onclick="switchTab('publicTab')">CZŁONKOWIE</span>
                     <span onclick="switchTab('reportTab')">RAPORT</span>
-                    <span id="adminBtn" onclick="switchTab('adminTab')" style="display:none; color: white; border-bottom: 1px solid white;">ZARZĄD</span>
+                    <span id="adminBtn" onclick="switchTab('adminTab')" style="display:none;">ZARZĄD</span>
                     <span class="logout" onclick="location.reload()">WYLOGUJ</span>
                 </div>
             </div>
@@ -38,21 +39,21 @@
 
         <div class="content">
             
-            <div id="publicTab" class="tab-content">
+            <div id="publicTab" class="tab-content active-tab">
                 <div class="card">
-                    <h3 style="margin-bottom: 20px;">LISTA AKTYWNYCH JEDNOSTEK</h3>
+                    <h3 class="section-title">LISTA AKTYWNYCH JEDNOSTEK</h3>
                     <table class="minimal-table">
                         <thead>
-                            <tr><th>KONTO</th><th>ROLA</th></tr>
+                            <tr><th>KONTO</th><th style="text-align: right;">ROLA</th></tr>
                         </thead>
                         <tbody id="publicUserList"></tbody>
                     </table>
                 </div>
             </div>
 
-            <div id="reportTab" class="tab-content" style="display:none;">
+            <div id="reportTab" class="tab-content">
                 <div class="card" style="max-width: 600px; margin: 0 auto;">
-                    <h3 style="margin-bottom: 20px;">NOWA DOSTAWA / AKCJA</h3>
+                    <h3 class="section-title">NOWA DOSTAWA / AKCJA</h3>
                     <select id="reportType" onchange="toggleExtraFields()">
                         <option value="Paczki">Paczki (10,000$)</option>
                         <option value="Cenna">Cenna (10,000$)</option>
@@ -67,32 +68,32 @@
                     </div>
 
                     <input type="text" id="reportLink" placeholder="Link Imgur (Dowód)">
-                    <button class="btn-primary" onclick="sendReport()" style="width: 100%; margin-top: 10px;">PRZEŚLIJ DO WERYFIKACJI</button>
+                    <button class="btn-primary" onclick="sendReport()" style="margin-top: 10px;">PRZEŚLIJ RAPORT</button>
                 </div>
             </div>
 
-            <div id="adminTab" class="tab-content" style="display:none;">
-                <div class="card mt-15">
-                    <h3>RAPORTY DO ZATWIERDZENIA</h3>
+            <div id="adminTab" class="tab-content">
+                <div class="card">
+                    <h3 class="section-title">OCZEKUJĄCE RAPORTY</h3>
                     <table class="minimal-table">
                         <thead>
-                            <tr><th>GRACZ</th><th>KWOTA</th><th>DOWÓD</th><th>AKCJA</th></tr>
+                            <tr><th>GRACZ</th><th>KWOTA</th><th>DOWÓD</th><th style="text-align: right;">AKCJA</th></tr>
                         </thead>
                         <tbody id="adminReportsList"></tbody>
                     </table>
                 </div>
 
-                <div class="card mt-15">
-                    <h3>LOGI SYSTEMOWE / KONSOLA</h3>
+                <div class="card">
+                    <h3 class="section-title">KONSOLA SYSTEMOWA</h3>
                     <div id="systemLogs" class="logs-viewport"></div>
-                    <input type="text" id="adminConsole" placeholder="Terminal command..." onkeypress="handleConsole(event)" class="mt-15">
+                    <input type="text" id="adminConsole" placeholder="Wpisz komendę..." onkeypress="handleConsole(event)" style="margin-top: 15px; background: rgba(0,0,0,0.6);">
                 </div>
 
-                <div class="card mt-15">
-                    <h3>ZARZĄDZANIE DOSTĘPEM</h3>
+                <div class="card">
+                    <h3 class="section-title">ZARZĄDZANIE KONTY</h3>
                     <table class="minimal-table">
                         <thead>
-                            <tr><th>USER</th><th>OSTATNIE IP</th><th>USUŃ</th></tr>
+                            <tr><th>NICK / ROLA</th><th>IP</th><th style="text-align: right;">USUŃ</th></tr>
                         </thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
