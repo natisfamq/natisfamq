@@ -338,3 +338,28 @@ button {
     background: linear-gradient(#ffffff, #888888);
     border-radius: 20px;
 }
+
+/* ===== CENTER MAIN PANELS ===== */
+
+.content {
+    display: flex;
+    justify-content: center;
+    padding: 40px 20px;
+}
+
+/* limit card width so it doesn't stretch */
+.content .card {
+    width: 100%;
+    max-width: 900px;
+}
+
+/* better table spacing */
+.minimal-table {
+    width: 100%;
+    max-width: 500px;
+}
+
+/* center section titles */
+.card-title {
+    margin-bottom: 20px;
+}
