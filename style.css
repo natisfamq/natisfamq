@@ -1,137 +1,166 @@
-:root {
-    --bg-main: #000000;
-    --bg-soft: #111111;
-    --glass-light: rgba(255, 255, 255, 0.06);
-    --glass-strong: rgba(255, 255, 255, 0.12);
-    --border-soft: rgba(255, 255, 255, 0.12);
-    --border-strong: rgba(255, 255, 255, 0.25);
-    --text-main: #f5f5f5;
-    --text-muted: #9a9a9a;
+:root{
+    --bg:#000;
+    --glass:rgba(255,255,255,0.06);
+    --glass-strong:rgba(255,255,255,0.12);
+    --border:rgba(255,255,255,0.15);
+    --text:#f5f5f5;
+    --text-muted:#9a9a9a;
 }
 
 /* =========================
    GLOBAL
 ========================= */
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+*{
+    margin:0;
+    padding:0;
+    box-sizing:border-box;
+    font-family:Inter,Segoe UI,system-ui;
 }
 
-body {
-    min-height: 100vh;
-    background: radial-gradient(circle at 30% 30%, #1a1a1a, #000000 60%);
-    color: var(--text-main);
-}
-
-/* Subtle animated depth */
-body::before {
-    content: "";
-    position: fixed;
-    inset: 0;
-    background: linear-gradient(
-        120deg,
-        rgba(255,255,255,0.04),
-        rgba(255,255,255,0.02),
-        rgba(255,255,255,0.04)
-    );
-    background-size: 200% 200%;
-    animation: bgMove 15s ease infinite;
-    z-index: -1;
-    filter: blur(120px);
-}
-
-@keyframes bgMove {
-    0% { background-position: 0% 50%; }
-    50% { background-position: 100% 50%; }
-    100% { background-position: 0% 50%; }
+body{
+    background:radial-gradient(circle at 30% 30%,#1a1a1a,#000 60%);
+    color:var(--text);
+    min-height:100vh;
 }
 
 /* =========================
-   CENTERED LAYOUT SYSTEM
+   NAVBAR
 ========================= */
 
-.nav-container,
-.content {
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 20px;
+.navbar{
+    background:rgba(10,10,10,.75);
+    backdrop-filter:blur(18px);
+    border-bottom:1px solid var(--border);
+    padding:14px 0;
 }
 
-/* Add spacing below navbar */
-.content {
-    margin-top: 40px;
+.nav-container{
+    max-width:1200px;
+    margin:auto;
+    padding:0 20px;
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+}
+
+.brand{
+    font-weight:700;
+    font-size:20px;
+}
+
+.menu{
+    display:flex;
+    gap:10px;
+}
+
+.menu span{
+    padding:8px 16px;
+    border-radius:10px;
+    background:linear-gradient(#f0f0f0,#cfcfcf);
+    color:#000;
+    cursor:pointer;
+    font-size:14px;
+}
+
+.logout{
+    opacity:.6;
 }
 
 /* =========================
-   GLASS CARDS
+   CENTER CONTENT
 ========================= */
 
-.card,
-.auth-card,
-.modal-content {
-    background: var(--glass-light);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border: 1px solid var(--border-soft);
-    border-radius: 20px;
-    padding: 25px;
-    box-shadow:
-        0 8px 40px rgba(0,0,0,0.8),
-        inset 0 0 0 1px rgba(255,255,255,0.03);
-    transition: all 0.3s ease;
-}
-
-.card:hover,
-.auth-card:hover {
-    background: var(--glass-strong);
-    border-color: var(--border-strong);
-    transform: translateY(-4px);
-    box-shadow:
-        0 15px 60px rgba(0,0,0,0.9),
-        0 0 25px rgba(255,255,255,0.15);
+.content{
+    display:flex;
+    justify-content:center;
+    padding:40px 20px;
 }
 
 /* =========================
-   LOGIN PAGE
+   GLASS CARD
 ========================= */
 
-.full-screen {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-}
+.card{
+    width:100%;
+    max-width:950px;
 
-.auth-card {
-    width: 380px;
-    text-align: center;
-}
+    background:var(--glass);
+    backdrop-filter:blur(20px);
 
-/* ROUND LOGO */
-.login-logo {
-    width: 100px;
-    height: 100px;
-    object-fit: cover;
-    border-radius: 50%;
-    margin-bottom: 20px;
-    filter: grayscale(100%) brightness(1.2);
-    border: 2px solid rgba(255,255,255,0.3);
+    border:1px solid var(--border);
+    border-radius:20px;
+
+    padding:30px;
+
     box-shadow:
-        0 0 25px rgba(255,255,255,0.2),
-        inset 0 0 10px rgba(255,255,255,0.1);
+    0 8px 40px rgba(0,0,0,.8),
+    inset 0 0 0 1px rgba(255,255,255,.03);
 }
 
-.brand {
-    font-weight: 600;
-    letter-spacing: 1px;
+/* =========================
+   TITLES
+========================= */
+
+.card-title{
+    font-size:26px;
+    font-weight:700;
+    margin-bottom:20px;
 }
 
-.brand span {
-    color: white;
-    text-shadow: 0 0 10px rgba(255,255,255,0.4);
+/* =========================
+   TABLE
+========================= */
+
+.minimal-table{
+    width:100%;
+    max-width:500px;
+    border-collapse:collapse;
+}
+
+.minimal-table th,
+.minimal-table td{
+    padding:6px 0;
+}
+
+.minimal-table th{
+    color:#cfcfcf;
+}
+
+/* =========================
+   LOGIN
+========================= */
+
+.full-screen{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    height:100vh;
+}
+
+.auth-card{
+    width:380px;
+    text-align:center;
+
+    background:var(--glass);
+    backdrop-filter:blur(20px);
+
+    border:1px solid var(--border);
+    border-radius:20px;
+
+    padding:30px;
+}
+
+.login-logo{
+    width:100px;
+    height:100px;
+    border-radius:50%;
+    object-fit:cover;
+
+    margin-bottom:20px;
+
+    border:2px solid rgba(255,255,255,.3);
 }
 
 /* =========================
@@ -139,227 +168,103 @@ body::before {
 ========================= */
 
 input,
-select {
-    width: 100%;
-    padding: 12px 14px;
-    margin-bottom: 14px;
-    border-radius: 12px;
-    border: 1px solid var(--border-soft);
-    background: rgba(255,255,255,0.04);
-    color: var(--text-main);
-    outline: none;
-    transition: 0.25s ease;
-}
+select{
+    width:100%;
+    padding:12px;
+    margin-bottom:12px;
 
-/* DARK SELECT FIX */
-select {
-    background: #1a1a1a;
-    color: #ffffff;
-    appearance: none;
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    background-image: linear-gradient(45deg, transparent 50%, white 50%),
-                      linear-gradient(135deg, white 50%, transparent 50%);
-    background-position: calc(100% - 20px) calc(1.1em),
-                         calc(100% - 15px) calc(1.1em);
-    background-size: 5px 5px,
-                     5px 5px;
-    background-repeat: no-repeat;
+    border-radius:10px;
+    border:1px solid var(--border);
+
+    background:#1a1a1a;
+    color:white;
 }
 
 input:focus,
-select:focus {
-    border-color: white;
-    box-shadow: 0 0 15px rgba(255,255,255,0.2);
+select:focus{
+    outline:none;
+    border-color:white;
 }
 
 /* =========================
    BUTTONS
 ========================= */
 
-button {
-    cursor: pointer;
-    border: none;
-    border-radius: 12px;
-    padding: 12px 16px;
-    font-weight: 600;
-    letter-spacing: 0.5px;
-    transition: all 0.25s ease;
-}
+button{
+    width:100%;
+    padding:12px;
 
-.btn-primary,
-.btn-action {
-    background: linear-gradient(135deg, #ffffff, #dcdcdc);
-    color: black;
-    box-shadow: 0 0 20px rgba(255,255,255,0.15);
-}
+    border:none;
+    border-radius:10px;
 
-.btn-primary:hover,
-.btn-action:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 30px rgba(255,255,255,0.3);
-}
+    background:linear-gradient(#ffffff,#dcdcdc);
+    color:black;
 
-.logout {
-    color: var(--text-muted);
-}
-
-.logout:hover {
-    color: white;
-}
-
-/* =========================
-   NAVBAR
-========================= */
-
-.navbar {
-    background: rgba(10,10,10,0.75);
-    backdrop-filter: blur(18px);
-    border-bottom: 1px solid var(--border-soft);
-    padding: 14px 0;
-}
-
-.nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.menu span {
-    margin-left: 25px;
-    cursor: pointer;
-    color: var(--text-muted);
-    transition: 0.25s ease;
-}
-
-.menu span:hover {
-    color: white;
-}
-
-/* =========================
-   TABLE
-========================= */
-
-.minimal-table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.minimal-table th,
-.minimal-table td {
-    padding: 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-}
-
-/* Konto LEFT */
-.minimal-table th:first-child,
-.minimal-table td:first-child {
-    text-align: left !important;
-}
-
-/* Role RIGHT */
-.minimal-table th:last-child,
-.minimal-table td:last-child {
-    text-align: right;
-}
-
-.minimal-table tr:hover {
-    background: rgba(255,255,255,0.05);
+    cursor:pointer;
 }
 
 /* =========================
    TERMINAL
 ========================= */
 
-.logs-viewport {
-    background: black;
-    border-radius: 12px;
-    padding: 10px;
-    font-family: monospace;
-    font-size: 12px;
-    overflow-y: auto;
-    max-height: 200px;
-    color: white;
+.logs-viewport{
+    background:black;
+    color:white;
+
+    font-family:monospace;
+    font-size:12px;
+
+    border-radius:12px;
+    padding:10px;
+
+    max-height:200px;
+    overflow-y:auto;
 }
 
 /* =========================
    MODAL
 ========================= */
 
-.modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    backdrop-filter: blur(10px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
+.modal{
+    position:fixed;
+    inset:0;
+
+    background:rgba(0,0,0,.85);
+    backdrop-filter:blur(10px);
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
 }
 
 /* =========================
    UTILITIES
 ========================= */
 
-.mt-15 {
-    margin-top: 15px;
+.mt-15{
+    margin-top:15px;
 }
 
-.form-inline {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
+.form-inline{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
 }
 
-.pass-wrapper {
-    display: flex;
-    gap: 5px;
-}
-
-.dice-btn {
-    background: rgba(255,255,255,0.1);
-    color: white;
-}
-
-.error {
-    color: white;
-    font-size: 13px;
-    margin-top: 5px;
+.pass-wrapper{
+    display:flex;
+    gap:5px;
 }
 
 /* =========================
    SCROLLBAR
 ========================= */
 
-::-webkit-scrollbar {
-    width: 8px;
+::-webkit-scrollbar{
+    width:8px;
 }
 
-::-webkit-scrollbar-thumb {
-    background: linear-gradient(#ffffff, #888888);
-    border-radius: 20px;
-}
-
-/* ===== CENTER MAIN PANELS ===== */
-
-.content {
-    display: flex;
-    justify-content: center;
-    padding: 40px 20px;
-}
-
-/* limit card width so it doesn't stretch */
-.content .card {
-    width: 100%;
-    max-width: 900px;
-}
-
-/* better table spacing */
-.minimal-table {
-    width: 100%;
-    max-width: 500px;
-}
-
-/* center section titles */
-.card-title {
-    margin-bottom: 20px;
+::-webkit-scrollbar-thumb{
+    background:#888;
+    border-radius:20px;
 }
