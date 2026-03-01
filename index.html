@@ -3,93 +3,118 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ɴᴀᴛɪs ғᴀᴍǫ ◉</title>
+    <title>NATIS OS // MONO</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
-    <style>
-        .brand span, .card-title span, .logo span { color: #ffffff !important; }
-        .status-table th:last-child, #publicUserList td:last-child { text-align: right !important; }
-        .led-dot { background: #ffffff !important; box-shadow: 0 0 5px #ffffff !important; }
-    </style>
 </head>
 <body>
+
     <div id="loginPage" class="full-screen">
         <div class="auth-card">
             <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-            <div class="brand">NATIS <span>FAMQ</span><span class="led-dot"></span></div>
-            <div class="auth-inputs">
+            <div class="brand">NATIS <span>FAMQ</span></div>
+            <div class="mt-15">
                 <input type="text" id="userName" placeholder="użytkownik">
                 <input type="password" id="userPass" placeholder="hasło">
-                <button class="btn-primary" onclick="login()">ZALOGUJ SYSTEM</button>
+                <button class="btn-primary" onclick="login()" style="width: 100%;">ZALOGUJ SYSTEM</button>
             </div>
+            <p id="loginError" class="error"></p>
         </div>
     </div>
 
     <div id="mainPanel" style="display: none;">
-        <nav class="top-nav">
-            <div class="brand">NATIS <span>FAMQ</span></div>
-            <div class="nav-menu">
-                <button class="nav-link active" onclick="switchTab('publicTab')">Status</button>
-                <button class="nav-link" onclick="switchTab('membersTab')">Raporty</button>
-                <button id="adminTab" class="nav-link" style="display:none;" onclick="switchTab('adminTabContent')">Admin</button>
-                <button class="nav-link logout" onclick="location.reload()">Wyloguj</button>
+        <nav class="navbar">
+            <div class="nav-container">
+                <div class="brand">NATIS <span>FAMQ</span></div>
+                <div class="menu">
+                    <span onclick="switchTab('publicTab')" style="color: white;">Status</span>
+                    <span onclick="switchTab('reportsTab')">Raporty</span>
+                    <span id="adminBtn" style="display:none;" onclick="switchTab('adminTab')">Admin</span>
+                    <span class="logout" onclick="location.reload()">Wyloguj</span>
+                </div>
             </div>
         </nav>
 
-        <main class="content-wrapper">
+        <main class="content">
             <section id="publicTab" class="tab-content">
                 <div class="card">
-                    <h2 class="card-title">STATUS <span>RODZINY</span></h2>
-                    <table class="status-table">
-                        <thead><tr><th>KONTO</th><th style="text-align: right;">ROLA</th></tr></thead>
+                    <table class="minimal-table">
+                        <thead>
+                            <tr>
+                                <th>KONTO</th>
+                                <th>ROLA / STOPIEŃ</th>
+                            </tr>
+                        </thead>
                         <tbody id="publicUserList"></tbody>
                     </table>
                 </div>
             </section>
 
-            <section id="membersTab" class="tab-content" style="display:none;">
+            <section id="reportsTab" class="tab-content" style="display:none;">
                 <div class="card">
-                    <h3 class="card-title">Wyślij Raport</h3>
-                    <div class="form-group">
-                        <select id="reportType" onchange="toggleExtraFields()">
-                            <option value="Paczki">Paczki</option>
-                            <option value="Cenna">Cenna</option>
-                            <option value="Grover">Grover</option>
-                            <option value="Capt">Capt</option>
-                        </select>
-                        <input type="number" id="groverPlants" placeholder="Rośliny" style="display:none; margin-top:10px;">
-                        <input type="number" id="captKills" placeholder="Kills" style="display:none; margin-top:10px;">
-                        <input type="number" id="captDmg" placeholder="DMG" style="display:none; margin-top:10px;">
-                        <input type="text" id="reportLink" placeholder="Link Imgur" style="margin-top:10px;">
-                        <button class="btn-action" onclick="sendReport()" style="margin-top:10px;">WYŚLIJ</button>
-                    </div>
+                    <div class="brand" style="margin-bottom: 20px; font-size: 14px;">WYŚLIJ <span>RAPORT</span></div>
+                    
+                    <select id="reportType" onchange="toggleExtraFields()">
+                        <option value="Paczki">Dostawa Paczek</option>
+                        <option value="Cenna">Dostawa Cennej</option>
+                        <option value="Grover">Grover (Rośliny)</option>
+                        <option value="Capt">Przejmowanie (Capt)</option>
+                    </select>
+                    
+                    <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none;">
+                    <input type="number" id="captKills" placeholder="Ilość Kills" style="display:none;">
+                    <input type="number" id="captDmg" placeholder="Zadane Obrażenia" style="display:none;">
+                    
+                    <input type="text" id="reportLink" placeholder="Link do dowodu (Wymagany Imgur)">
+                    <button class="btn-action" style="width: 100%; margin-top: 10px;" onclick="sendReport()">WYŚLIJ DO ZARZĄDU</button>
                 </div>
             </section>
 
-            <section id="adminTabContent" class="tab-content" style="display:none;">
-                <div class="card">
-                    <h3 class="card-title">Dodaj konto</h3>
-                    <input type="text" id="newUserName" placeholder="Nick">
-                    <input type="text" id="newUserPass" placeholder="Hasło">
-                    <select id="newUserRole"></select>
-                    <button class="btn-action" onclick="createUser()">DODAJ</button>
+            <section id="adminTab" class="tab-content" style="display:none;">
+                
+                <div class="form-inline" style="display: flex; gap: 20px; flex-wrap: wrap;">
+                    <div class="card" style="flex: 1; min-width: 300px;">
+                        <div class="brand" style="margin-bottom: 20px; font-size: 14px;">DODAJ <span>UŻYTKOWNIKA</span></div>
+                        <input type="text" id="newUserName" placeholder="Nick">
+                        <div class="pass-wrapper">
+                            <input type="text" id="newUserPass" placeholder="Hasło" style="flex-grow: 1; margin-bottom:0;">
+                            <button class="dice-btn" onclick="generatePass()">🎲</button>
+                        </div>
+                        <select id="newUserRole" style="margin-top: 14px;"></select>
+                        <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="createUser()">UTWÓRZ KONTO</button>
+                    </div>
+
+                    <div class="card" style="flex: 1; min-width: 300px;">
+                        <div class="brand" style="margin-bottom: 20px; font-size: 14px;">AWANSUJ <span>/ DEGRADUJ</span></div>
+                        <select id="promoteUserList"></select>
+                        <select id="promoteNewRole"></select>
+                        <button class="btn-action" style="width: 100%; margin-top: 10px;" onclick="promoteUser()">ZMIEŃ RANGĘ</button>
+                    </div>
                 </div>
 
                 <div class="card mt-15">
-                    <h3 class="card-title">Awansuj / Degraduj</h3>
-                    <select id="promoteUserList"></select>
-                    <select id="promoteNewRole"></select>
-                    <button class="btn-action" onclick="promoteUser()">ZMIEŃ RANGĘ</button>
-                </div>
-
-                <div class="card mt-15">
-                    <h3 class="card-title">Zarządzanie</h3>
-                    <table class="status-table">
-                        <thead><tr><th>NICK</th><th>IP</th><th align="right">AKCJA</th></tr></thead>
+                    <div class="brand" style="margin-bottom: 15px; font-size: 14px;">ZARZĄDZANIE <span>KONTAMI</span></div>
+                    <table class="minimal-table">
+                        <thead><tr><th>NICK / ROLA</th><th>OSTATNIE IP</th><th>AKCJA</th></tr></thead>
                         <tbody id="adminUsersList"></tbody>
                     </table>
                 </div>
+
+                <div class="card mt-15">
+                    <div class="brand" style="margin-bottom: 15px; font-size: 14px;">OCZEKUJĄCE <span>RAPORTY</span></div>
+                    <table class="minimal-table">
+                        <thead><tr><th>NICK</th><th>TYP RAPORTU</th><th>DOWÓD</th></tr></thead>
+                        <tbody id="adminReportsList"></tbody>
+                    </table>
+                </div>
+
+                <div class="card mt-15">
+                    <div class="brand" style="margin-bottom: 10px; font-size: 12px;">SYSTEM <span>LOGS</span></div>
+                    <div id="systemLogs" class="logs-viewport"></div>
+                </div>
+
             </section>
         </main>
     </div>
