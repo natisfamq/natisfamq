@@ -7,6 +7,12 @@
     --border-strong: rgba(255, 255, 255, 0.25);
     --text-main: #f5f5f5;
     --text-muted: #9a9a9a;
+.brand span, .card-title span { color: var(--accent); }
+.status-table { width: 100%; border-collapse: collapse; }
+.status-table th:last-child, .status-table td:last-child { text-align: right; }
+.btn-action { background: #222; color: #fff; border: 1px solid #444; padding: 8px 15px; cursor: pointer; }
+.mt-15 { margin-top: 15px; }
+.card { background: #0a0a0a; border: 1px solid #1a1a1a; padding: 20px; border-radius: 10px; }
 }
 
 /* =========================
@@ -310,3 +316,4 @@ button {
     50% { opacity: 0.3; box-shadow: 0 0 2px #fff; }
     100% { opacity: 1; box-shadow: 0 0 8px #fff; }
 }
+
