@@ -3,130 +3,94 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NATIS OS // MONO</title>
+    <title>NATIS OS | System Zarządzania</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
 </head>
 <body>
 
-    <div id="loginPage" class="full-screen">
-        <div class="auth-card">
-            <img src="logo.jpg" alt="NATIS LOGO" class="login-logo">
-            <div class="brand">NATIS <span>FAMQ</span></div>
-            <div class="mt-15">
-                <input type="text" id="userName" placeholder="użytkownik">
-                <input type="password" id="userPass" placeholder="hasło">
-                <button class="btn-primary" onclick="login()" style="width: 100%;">ZALOGUJ SYSTEM</button>
-            </div>
-            <p id="loginError" class="error"></p>
+    <div id="loginPage" class="container">
+        <div class="login-box">
+            <h1 style="letter-spacing: 5px;">NATIS OS</h1>
+            <input type="text" id="userName" placeholder="Nick">
+            <input type="password" id="userPass" placeholder="Hasło">
+            <button onclick="login()">ZALOGUJ SYSTEM</button>
+            <p id="loginError" style="color: #ff4d4d; font-size: 12px; margin-top: 10px;"></p>
         </div>
     </div>
 
-    <div id="mainPanel" style="display: none;">
-        <nav class="navbar">
-            <div class="nav-container">
-                <div class="brand">NATIS <span>FAMQ</span></div>
-                <div class="menu">
-                    <span onclick="switchTab('publicTab')" style="color: white;">Status</span>
-                    <span onclick="switchTab('reportsTab')">Raporty</span>
-                    <span id="adminBtn" style="display:none;" onclick="switchTab('adminTab')">Admin</span>
-                    <span class="logout" onclick="location.reload()">Wyloguj</span>
-                </div>
-            </div>
+    <div id="mainPanel" class="container" style="display:none;">
+        <nav class="menu">
+            <span onclick="switchTab('publicTab')">LISTA CZŁONKÓW</span>
+            <span onclick="switchTab('reportTab')">NOWY RAPORT</span>
+            <span id="adminBtn" onclick="switchTab('adminTab')" style="display:none; color: #f1c40f; font-weight: bold;">ZARZĄDZANIE</span>
         </nav>
 
-        <main class="content">
-            <section id="publicTab" class="tab-content">
-                <div class="card">
-                    <table class="minimal-table">
+        <hr style="border: 0; border-top: 1px solid #333; margin: 20px 0;">
+
+        <div id="publicTab" class="tab-content">
+            <h3 class="section-title">CZŁONKOWIE FAMILII</h3>
+            <table class="natis-table">
+                <thead>
+                    <tr><th>NICK / PSEUDONIM</th><th>RANGA W RODZINIE</th></tr>
+                </thead>
+                <tbody id="publicUserList"></tbody>
+            </table>
+        </div>
+
+        <div id="reportTab" class="tab-content" style="display:none;">
+            <h3 class="section-title">FORMULARZ DOSTAWY / AKCJI</h3>
+            <div class="form-card">
+                <label>Rodzaj raportu:</label>
+                <select id="reportType" onchange="toggleExtraFields()">
+                    <option value="Paczki">Paczki (10,000$)</option>
+                    <option value="Cenna">Cenna (10,000$)</option>
+                    <option value="Grover">Grover (1,000$ / krzak)</option>
+                    <option value="Capt">Capt (Baza + Kille + DMG)</option>
+                </select>
+
+                <div id="extraFields">
+                    <input type="number" id="groverPlants" placeholder="Ilość krzaków" style="display:none;">
+                    <input type="number" id="captKills" placeholder="Ilość killi" style="display:none;">
+                    <input type="number" id="captDmg" placeholder="Suma DMG" style="display:none;">
+                </div>
+
+                <label>Link do dowodu (Imgur):</label>
+                <input type="text" id="reportLink" placeholder="https://imgur.com/...">
+                <button onclick="sendReport()" class="btn-send">WYŚLIJ DO WERYFIKACJI</button>
+            </div>
+        </div>
+
+        <div id="adminTab" class="tab-content" style="display:none;">
+            <div class="admin-grid">
+                <div class="admin-section">
+                    <h4 class="section-title">OCZEKUJĄCE RAPORTY</h4>
+                    <table class="natis-table">
                         <thead>
-                            <tr>
-                                <th>KONTO</th>
-                                <th>ROLA / STOPIEŃ</th>
-                            </tr>
+                            <tr><th>GRACZ</th><th>KWOTA ($)</th><th>DOWÓD</th><th>AKCJA</th></tr>
                         </thead>
-                        <tbody id="publicUserList"></tbody>
-                    </table>
-                </div>
-            </section>
-
-            <section id="reportsTab" class="tab-content" style="display:none;">
-                <div class="card">
-                    <div class="brand" style="margin-bottom: 20px; font-size: 14px;">WYŚLIJ <span>RAPORT</span></div>
-                    
-                    <select id="reportType" onchange="toggleExtraFields()">
-                        <option value="Paczki">Dostawa Paczek</option>
-                        <option value="Cenna">Dostawa Cennej</option>
-                        <option value="Grover">Grover (Rośliny)</option>
-                        <option value="Capt">Przejmowanie (Capt)</option>
-                    </select>
-                    
-                    <input type="number" id="groverPlants" placeholder="Ilość roślin" style="display:none;">
-                    <input type="number" id="captKills" placeholder="Ilość Kills" style="display:none;">
-                    <input type="number" id="captDmg" placeholder="Zadane Obrażenia" style="display:none;">
-                    
-                    <input type="text" id="reportLink" placeholder="Link do dowodu (Wymagany Imgur)">
-                    <button class="btn-action" style="width: 100%; margin-top: 10px;" onclick="sendReport()">WYŚLIJ DO ZARZĄDU</button>
-                </div>
-            </section>
-
-            <section id="adminTab" class="tab-content" style="display:none;">
-
-                <div class="card mt-15">
-    <div class="brand" style="margin-bottom: 10px; font-size: 12px;">SYSTEM <span>CONSOLE</span></div>
-    <input type="text" id="adminConsole" placeholder="Wpisz komendę i naciśnij Enter..." 
-           style="font-family: monospace; background: #000 !important; border: 1px solid #333;" 
-           onkeypress="handleConsole(event)">
-    <div id="systemLogs" class="logs-viewport"></div>
-               </div> 
-                
-               <div class="form-inline" style="display: flex; gap: 20px; flex-wrap: wrap;">
-                    <div class="card" style="flex: 1; min-width: 300px;">
-                        <div class="brand" style="margin-bottom: 20px; font-size: 14px;">DODAJ <span>UŻYTKOWNIKA</span></div>
-                        <input type="text" id="newUserName" placeholder="Nick">
-                        <div class="pass-wrapper">
-                            <input type="text" id="newUserPass" placeholder="Hasło" style="flex-grow: 1; margin-bottom:0;">
-                            <button class="dice-btn" onclick="generatePass()">🎲</button>
-                        </div>
-                        <select id="newUserRole" style="margin-top: 14px;"></select>
-                        <button class="btn-primary" style="width: 100%; margin-top: 10px;" onclick="createUser()">UTWÓRZ KONTO</button>
-                    </div>
-
-                    <div class="card" style="flex: 1; min-width: 300px;">
-                        <div class="brand" style="margin-bottom: 20px; font-size: 14px;">AWANSUJ <span>/ DEGRADUJ</span></div>
-                        <select id="promoteUserList"></select>
-                        <select id="promoteNewRole"></select>
-                        <button class="btn-action" style="width: 100%; margin-top: 10px;" onclick="promoteUser()">ZMIEŃ RANGĘ</button>
-                    </div>
-                </div>
-
-                <div class="card mt-15">
-                    <div class="brand" style="margin-bottom: 15px; font-size: 14px;">ZARZĄDZANIE <span>KONTAMI</span></div>
-                    <table class="minimal-table">
-                        <thead><tr><th>NICK / ROLA</th><th>OSTATNIE IP</th><th>AKCJA</th></tr></thead>
-                        <tbody id="adminUsersList"></tbody>
-                    </table>
-                </div>
-
-                <div class="card mt-15">
-                    <div class="brand" style="margin-bottom: 15px; font-size: 14px;">OCZEKUJĄCE <span>RAPORTY</span></div>
-                    <table class="minimal-table">
-                        <thead><tr><th>NICK</th><th>TYP RAPORTU</th><th>DOWÓD</th></tr></thead>
                         <tbody id="adminReportsList"></tbody>
                     </table>
                 </div>
 
-                <div class="card mt-15">
-                    <div class="brand" style="margin-bottom: 10px; font-size: 12px;">SYSTEM <span>LOGS</span></div>
-                    <div id="systemLogs" class="logs-viewport"></div>
+                <div class="admin-section">
+                    <h4 class="section-title">KONTROLA DOSTĘPU</h4>
+                    <table class="natis-table">
+                        <thead>
+                            <tr><th>NICK / ROLA</th><th>OSTATNIE IP</th><th>AKCJA</th></tr>
+                        </thead>
+                        <tbody id="adminUsersList"></tbody>
+                    </table>
                 </div>
+            </div>
 
-            </section>
-        </main>
+            <h4 class="section-title" style="margin-top: 30px;">KONSOLA SYSTEMOWA</h4>
+            <div id="systemLogs" class="console-box"></div>
+            <input type="text" id="adminConsole" placeholder="Wpisz komendę..." onkeypress="handleConsole(event)">
+        </div>
     </div>
+
     <script src="script.js"></script>
 </body>
 </html>
-
