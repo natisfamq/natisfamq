@@ -1,82 +1,40 @@
 :root {
     --bg-main: #000000;
-    --bg-soft: #0a0a0a;
-    --bg-input: #141414;
-    --accent: #ffffff;
-    --text-muted: #666666;
-    --border-soft: #1c1c1c;
+    --bg-soft: #111111;
+    --glass-light: rgba(255, 255, 255, 0.06);
+    --glass-strong: rgba(255, 255, 255, 0.12);
+    --border-soft: rgba(255, 255, 255, 0.12);
+    --border-strong: rgba(255, 255, 255, 0.25);
+    --text-main: #f5f5f5;
+    --text-muted: #9a9a9a;
 }
-
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Inter", sans-serif; }
-body { background: var(--bg-main); color: #fff; min-height: 100vh; }
-
-/* NAWIGACJA W PRAWYM GÓRNYM */
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 40px;
-    background: rgba(5, 5, 5, 0.9);
-    border-bottom: 1px solid var(--border-soft);
-    position: sticky;
-    top: 0;
-}
-
-.nav-menu { display: flex; gap: 10px; }
-
-.nav-link {
-    background: transparent;
-    color: var(--text-muted);
-    border: none;
-    padding: 8px 16px;
-    border-radius: 8px;
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-/* Tylko hover - brak stałego podświetlenia */
-.nav-link:hover {
-    color: #fff;
-    background: rgba(255, 255, 255, 0.05);
-}
-
-.logout { color: #ff4d4d !important; }
-
-/* SMOOTH SELECTS & INPUTS */
-input, select {
-    width: 100%;
-    padding: 12px 16px;
-    background: var(--bg-input);
-    border: 1px solid var(--border-soft);
-    color: #fff;
-    border-radius: 12px;
-    outline: none;
-    appearance: none;
-}
-
-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%23666' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
-    background-repeat: no-repeat;
-    background-position: calc(100% - 15px) center;
-}
-
-/* LOGO & CARDS */
-.full-screen { height: 100vh; display: flex; align-items: center; justify-content: center; }
-.auth-card { background: var(--bg-soft); border: 1px solid var(--border-soft); padding: 40px; border-radius: 20px; text-align: center; width: 360px; }
-.login-logo { width: 80px; height: 80px; border-radius: 50%; margin-bottom: 20px; border: 1px solid var(--border-soft); object-fit: cover; }
-.brand { font-size: 18px; font-weight: 800; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; justify-content: center; }
-.brand span { color: var(--accent); }
-.led-dot { width: 6px; height: 6px; background: #fff; border-radius: 50%; margin-left: 10px; box-shadow: 0 0 10px #fff; }
-
-.content-wrapper { max-width: 900px; margin: 40px auto; padding: 0 20px; }
-.card { background: var(--bg-soft); border: 1px solid var(--border-soft); border-radius: 16px; padding: 25px; margin-bottom: 20px; }
-.card-title { font-size: 13px; color: var(--text-muted); text-transform: uppercase; margin-bottom: 20px; }
-
-.btn-primary { width: 100%; padding: 14px; background: #fff; color: #000; border: none; border-radius: 12px; font-weight: 700; cursor: pointer; margin-top: 15px; }
-.btn-action { background: var(--bg-input); border: 1px solid var(--border-soft); color: #fff; padding: 10px 20px; border-radius: 8px; cursor: pointer; }
-
-.status-table { width: 100%; border-collapse: collapse; }
-.status-table td { padding: 14px 0; border-bottom: 1px solid #080808; }
-.status-table tr td:last-child { text-align: right; }
+body { min-height: 100vh; background: radial-gradient(circle at 30% 30%, #1a1a1a, #000000 60%); color: var(--text-main); }
+body::before { content: ""; position: fixed; inset: 0; background: linear-gradient(120deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02), rgba(255,255,255,0.04)); background-size: 200% 200%; animation: bgMove 15s ease infinite; z-index: -1; filter: blur(120px); }
+@keyframes bgMove { 0% { background-position: 0% 50%; } 50% { background-position: 100% 50%; } 100% { background-position: 0% 50%; } }
+.nav-container, .content { max-width: 1100px; margin: 0 auto; padding: 0 20px; }
+.content { margin-top: 40px; }
+.card, .auth-card { background: var(--glass-light); backdrop-filter: blur(20px); border: 1px solid var(--border-soft); border-radius: 20px; padding: 25px; box-shadow: 0 8px 40px rgba(0,0,0,0.8); transition: 0.3s; }
+.card:hover { background: var(--glass-strong); transform: translateY(-4px); }
+.full-screen { display: flex; align-items: center; justify-content: center; height: 100vh; }
+.auth-card { width: 380px; text-align: center; }
+.login-logo { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 20px; border: 2px solid rgba(255,255,255,0.3); }
+.brand { font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
+.brand span { color: white; text-shadow: 0 0 10px rgba(255,255,255,0.4); }
+input, select { width: 100%; padding: 12px 14px; margin-bottom: 14px; border-radius: 12px; border: 1px solid var(--border-soft); background: rgba(255,255,255,0.04); color: #fff; outline: none; }
+select { background: #111; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='white'%3E%3Cpath d='M0 0l5 5 5-5z'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: calc(100% - 15px) center; }
+button { cursor: pointer; border: none; border-radius: 12px; padding: 12px 16px; font-weight: 600; transition: 0.25s; }
+.btn-primary, .btn-action { background: #fff; color: #000; }
+.btn-primary:hover { box-shadow: 0 0 20px rgba(255,255,255,0.4); }
+.navbar { background: rgba(10,10,10,0.75); backdrop-filter: blur(18px); border-bottom: 1px solid var(--border-soft); padding: 14px 0; position: sticky; top: 0; z-index: 100; }
+.nav-container { display: flex; justify-content: space-between; align-items: center; }
+.menu span { margin-left: 25px; cursor: pointer; color: var(--text-muted); font-size: 14px; font-weight: 600; }
+.menu span:hover { color: white; }
+.minimal-table { width: 100%; border-collapse: collapse; }
+.minimal-table th, .minimal-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.06); font-size: 14px; }
+.minimal-table th { text-align: left; color: var(--text-muted); font-size: 11px; text-transform: uppercase; }
+.minimal-table td:last-child { text-align: right; }
+.error { color: #ff4d4d; font-size: 12px; margin-top: 10px; }
+.mt-15 { margin-top: 15px; }
+.pass-wrapper { display: flex; gap: 5px; }
+.dice-btn { background: rgba(255,255,255,0.1); color: #fff; }
