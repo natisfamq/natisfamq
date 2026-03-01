@@ -5,13 +5,14 @@
     --text-main: #ffffff;
     --text-muted: #888888;
     --border-soft: #1a1a1a;
+    --font-family: 'Inter', 'Segoe UI', sans-serif;
 }
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    font-family: "Inter", sans-serif;
+    font-family: var(--font-family);
 }
 
 body {
@@ -20,7 +21,7 @@ body {
     min-height: 100vh;
 }
 
-/* CENTROWANIE LOGOWANIA */
+/* --- CENTROWANIE STRONY LOGOWANIA --- */
 .full-screen {
     height: 100vh;
     display: flex;
@@ -33,114 +34,89 @@ body {
     background: var(--bg-soft);
     border: 1px solid var(--border-soft);
     padding: 40px;
-    border-radius: 20px;
+    border-radius: 15px;
     width: 100%;
-    max-width: 400px;
+    max-width: 380px;
     text-align: center;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
 }
 
-/* UKŁAD PANELU GŁÓWNEGO */
+/* --- NAPRAWA LOGO (Kółko i rozmiar) --- */
+.login-logo {
+    width: 70px; /* Rozmiar kółka */
+    height: 70px;
+    border-radius: 50%; /* Tworzy kółko */
+    border: 1px solid var(--border-soft);
+    margin: 0 auto 20px auto; /* Centruje i dodaje odstęp */
+    display: block; /* Upewnia się, że margines auto zadziała */
+}
+
+/* --- NAPRAWA NAPISU I ŚWIECENIA --- */
+.brand {
+    font-size: 18px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.brand span, .logo span {
+    color: var(--accent); /* "FAMQ" jest białe */
+}
+
+.led-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    background: var(--accent); /* Świecący punkt */
+    border-radius: 50%;
+    margin-left: 8px;
+    box-shadow: 0 0 10px var(--accent); /* Efekt Glow */
+}
+
+/* --- FORMULARZE NA LOGOWANIU --- */
+.auth-inputs input {
+    width: 100%;
+    padding: 12px;
+    margin: 10px 0;
+    background: #0d0d0d;
+    border: 1px solid #222;
+    color: #fff;
+    border-radius: 5px;
+    outline: none;
+}
+
+.auth-inputs input:focus {
+    border-color: var(--accent);
+}
+
+.btn-primary {
+    width: 100%;
+    padding: 12px;
+    background: var(--accent);
+    color: #000;
+    border: none;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 5px;
+}
+
+/* --- UKŁAD PANELU GŁÓWNEGO --- */
 .content-wrapper {
-    max-width: 900px;
-    margin: 40px auto; /* Centruje kontener na środku strony */
+    max-width: 1000px;
+    margin: 40px auto;
     padding: 0 20px;
 }
 
 .card {
     background: var(--bg-soft);
     border: 1px solid var(--border-soft);
-    border-radius: 15px;
+    border-radius: 10px;
     padding: 25px;
-    margin-bottom: 20px;
+    margin-bottom: 15px;
 }
 
-/* NAWIGACJA */
-.top-nav {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 20px 40px;
-    background: rgba(10, 10, 10, 0.8);
-    backdrop-filter: blur(10px);
-    border-bottom: 1px solid var(--border-soft);
-    sticky: top;
-}
-
-.nav-menu {
-    display: flex;
-    gap: 15px;
-}
-
-/* FORMULARZE */
-.form-group {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-input, select {
-    width: 100%;
-    padding: 12px;
-    background: #111;
-    border: 1px solid #222;
-    color: #fff;
-    border-radius: 8px;
-    outline: none;
-}
-
-input:focus {
-    border-color: var(--accent);
-}
-
-/* PRZYCISKI */
-.btn-primary, .btn-action {
-    padding: 12px;
-    border-radius: 8px;
-    border: none;
-    font-weight: 600;
-    cursor: pointer;
-    transition: 0.2s;
-}
-
-.btn-primary {
-    background: var(--accent);
-    color: #000;
-    width: 100%;
-}
-
-.btn-action {
-    background: #1a1a1a;
-    color: #fff;
-    border: 1px solid #333;
-}
-
-.btn-action:hover {
-    background: #252525;
-}
-
-/* TABELE */
-.status-table {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-}
-
-.status-table th {
-    text-align: left;
-    color: var(--text-muted);
-    font-size: 12px;
-    padding: 10px 0;
-    border-bottom: 1px solid var(--border-soft);
-}
-
-.status-table td {
-    padding: 15px 0;
-    border-bottom: 1px solid #050505;
-}
-
-.status-table th:last-child, .status-table td:last-child {
-    text-align: right;
-}
-
-.brand span { color: var(--accent); }
+/* ... reszta twoich styli (btn-action, status-table) ... */
