@@ -32,12 +32,7 @@ export default async function handler(req, res) {
         res.status(200).json({
             username: data.nick || data.user.global_name || data.user.username,
             avatar: `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png`,
-            roleName: `Ranga: ${roleNames[topRoleId] || "Brak Rangi"}`,
-            reportsThisWeek: 0, 
-            lastActivity: {
-                name: "Logowanie do panelu",
-                date: new Date().toLocaleString('pl-PL')
-            }
+            roleName: `Ranga: ${roleNames[topRoleId] || "Brak Rangi"}`
         });
     } catch (error) {
         res.status(500).json({ error: "Błąd podczas pobierania profilu" });
