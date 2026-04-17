@@ -1,7 +1,6 @@
 :root {
     --bg: #050505;
     --accent: #ffffff;
-    --glow: rgba(255, 255, 255, 0.4);
     --glass: rgba(255, 255, 255, 0.05);
     --border: rgba(255, 255, 255, 0.1);
     --success: #2ecc71;
@@ -21,64 +20,49 @@ body {
     min-height: 100vh;
 }
 
+.main-title { font-size: 3rem; text-align: center; margin-bottom: 40px; font-weight: 900; letter-spacing: 5px; text-transform: uppercase; }
+
 .glass-panel {
     background: var(--glass);
     backdrop-filter: blur(20px);
     border: 1px solid var(--border);
     border-radius: 25px;
-    padding: 40px;
+    padding: 30px;
     width: 90%;
-    max-width: 1000px;
+    max-width: 900px;
 }
 
-.main-title { font-size: 3rem; text-align: center; margin-bottom: 40px; font-weight: 900; letter-spacing: 5px; text-transform: uppercase; }
-
-/* Przyciski */
-.btn { 
-    padding: 12px 20px; border-radius: 10px; border: 1px solid white; 
-    background: transparent; color: white; cursor: pointer; 
-    text-transform: uppercase; font-weight: bold; transition: 0.3s;
-    text-align: center; font-size: 0.9rem; width: 100%;
-}
-.glow-btn:hover { background: white; color: black; box-shadow: 0 0 20px white; }
-
-/* Nawigacja */
-.tabs-nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; border-bottom: 1px solid var(--border); }
-.tab-btn { 
-    background: none; border: none; color: #666; padding: 15px 30px; 
-    cursor: pointer; font-size: 1.1rem; text-transform: uppercase; 
-    font-weight: bold; transition: 0.3s;
-}
+/* TABS */
+.tabs-nav { display: flex; justify-content: center; gap: 10px; margin-bottom: 30px; border-bottom: 1px solid var(--border); }
+.tab-btn { background: none; border: none; color: #555; padding: 15px 25px; cursor: pointer; font-weight: bold; text-transform: uppercase; transition: 0.3s; }
 .tab-btn.active { color: #fff; border-bottom: 3px solid #fff; }
-
 .tab-content { display: none; width: 100%; }
 .tab-content.active { display: block; }
 
-/* Profile Card - NAPRAWIONE */
-.profile-card { border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
-.user-banner { height: 120px; background: linear-gradient(90deg, #111, #222); background-size: cover; background-position: center; }
-.profile-header { display: flex; align-items: flex-start; padding: 20px 40px; margin-top: -60px; gap: 30px; }
+/* PROFILE CARD */
+.profile-card { border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); overflow: hidden; }
+.user-banner { height: 120px; background: #111; background-size: cover; background-position: center; }
+.profile-header { display: flex; align-items: center; padding: 20px 40px; margin-top: -60px; gap: 30px; }
 .profile-avatar { width: 140px; height: 140px; border-radius: 20px; border: 4px solid var(--bg); background: #000; object-fit: cover; }
-.profile-main-info { margin-top: 65px; flex-grow: 1; }
-.profile-name { font-size: 2.2rem; font-weight: 900; margin: 0; text-transform: uppercase; }
+.profile-main-info { margin-top: 50px; flex-grow: 1; }
+.profile-name { font-size: 2rem; font-weight: 900; margin: 0; }
+.profile-stats-list { list-style: none; padding: 0; margin: 10px 0; color: #aaa; }
+.profile-stats-list li { margin-bottom: 5px; }
+.profile-stats-list strong { color: #fff; }
 
-.profile-stats-list { list-style: none; padding: 0; margin: 15px 0 0 0; }
-.profile-stats-list li { font-size: 1.1rem; color: #ccc; margin-bottom: 8px; font-weight: 500; }
-.profile-stats-list li strong { color: #fff; }
-
-/* Członkowie - NAPRAWIONE */
-.list-item { 
-    background: rgba(255,255,255,0.02); border: 1px solid var(--border); 
-    margin-bottom: 12px; padding: 15px 25px; border-radius: 15px; 
-    display: flex; justify-content: space-between; align-items: center;
-}
-.mini-avatar { width: 50px; height: 50px; border-radius: 10px; object-fit: cover; }
-.member-name { font-size: 1.2rem; font-weight: 700; margin-left: 20px; }
-.member-rank-label { color: #888; font-weight: 600; font-size: 0.9rem; background: rgba(255,255,255,0.05); padding: 5px 12px; border-radius: 8px; }
-
-/* Admin Cards */
-.admin-report-card { border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+/* ADMIN & LISTS */
+.admin-report-card { border-radius: 15px; background: rgba(255,255,255,0.03); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
 .report-body { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+.list-item { background: rgba(255,255,255,0.02); border: 1px solid var(--border); margin-bottom: 10px; padding: 15px 20px; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; }
+.mini-avatar { width: 50px; height: 50px; border-radius: 10px; }
 
-/* Formularze */
-input, select { width: 100%; padding: 15px; background: #111; border: 1px solid var(--border); color: white; border-radius: 10px; margin-bottom: 15px; }
+/* BUTTONS & INPUTS */
+.btn { padding: 12px 20px; border: 1px solid #fff; background: transparent; color: #fff; font-weight: bold; cursor: pointer; border-radius: 10px; transition: 0.3s; }
+.glow-btn:hover { background: #fff; color: #000; box-shadow: 0 0 15px #fff; }
+.btn-accept { border-color: var(--success); color: var(--success); }
+.btn-accept:hover { background: var(--success); color: #000; }
+.btn-reject { border-color: var(--danger); color: var(--danger); }
+.btn-reject:hover { background: var(--danger); color: #000; }
+
+input, select { width: 100%; padding: 12px; background: #111; border: 1px solid var(--border); color: #fff; border-radius: 10px; margin-bottom: 15px; }
+label { display: block; margin-bottom: 5px; color: #888; font-size: 0.9rem; }

@@ -18,7 +18,15 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Formularz raportu z Webhookiem
+    // LOGIKA PÓL FORMULARZA (PRZYWRÓCONA)
+    const typeSelect = document.getElementById('contract-type');
+    typeSelect.addEventListener('change', (e) => {
+        const val = e.target.value;
+        document.getElementById('grover-fields').style.display = val === 'grover' ? 'block' : 'none';
+        document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
+    });
+
+    // WYSYŁANIE RAPORTU
     document.getElementById('report-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const type = document.getElementById('contract-type').value;
@@ -40,6 +48,8 @@ document.addEventListener('DOMContentLoaded', () => {
             desc = `CAPT (K: ${kille}, D: ${dmg})`;
         }
 
+        if (!imgur) return alert("Podaj link do dowodu!");
+
         const reportData = {
             username: me.username,
             type: desc,
@@ -48,20 +58,22 @@ document.addEventListener('DOMContentLoaded', () => {
             date: new Date().toLocaleString('pl-PL')
         };
 
-        // WYSYŁKA NA WEBHOOK
+        // WEBHOOK
         await fetch('/api/webhook', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(reportData)
         });
 
-        // Zapis lokalny dla Admina
+        // ADMIN STORAGE
         let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
         reports.unshift({ ...reportData, banner: me.banner });
         localStorage.setItem('admin_reports', JSON.stringify(reports));
 
         alert("Raport wysłany!");
         e.target.reset();
+        document.getElementById('grover-fields').style.display = 'none';
+        document.getElementById('capt-fields').style.display = 'none';
         loadData();
     });
 });
@@ -93,7 +105,6 @@ async function loadData() {
             </div>
         `).join('');
 
-        // Lista Admin
         const adminReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
         document.getElementById('admin-list').innerHTML = adminReports.map((r, i) => `
             <div class="admin-report-card">
