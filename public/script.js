@@ -32,7 +32,6 @@ document.addEventListener('DOMContentLoaded', () => {
         let imgur = document.getElementById('imgur-link').value.trim();
         const me = await (await fetch('/api/me')).json();
 
-        // FIX: Naprawa linku Imgur (dodawanie protokołu jeśli brak)
         if (imgur && !imgur.startsWith('http')) {
             imgur = 'https://' + imgur;
         }
@@ -72,7 +71,7 @@ document.addEventListener('DOMContentLoaded', () => {
                     { name: "Akcja", value: `👀 [SPRAWDŹ RAPORTY](${window.location.origin})`, inline: false }
                 ],
                 thumbnail: {
-                    url: "https://cdn.discordapp.com/icons/1218558455823405108/a_d65e2361099e03f191b4e3e6060f0891.webp"
+                    url: `${window.location.origin}/logo.jpg` // Użycie Twojego loga
                 },
                 footer: { text: `Panel Wyplat | ${timestamp}` }
             }]
@@ -85,7 +84,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(discordPayload)
             });
 
-            // Zapis lokalny dla panelu Admina
             let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
             reports.unshift({
                 username: me.username,
@@ -125,14 +123,13 @@ async function loadData() {
         document.getElementById('members-list').innerHTML = members.map(m => `
             <div class="list-item">
                 <div style="display:flex; align-items:center;">
-                    <img src="${m.avatar}" class="mini-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    <img src="${m.avatar}" class="mini-avatar" onerror="this.src='${window.location.origin}/logo.jpg'">
                     <span class="member-name" style="font-size:1.5rem; font-weight:700;">${m.displayName}</span>
                 </div>
                 <span class="member-rank-label" style="color:#888;">${m.rankName}</span>
             </div>
         `).join('');
 
-        // Lista raportów w adminie - przejrzysty design
         const adminReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
         document.getElementById('admin-list').innerHTML = adminReports.map((r, i) => `
             <div class="admin-report-card">
@@ -154,7 +151,6 @@ async function loadData() {
     } catch (e) { console.error(e); }
 }
 
-// PRZETWARZANIE RAPORTU Przez Admina (Akceptacja/Odrzucenie)
 async function processReport(index, actionType) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
@@ -169,7 +165,6 @@ async function processReport(index, actionType) {
     const now = new Date();
     const timestamp = now.toLocaleDateString('pl-PL') + ', ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-    // Formatowanie embeda zgodnie ze screenami
     const discordPayload = {
         embeds: [{
             title: isAccept ? "⚖️ RAPORT AKCEPTACJA" : "⚖️ RAPORT ODRZUCENIE",
@@ -180,7 +175,7 @@ async function processReport(index, actionType) {
                 { name: "Weryfikator", value: verifierName, inline: true }
             ],
             thumbnail: {
-                url: "https://cdn.discordapp.com/icons/1218558455823405108/a_d65e2361099e03f191b4e3e6060f0891.webp" 
+                url: `${window.location.origin}/logo.jpg` // Użycie Twojego loga
             },
             footer: { 
                 text: `Panel Wyplat | ${timestamp}` 
@@ -196,7 +191,6 @@ async function processReport(index, actionType) {
         });
 
         if (response.ok) {
-            // Usuwamy raport z lokalnej bazy tylko jeśli webhook przeszedł
             reports.splice(index, 1);
             localStorage.setItem('admin_reports', JSON.stringify(reports));
             loadData();
