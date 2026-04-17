@@ -19,22 +19,20 @@ export default async function handler(req, res) {
         });
         const data = await response.json();
 
-        // Pobieranie danych o bannerze (wymaga dodatkowego zapytania do API Discord User)
-        const userResponse = await fetch(`https://discord.com/api/users/${userId}`, {
-            headers: { Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}` }
-        });
-        const userData = await userResponse.json();
-
         const hierarchy = Object.keys(roleNames);
         const topRoleId = hierarchy.find(id => data.roles.includes(id));
+        const roleName = roleNames[topRoleId] || "Brak rangi";
+        
+        // Wyciągamy numer rangi (np. 15)
+        const roleLevel = parseInt(roleName.split(' | ')[0]) || 0;
 
         res.status(200).json({
-            username: data.nick || data.user.global_name || data.user.username,
-            avatar: `https://cdn.discordapp.com/avatars/${data.user.id}/${data.user.avatar}.png`,
-            banner: userData.banner ? `https://cdn.discordapp.com/banners/${userData.id}/${userData.banner}.png?size=600` : '',
-            roleName: `Ranga: ${roleNames[topRoleId] || "Brak"}`
+            username: data.nick || data.user.username,
+            avatar: data.user.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${data.user.avatar}.png` : null,
+            roleName: roleName,
+            roleLevel: roleLevel // Dodajemy to pole!
         });
     } catch (error) {
-        res.status(500).json({ error: "Błąd API" });
+        res.status(500).json({ error: error.message });
     }
 }

@@ -113,6 +113,14 @@ async function fetchUserInfo() {
             if (nameEl) nameEl.innerText = currentUser.username;
             if (avatarEl) avatarEl.src = currentUser.avatar || 'logo.jpg';
             if (roleEl) roleEl.innerText = `Ranga: ${currentUser.roleName || '-'}`;
+
+            // --- LOGIKA BLOKADY ADMINA ---
+            const adminBtn = document.querySelector('.tab-btn[data-tab="admin"]');
+            if (adminBtn) {
+                if (currentUser.roleLevel < 11) {
+                    adminBtn.remove(); // Usuwamy przycisk z menu dla rang 1-10
+                }
+            }
         }
     } catch (e) { console.error("Błąd profilu:", e); }
 }
