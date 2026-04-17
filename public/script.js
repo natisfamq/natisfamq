@@ -1,5 +1,24 @@
+// Importy Firebase z CDN (nie musisz nic instalować przez npm)
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+// Twoja konfiguracja Firebase
+const firebaseConfig = {
+    apiKey: "AIzaSyDyTpY2vGcvM8Sz5B1TCdDeNUObQ6yZF4o",
+    authDomain: "natis-add35.firebaseapp.com",
+    databaseURL: "https://natis-add35-default-rtdb.europe-west1.firebasedatabase.app",
+    projectId: "natis-add35",
+    storageBucket: "natis-add35.firebasestorage.app",
+    messagingSenderId: "303875422065",
+    appId: "1:303875422065:web:c142a191607606e01a28d0"
+};
+
+// Inicjalizacja
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
 let currentUser = null;
-let currentAdminReports = []; // Dodana zmienna do trzymania raportów z bazy
+let currentAdminReports = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
@@ -14,9 +33,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadData();
     }
 
-    const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) loginBtn.addEventListener('click', () => window.location.href = '/api/login');
-
+    // Obsługa zakładek
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -28,6 +45,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
+    // Przełączanie pól Grover/Capt
     const contractSelect = document.getElementById('contract-type');
     if (contractSelect) {
         contractSelect.addEventListener('change', (e) => {
@@ -39,6 +57,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
+    // WYSYŁANIE RAPORTU DO FIREBASE
     const reportForm = document.getElementById('report-form');
     if (reportForm) {
         reportForm.addEventListener('submit', async (e) => {
@@ -70,33 +89,28 @@ document.addEventListener('DOMContentLoaded', async () => {
                 payout: payout,
                 imgur: imgur,
                 date: new Date().toLocaleString('pl-PL'),
+                timestamp: Date.now(),
                 krzaki: krzaki,
                 kille: kille
             };
 
-            // ZAPIS LOKALNY: Zostawiamy, żeby Twoje prywatne statystyki działały tak jak wcześniej!
+            // ZAPIS LOKALNY (dla Twojego panelu)
             let userReports = JSON.parse(localStorage.getItem('user_reports') || '[]');
             userReports.unshift(reportData);
             localStorage.setItem('user_reports', JSON.stringify(userReports));
 
-            // ZAPIS DO BAZY (DLA ADMINA): Nowy system wysyłania na serwer
+            // ZAPIS DO FIREBASE (dla Admina)
             try {
-                const res = await fetch('/api/save-report', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(reportData)
-                });
-
-                if (res.ok) {
-                    alert("Raport wysłany do Admina!");
-                    reportForm.reset();
-                    loadData();
-                } else {
-                    alert("Błąd serwera przy zapisie do bazy.");
-                }
+                const reportsRef = ref(db, 'reports');
+                const newReportRef = push(reportsRef);
+                await set(newReportRef, reportData);
+                
+                alert("Raport wysłany do Firebase!");
+                reportForm.reset();
+                loadData();
             } catch (err) {
                 console.error(err);
-                alert("Błąd połączenia z API.");
+                alert("Błąd zapisu w Firebase: " + err.message);
             }
         });
     }
@@ -107,26 +121,20 @@ async function fetchUserInfo() {
         const res = await fetch('/api/me');
         if (res.ok) {
             currentUser = await res.json();
-            const nameEl = document.getElementById('user-name');
-            const avatarEl = document.getElementById('user-avatar');
-            const roleEl = document.getElementById('user-role-text');
-            
-            if (nameEl) nameEl.innerText = currentUser.username;
-            if (avatarEl) avatarEl.src = currentUser.avatar || 'logo.jpg';
-            if (roleEl) roleEl.innerText = `Ranga: ${currentUser.roleName || '-'}`;
+            document.getElementById('user-name').innerText = currentUser.username;
+            document.getElementById('user-avatar').src = currentUser.avatar || 'logo.jpg';
+            document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
 
-            // Ukrywanie panelu admina wizualnie dla mniejszych rang
-            const adminBtn = document.querySelector('.tab-btn[data-tab="admin"]');
-            if (adminBtn && currentUser.roleLevel < 11) {
-                adminBtn.remove();
+            if (currentUser.roleLevel < 11) {
+                const adminBtn = document.querySelector('.tab-btn[data-tab="admin"]');
+                if (adminBtn) adminBtn.remove();
             }
         }
-    } catch (e) { console.error("Błąd pobierania danych użytkownika:", e); }
+    } catch (e) { console.error("Błąd pobierania użytkownika", e); }
 }
 
 async function loadData() {
-    // 1. Pobieranie członków z Discorda
-    // Poprawiony fragment w loadData()
+    // 1. CZŁONKOWIE (Z FIXEM NA RANGI)
     try {
         const res = await fetch('/api/members');
         const members = await res.json();
@@ -142,28 +150,21 @@ async function loadData() {
                 </div>
             `).join('');
         }
-    } catch (e) { console.error("Błąd członków:", e); }
+    } catch (e) { console.error("Błąd członków", e); }
 
-    // 2. Ładowanie prywatnych statystyk (Zostawiamy nienaruszone!)
+    // 2. PRYWATNE STATYSTYKI
     let userReports = JSON.parse(localStorage.getItem('user_reports') || '[]');
-    
-    let totalKrzaki = 0;
-    let totalKille = 0;
-    let totalPayout = 0;
+    let totalKrzaki = 0, totalKille = 0, totalPayout = 0;
 
     userReports.forEach(r => {
-        if (r.krzaki) totalKrzaki += r.krzaki;
-        if (r.kille) totalKille += r.kille;
-        if (r.payout) totalPayout += r.payout;
+        totalKrzaki += (r.krzaki || 0);
+        totalKille += (r.kille || 0);
+        totalPayout += (r.payout || 0);
     });
 
-    const statKrzaki = document.getElementById('total-krzaki');
-    const statKille = document.getElementById('total-kille');
-    const statPayout = document.getElementById('total-payout');
-    
-    if (statKrzaki) statKrzaki.innerText = totalKrzaki;
-    if (statKille) statKille.innerText = totalKille;
-    if (statPayout) statPayout.innerText = `${totalPayout}$`;
+    document.getElementById('total-krzaki').innerText = totalKrzaki;
+    document.getElementById('total-kille').innerText = totalKille;
+    document.getElementById('total-payout').innerText = `${totalPayout}$`;
 
     const activityEl = document.getElementById('recent-activity-list');
     if (activityEl) {
@@ -176,69 +177,65 @@ async function loadData() {
         `).join('') : '<p style="font-size:0.7rem; color:#444;">Brak aktywności</p>';
     }
 
-    // 3. Ładowanie raportów Admina (NOWOŚĆ: Z BAZY DANYCH)
+    // 3. RAPORTY ADMINA (FIREBASE REAL-TIME)
     const adminList = document.getElementById('admin-list');
     if (adminList) {
-        try {
-            const res = await fetch('/api/get-reports');
-            if (res.ok) {
-                currentAdminReports = await res.json();
-                if (currentAdminReports.length === 0) {
-                    adminList.innerHTML = '<p style="text-align:center; padding:20px;">Brak oczekujących raportów.</p>';
-                    return;
-                }
-                adminList.innerHTML = currentAdminReports.map((r) => `
-                    <div class="admin-report-card">
-                        <div>
-                            <strong>${r.username} - ${r.type}</strong><br>
-                            <small>${r.payout}$ | ${r.date || 'Brak daty'}</small>
-                        </div>
-                        <div>
-                            <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
-                            <button onclick="acceptReport('${r.id}')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #2ecc71;">V</button>
-                            <button onclick="rejectReport('${r.id}')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #e74c3c;">X</button>
-                        </div>
-                    </div>
-                `).join('');
-            } else if (res.status === 403) {
-                // Jeśli serwer odrzuci (brak rangi), czyścimy listę
-                adminList.innerHTML = '';
+        const reportsRef = ref(db, 'reports');
+        // onValue sprawia, że lista odświeża się sama, gdy coś dojdzie do bazy
+        onValue(reportsRef, (snapshot) => {
+            const data = snapshot.val();
+            adminList.innerHTML = '';
+            currentAdminReports = [];
+
+            if (!data) {
+                adminList.innerHTML = '<p style="text-align:center; padding:20px;">Brak raportów w Firebase.</p>';
+                return;
             }
-        } catch (err) {
-            console.error("Błąd pobierania bazy:", err);
+
+            Object.keys(data).forEach(key => {
+                const r = data[key];
+                r.firebaseId = key; // Zapisujemy klucz do usuwania
+                currentAdminReports.push(r);
+
+                const card = document.createElement('div');
+                card.className = 'admin-report-card';
+                card.innerHTML = `
+                    <div>
+                        <strong>${r.username} - ${r.type}</strong><br>
+                        <small>${r.payout}$ | ${r.date}</small>
+                    </div>
+                    <div>
+                        <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
+                        <button onclick="handleReport('${key}', 'accept')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #2ecc71;">V</button>
+                        <button onclick="handleReport('${key}', 'reject')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #e74c3c;">X</button>
+                    </div>
+                `;
+                adminList.appendChild(card);
+            });
+        });
+    }
+}
+
+// Globalna funkcja do obsługi przycisków Admina
+window.handleReport = async function(firebaseId, action) {
+    const report = currentAdminReports.find(r => r.firebaseId === firebaseId);
+    if (!report) return;
+
+    const endpoint = action === 'accept' ? '/api/send-webhook' : '/api/reject-webhook';
+    
+    try {
+        const res = await fetch(endpoint, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(report)
+        });
+
+        if (res.ok) {
+            // USUWANIE Z FIREBASE PO KLIKNIĘCIU
+            await remove(ref(db, `reports/${firebaseId}`));
+            alert(action === 'accept' ? "Zaakceptowano!" : "Odrzucono!");
         }
+    } catch (err) {
+        console.error("Błąd webhooka", err);
     }
-}
-
-// Funkcje Admina korzystające z nowego ID z bazy danych
-async function acceptReport(id) {
-    const r = currentAdminReports.find(rep => rep.id === id);
-    if (!r) return;
-
-    const res = await fetch('/api/send-webhook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(r)
-    });
-    
-    if (res.ok) {
-        alert("Zaakceptowano i wysłano log!");
-        loadData();
-    }
-}
-
-async function rejectReport(id) {
-    const r = currentAdminReports.find(rep => rep.id === id);
-    if (!r) return;
-
-    const res = await fetch('/api/reject-webhook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(r)
-    });
-    
-    if (res.ok) {
-        alert("Odrzucono i wysłano log!");
-        loadData();
-    }
-}
+};
