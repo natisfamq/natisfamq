@@ -25,20 +25,25 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
     });
 
+    // WYSYŁANIE NOWEGO RAPORTU Przez Gracza
     document.getElementById('report-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const type = document.getElementById('contract-type').value;
         let imgur = document.getElementById('imgur-link').value.trim();
         const me = await (await fetch('/api/me')).json();
 
+        // FIX: Naprawa linku Imgur (dodawanie protokołu jeśli brak)
         if (imgur && !imgur.startsWith('http')) {
             imgur = 'https://' + imgur;
         }
 
         let payout = 0;
         let desc = type.toUpperCase();
-        if (type === 'paczki' || type === 'cenna') payout = 10000;
-        else if (type === 'grover') {
+        let logDesc = type.charAt(0).toUpperCase() + type.slice(1);
+
+        if (type === 'paczki' || type === 'cenna') {
+            payout = 10000;
+        } else if (type === 'grover') {
             const count = document.getElementById('krzaki-count').value;
             payout = count * 1000;
             desc = `GROVER (${count} szt.)`;
@@ -47,26 +52,56 @@ document.addEventListener('DOMContentLoaded', () => {
             const dmg = document.getElementById('dmg-count').value;
             payout = 2500 + (kille * 1000) + (dmg * 10);
             desc = `CAPT (K: ${kille}, D: ${dmg})`;
+            logDesc = "Capt";
         }
 
         if (!imgur) return alert("Podaj link do dowodu!");
 
-        const reportData = {
-            username: me.username,
-            type: desc,
-            payout: payout,
-            imgur: imgur,
-            date: new Date().toLocaleString('pl-PL')
+        const now = new Date();
+        const timestamp = now.toLocaleDateString('pl-PL') + ', ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+        // LOG DO DISCORDA: NOWY RAPORT
+        const discordPayload = {
+            embeds: [{
+                title: "📩 NOWY RAPORT",
+                color: 16766720, // Żółty
+                fields: [
+                    { name: "Gracz", value: me.username, inline: true },
+                    { name: "Typ", value: logDesc, inline: true },
+                    { name: "Kwota", value: `${payout}$`, inline: true },
+                    { name: "Akcja", value: `👀 [SPRAWDŹ RAPORTY](${window.location.origin})`, inline: false }
+                ],
+                thumbnail: {
+                    url: "https://cdn.discordapp.com/icons/1218558455823405108/a_d65e2361099e03f191b4e3e6060f0891.webp"
+                },
+                footer: { text: `Panel Wyplat | ${timestamp}` }
+            }]
         };
 
-        // Zapis lokalny dla admina
-        let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift(reportData);
-        localStorage.setItem('admin_reports', JSON.stringify(reports));
+        try {
+            await fetch('/api/webhook', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(discordPayload)
+            });
 
-        alert("Raport wysłany do panelu admina!");
-        e.target.reset();
-        loadData();
+            // Zapis lokalny dla panelu Admina
+            let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+            reports.unshift({
+                username: me.username,
+                type: desc,
+                payout: payout,
+                imgur: imgur,
+                date: timestamp
+            });
+            localStorage.setItem('admin_reports', JSON.stringify(reports));
+
+            alert("Raport wysłany!");
+            e.target.reset();
+            loadData();
+        } catch (err) {
+            alert("Błąd połączenia z API.");
+        }
     });
 });
 
@@ -77,10 +112,12 @@ async function loadData() {
             document.getElementById('user-name').innerText = me.username;
             document.getElementById('user-avatar').src = me.avatar;
             document.getElementById('user-role-text').innerHTML = `Ranga: <strong>${me.roleName}</strong>`;
+            
             const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
             const myReports = reports.filter(r => r.username === me.username);
             document.getElementById('reports-count').innerText = myReports.length;
             document.getElementById('last-act-text').innerText = myReports[0] ? myReports[0].type : "Brak danych";
+            
             if (me.banner) document.getElementById('user-banner-div').style.backgroundImage = `url(${me.banner})`;
         }
 
@@ -95,6 +132,7 @@ async function loadData() {
             </div>
         `).join('');
 
+        // Lista raportów w adminie - przejrzysty design
         const adminReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
         document.getElementById('admin-list').innerHTML = adminReports.map((r, i) => `
             <div class="admin-report-card">
@@ -116,24 +154,22 @@ async function loadData() {
     } catch (e) { console.error(e); }
 }
 
-// GŁÓWNA FUNKCJA WYSYŁAJĄCA LOGI
+// PRZETWARZANIE RAPORTU Przez Admina (Akceptacja/Odrzucenie)
 async function processReport(index, actionType) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
     
-    // Pobranie danych weryfikatora
     const meRes = await fetch('/api/me');
     const me = await meRes.json();
-    const verifierName = me.username || "Admin";
+    const verifierName = me.username || "System";
 
     const isAccept = actionType === 'AKCEPTACJA';
     const embedColor = isAccept ? 3066993 : 15158332; // Zielony vs Czerwony
     
-    // Generowanie timestampu dokładnie jak na screenie
     const now = new Date();
     const timestamp = now.toLocaleDateString('pl-PL') + ', ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
-    // Payload zgodny z Twoimi screenami
+    // Formatowanie embeda zgodnie ze screenami
     const discordPayload = {
         embeds: [{
             title: isAccept ? "⚖️ RAPORT AKCEPTACJA" : "⚖️ RAPORT ODRZUCENIE",
@@ -160,15 +196,14 @@ async function processReport(index, actionType) {
         });
 
         if (response.ok) {
-            // Dopiero gdy Discord potwierdzi odebranie, usuwamy z listy
+            // Usuwamy raport z lokalnej bazy tylko jeśli webhook przeszedł
             reports.splice(index, 1);
             localStorage.setItem('admin_reports', JSON.stringify(reports));
             loadData();
         } else {
-            const errorData = await response.json();
-            alert("Błąd Discorda: " + JSON.stringify(errorData));
+            alert("Błąd serwera Discord.");
         }
     } catch (error) {
-        alert("Błąd wysyłania: Sprawdź połączenie z internetem lub URL Webhooka.");
+        alert("Błąd wysyłania: " + error.message);
     }
 }
