@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 async function loadData() {
     try {
-        // Profil
+        // Profil zalogowanego
         const meRes = await fetch('/api/me');
         const me = await meRes.json();
         if (!me.error) {
@@ -69,20 +69,22 @@ async function loadData() {
             if (me.banner) document.getElementById('user-banner').style.backgroundImage = `url(${me.banner})`;
         }
 
-        // Członkowie - POWIĘKSZONE I NAZWY RANG
+        // Lista Członków z pseudonimami serwerowymi
         const memRes = await fetch('/api/members');
         const members = await memRes.json();
-        document.getElementById('members-list').innerHTML = members.map(m => `
+        const listContainer = document.getElementById('members-list');
+        
+        listContainer.innerHTML = members.map(m => `
             <div class="list-item">
                 <div class="member-info">
                     <img src="${m.avatar}" class="mini-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
-                    <span class="member-name">${m.username}</span>
+                    <span class="member-name">${m.displayName}</span>
                 </div>
                 <span class="member-rank-label">Ranga: ${m.rankName}</span>
             </div>
         `).join('');
     } catch (err) {
-        console.error("Błąd ładowania danych:", err);
+        console.error("Błąd podczas ładowania danych:", err);
     }
 }
 

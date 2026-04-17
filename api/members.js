@@ -42,13 +42,13 @@ export default async function handler(req, res) {
         const members = await response.json();
 
         const result = members
-            .filter(m => m.roles.some(r => hierarchy.includes(r)))
+            .filter(m => m.roles && m.roles.some(r => hierarchy.includes(r)))
             .map(m => {
-                // Szukamy najwyższej roli z naszej hierarchii
                 const topRoleId = hierarchy.find(r => m.roles.includes(r));
                 return {
-                    username: m.user.global_name || m.user.username,
-                    avatar: `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png`,
+                    // Priorytet: Pseudonim na serwerze -> Nazwa wyświetlana -> Login
+                    displayName: m.nick || m.user.global_name || m.user.username,
+                    avatar: m.user.avatar ? `https://cdn.discordapp.com/avatars/${m.user.id}/${m.user.avatar}.png` : `https://cdn.discordapp.com/embed/avatars/${parseInt(m.user.id) % 5}.png`,
                     rankName: roleNames[topRoleId] || "Członek",
                     rankOrder: hierarchy.indexOf(topRoleId)
                 };
@@ -57,6 +57,6 @@ export default async function handler(req, res) {
 
         res.status(200).json(result);
     } catch (err) {
-        res.status(500).json({ error: "Błąd serwera" });
+        res.status(500).json({ error: "Błąd serwera podczas pobierania członków" });
     }
 }
