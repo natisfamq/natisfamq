@@ -1,169 +1,111 @@
-body {
-    background-color: #000;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        loadData();
+    }
+
+    document.getElementById('login-btn').addEventListener('click', () => window.location.href = '/api/login');
+
+    const tabs = document.querySelectorAll('.tab-btn');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            tab.classList.add('active');
+            document.getElementById(tab.dataset.tab).style.display = 'block';
+        });
+    });
+
+    document.getElementById('contract-type').addEventListener('change', (e) => {
+        const val = e.target.value;
+        document.getElementById('grover-fields').style.display = val === 'grover' ? 'block' : 'none';
+        document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
+    });
+
+    document.getElementById('report-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const type = document.getElementById('contract-type').value;
+        let imgur = document.getElementById('imgur-link').value.trim();
+        const me = await (await fetch('/api/me')).json();
+
+        let payout = 10000;
+        let desc = type.toUpperCase();
+        if (type === 'grover') {
+            const count = document.getElementById('krzaki-count').value;
+            payout = count * 1000;
+            desc = `GROVER (${count} szt.)`;
+        } else if (type === 'capt') {
+            const k = document.getElementById('kille-count').value;
+            const d = document.getElementById('dmg-count').value;
+            payout = 2500 + (k * 1000) + (d * 10);
+            desc = `CAPT (K: ${k}, D: ${d})`;
+        }
+
+        const timestamp = new Date().toLocaleString('pl-PL');
+        
+        // Webhook log
+        await fetch('/api/webhook', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify({
+                embeds: [{
+                    title: "📩 NOWY RAPORT",
+                    color: 16766720,
+                    fields: [
+                        { name: "Gracz", value: me.username, inline: true },
+                        { name: "Typ", value: type.charAt(0).toUpperCase() + type.slice(1), inline: true },
+                        { name: "Kwota", value: `${payout}$`, inline: true }
+                    ],
+                    thumbnail: { url: `${window.location.origin}/logo.jpg` },
+                    footer: { text: `Panel Wyplat | ${timestamp}` }
+                }]
+            })
+        });
+
+        let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+        reports.unshift({ username: me.username, type: desc, payout, imgur, date: timestamp });
+        localStorage.setItem('admin_reports', JSON.stringify(reports));
+        alert("Wysłano!");
+        loadData();
+    });
+});
+
+async function loadData() {
+    const me = await (await fetch('/api/me')).json();
+    if (!me.error) {
+        document.getElementById('user-name').innerText = me.username;
+        document.getElementById('user-avatar').src = me.avatar || 'logo.jpg';
+        document.getElementById('user-role-text').innerText = `Ranga: ${me.roleName || '-'}`;
+    }
+
+    const members = await (await fetch('/api/members')).json();
+    document.getElementById('members-list').innerHTML = members.map(m => `
+        <div class="member-item">
+            <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
+            <span class="member-name">${m.displayName}</span>
+        </div>
+    `).join('');
+
+    const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+    document.getElementById('admin-list').innerHTML = reports.map((r, i) => `
+        <div class="admin-report-card">
+            <div>
+                <strong>${r.username} - ${r.type}</strong><br>
+                <small>${r.payout}$ | ${r.date}</small>
+            </div>
+            <div>
+                <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
+                <button onclick="deleteReport(${i})" class="btn-submit" style="padding: 5px 10px; margin-left:5px;">USUŃ</button>
+            </div>
+        </div>
+    `).join('');
 }
 
-.main-header {
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 50px 0 20px;
-}
-
-.header-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
-}
-
-.header-logo {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-}
-
-.header-title {
-    font-size: 3rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 5px;
-    margin: 0;
-}
-
-.app-container {
-    width: 100%;
-    max-width: 550px;
-    padding: 0 20px;
-}
-
-.tabs-nav {
-    display: flex;
-    justify-content: space-around;
-    background: #0a0a0a;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    border: 1px solid #1a1a1a;
-}
-
-.tab-btn {
-    background: transparent;
-    border: none;
-    color: #666;
-    padding: 8px 15px;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: 0.3s;
-}
-
-.tab-btn.active {
-    color: #fff;
-    border-bottom: 2px solid #fff;
-}
-
-.glass-card {
-    background: #080808;
-    border: 1px solid #1a1a1a;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 20px;
-}
-
-.card-title {
-    text-align: center;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
-
-/* LISTA CZŁONKÓW - AWATARY SĄ TERAZ OKRĄGŁE */
-.members-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.member-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: #0c0c0c;
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid #111;
-}
-
-.member-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%; /* Zmieniono na 50% dla idealnego koła */
-    object-fit: cover;
-    border: 1px solid #222;
-}
-
-.member-name {
-    font-weight: 700;
-    font-size: 0.95rem;
-}
-
-/* FORMULARZ I EFEKTY */
-.input-group label {
-    display: block;
-    font-size: 0.7rem;
-    color: #888;
-    margin-bottom: 5px;
-}
-
-input, select {
-    width: 100%;
-    background: #111;
-    border: 1px solid #222;
-    padding: 12px;
-    color: #fff;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-}
-
-input:hover, select:hover, input:focus {
-    border-color: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    outline: none;
-}
-
-.btn-submit, #login-btn {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    border: 1px solid #fff;
-    color: #fff;
-    border-radius: 5px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-submit:hover, #login-btn:hover {
-    background: #fff;
-    color: #000;
-}
-
-/* ADMIN */
-.admin-report-card {
-    background: #0f0f0f;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #222;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+function deleteReport(index) {
+    let reports = JSON.parse(localStorage.getItem('admin_reports'));
+    reports.splice(index, 1);
+    localStorage.setItem('admin_reports', JSON.stringify(reports));
+    loadData();
 }
