@@ -6,11 +6,20 @@ body {
     overflow-x: hidden;
 }
 
-/* EKRAN LOGOWANIA */
+/* --- KONTROLA WIDOCZNOŚCI --- */
+#login-screen, #main-app {
+    display: none;
+    opacity: 0;
+}
+
+.show-flex { display: flex !important; opacity: 1 !important; }
+.show-block { display: block !important; opacity: 1 !important; }
+
+/* --- EKRAN LOGOWANIA --- */
 #login-screen {
     height: 100vh;
     width: 100vw;
-    display: flex; /* Zmienione z display: none w HTML na flex w JS */
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     text-align: center;
@@ -24,7 +33,7 @@ body {
 }
 
 #login-btn {
-    padding: 12px 30px;
+    padding: 12px 35px;
     background: transparent;
     border: 2px solid #fff;
     color: #fff;
@@ -40,120 +49,37 @@ body {
     color: #000;
 }
 
-/* NAGŁÓWEK */
-.main-header {
-    width: 100%;
-    padding: 30px 0;
-    display: flex;
-    justify-content: center;
-}
+/* --- NAGŁÓWEK --- */
+.main-header { width: 100%; padding: 30px 0; display: flex; justify-content: center; }
+.header-content { display: flex; flex-direction: column; align-items: center; }
+.header-logo { width: 90px; height: 90px; border-radius: 50%; border: 2px solid #fff; margin-bottom: 10px; }
+.header-title { font-size: 2.8rem; font-weight: 900; letter-spacing: 5px; text-transform: uppercase; margin: 0; }
 
-.header-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
+/* --- KONTENER I NAV --- */
+.app-container { width: 100%; max-width: 480px; margin: auto; padding: 0 20px; }
+.tabs-nav { display: flex; background: #0a0a0a; border: 1px solid #1a1a1a; border-radius: 10px; padding: 5px; margin-bottom: 20px; }
+.tab-btn { flex: 1; background: transparent; border: none; color: #444; padding: 10px; font-weight: 700; cursor: pointer; text-transform: uppercase; }
+.tab-btn.active { color: #fff; border-bottom: 2px solid #fff; }
 
-.header-logo {
-    width: 90px;
-    height: 90px;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    margin-bottom: 10px;
-}
+/* --- KARTY --- */
+.glass-card { background: rgba(10, 10, 10, 0.9); border: 1px solid #1a1a1a; border-radius: 12px; padding: 20px; margin-bottom: 15px; }
+.profile-layout { display: flex; flex-direction: column; align-items: center; text-align: center; }
+.profile-img { width: 100px; height: 100px; border-radius: 50%; margin-bottom: 15px; border: 1px solid #333; }
 
-.header-title {
-    font-size: 2.8rem;
-    font-weight: 900;
-    letter-spacing: 5px;
-    text-transform: uppercase;
-    margin: 0;
-}
+/* --- LISTA CZŁONKÓW --- */
+.member-item { display: flex; align-items: center; gap: 15px; padding: 12px 0; border-bottom: 1px solid #111; }
+.member-avatar { width: 55px; height: 55px; border-radius: 6px; object-fit: cover; }
+.member-info strong { font-size: 1.1rem; color: #fff; }
 
-/* KONTENER */
-.app-container {
-    width: 100%;
-    max-width: 480px;
-    margin: auto;
-    padding: 0 20px;
-}
+/* --- FORMULARZ --- */
+input, select { width: 100%; padding: 10px; background: #111; border: 1px solid #222; color: #fff; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box; }
+.btn-submit { width: 100%; padding: 12px; background: #fff; color: #000; border: none; font-weight: 800; border-radius: 6px; cursor: pointer; text-transform: uppercase; }
 
-.tabs-nav {
-    display: flex;
-    background: #0a0a0a;
-    border: 1px solid #1a1a1a;
-    border-radius: 10px;
-    padding: 5px;
-    margin-bottom: 20px;
-}
-
-.tab-btn {
-    flex: 1;
-    background: transparent;
-    border: none;
-    color: #444;
-    padding: 10px;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-
-.tab-btn.active {
-    color: #fff;
-    border-bottom: 2px solid #fff;
-}
-
-/* KARTY */
-.glass-card {
-    background: rgba(10, 10, 10, 0.9);
-    border: 1px solid #1a1a1a;
-    border-radius: 12px;
-    padding: 20px;
-}
-
-.profile-layout {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-}
-
-.profile-img {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    margin-bottom: 15px;
-    border: 1px solid #333;
-}
-
-.member-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 10px 0;
-    border-bottom: 1px solid #111;
-}
-
-.member-avatar {
-    width: 55px;
-    height: 55px;
-    border-radius: 4px;
-    object-fit: cover;
-}
-
-input, select {
-    width: 100%; padding: 10px; background: #111; border: 1px solid #222; color: #fff; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box;
-}
-
-.btn-submit {
-    width: 100%; padding: 12px; background: #fff; color: #000; border: none; font-weight: 800; border-radius: 6px; cursor: pointer;
-}
-
+/* --- ANIMACJE I LOADER --- */
 .tab-content { display: none; }
-.tab-content.active-tab { display: block; }
+.tab-content.active-tab { display: block; animation: fadeIn 0.3s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-#loading-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center;
-}
+#loading-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center; }
 .spinner { width: 40px; height: 40px; border: 4px solid #222; border-top: 4px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
