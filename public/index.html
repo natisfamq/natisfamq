@@ -3,101 +3,93 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Natis FamQ | Management</title>
+    <title>Natis FamQ | Panel</title>
     <link rel="stylesheet" href="style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
 
-    <section id="login-screen" class="glass-panel active">
-        <div class="login-content" style="text-align: center;">
-            <h1 class="glow-text">Natis FamQ</h1>
-            <p>Zaloguj się przez Discord, aby wejść do panelu organizacji.</p>
-            <button id="login-btn" class="btn glow-btn">Zaloguj przez Discord</button>
-        </div>
-    </section>
+    <div id="login-screen">
+        <h1 class="main-title">Natis FamQ</h1>
+        <button id="login-btn" class="btn glow-btn">Zaloguj przez Discord</button>
+    </div>
 
-    <main id="main-app" style="display: none;">
-        <header>
-            <h1 class="main-title glow-text">Natis FamQ</h1>
-        </header>
+    <div id="main-app" style="display: none;">
+        <h1 class="main-title">Natis FamQ</h1>
+        
+        <div class="glass-panel">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" data-tab="panel">Panel</button>
+                <button class="tab-btn" data-tab="czlonkowie">Członkowie</button>
+                <button class="tab-btn" data-tab="raport">Raport</button>
+                <button class="tab-btn" data-tab="admin">Admin</button>
+            </nav>
 
-        <nav class="tabs-nav">
-            <button class="tab-btn active" data-tab="panel">Panel</button>
-            <button class="tab-btn" data-tab="czlonkowie">Członkowie</button>
-            <button class="tab-btn" data-tab="raport">Raport</button>
-            <button class="tab-btn" data-tab="admin">ADMIN</button>
-        </nav>
-
-        <section id="panel" class="tab-content glass-panel active">
-            <div class="profile-card">
-                <div id="user-banner" class="user-banner"></div>
-                <div class="profile-info">
-                    <img id="user-avatar" src="" alt="" class="profile-avatar">
-                    <div class="profile-text">
-                        <h2 id="user-name" class="glow-text">Użytkownik</h2>
-                        <span id="user-role" class="role-tag">Ładowanie...</span>
+            <section id="panel" class="tab-content active">
+                <div class="profile-card">
+                    <div class="user-banner"></div>
+                    <div class="profile-header">
+                        <img id="user-avatar" src="" alt="Avatar" class="profile-avatar">
+                        <div class="profile-main-info">
+                            <h2 id="user-name" class="profile-name">...</h2>
+                            <span id="user-role" class="profile-rank">...</span>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-grid">
+                        <div class="stat-item">
+                            <span class="stat-label">Raporty w tym tygodniu</span>
+                            <span id="reports-count" class="stat-value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Ostatnia aktywność</span>
+                            <span id="last-act-name" class="stat-value">Brak danych</span>
+                            <small id="last-act-date" style="color:#666; display: block; margin-top: 5px;"></small>
+                        </div>
                     </div>
                 </div>
-                <div class="profile-stats">
-                    <div class="stat-box">
-                        <span class="stat-label">Status</span>
-                        <span class="stat-value" style="color: #00ff00;">Aktywny</span>
-                    </div>
-                    <div class="stat-box">
-                        <span class="stat-label">Organizacja</span>
-                        <span class="stat-value">Natis FamQ</span>
-                    </div>
-                </div>
-            </div>
-        </section>
+            </section>
 
-        <section id="czlonkowie" class="tab-content glass-panel">
-            <h3>Lista Członków (Sorted by Rank)</h3>
-            <div id="members-list" class="list-container"></div>
-        </section>
+            <section id="czlonkowie" class="tab-content">
+                <div id="members-list">
+                    </div>
+            </section>
 
-        <section id="raport" class="tab-content glass-panel">
-            <h3>Wyślij Raport</h3>
-            <form id="report-form">
-                <div class="input-group">
+            <section id="raport" class="tab-content">
+                <form id="report-form">
                     <label>Typ Kontraktu</label>
                     <select id="contract-type">
                         <option value="paczki">Paczki (10.000$)</option>
-                        <option value="cenna">Cenna (10.000$)</option>
-                        <option value="grover">Grover (1.000$ / Krzak)</option>
-                        <option value="capt">Capt (Kille + DMG)</option>
+                        <option value="cenna">Cenna Paczka (10.000$)</option>
+                        <option value="grover">Grover</option>
+                        <option value="capt">Capt</option>
                     </select>
-                </div>
-                <div id="grover-fields" class="dynamic-fields">
-                    <label>Ilość krzaków</label>
-                    <input type="number" id="krzaki-count" min="0" value="0">
-                </div>
-                <div id="capt-fields" class="dynamic-fields">
-                    <div class="row">
-                        <div>
-                            <label>Kille (1.000$)</label>
-                            <input type="number" id="kille-count" min="0" value="0">
-                        </div>
-                        <div>
-                            <label>DMG (10$)</label>
-                            <input type="number" id="dmg-count" min="0" value="0">
-                        </div>
+                    
+                    <div id="grover-fields" style="display:none;">
+                        <label>Ilość krzaków</label>
+                        <input type="number" id="krzaki-count" value="0">
                     </div>
-                </div>
-                <div class="input-group">
+
+                    <div id="capt-fields" style="display:none;">
+                        <label>Kille (1.000$)</label>
+                        <input type="number" id="kille-count" value="0">
+                        <label>DMG (10$)</label>
+                        <input type="number" id="dmg-count" value="0">
+                    </div>
+
                     <label>Dowód (Link Imgur)</label>
                     <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
-                </div>
-                <button type="submit" class="btn glow-btn w-100">Wyślij do Admina</button>
-            </form>
-        </section>
+                    
+                    <button type="submit" class="btn glow-btn">Wyślij do Admina</button>
+                </form>
+            </section>
 
-        <section id="admin" class="tab-content glass-panel">
-            <h3>Zarządzanie</h3>
-            <div id="admin-list" class="list-container"></div>
-        </section>
-    </main>
+            <section id="admin" class="tab-content">
+                <div id="admin-list">
+                    </div>
+            </section>
+        </div>
+    </div>
 
     <script src="script.js"></script>
 </body>

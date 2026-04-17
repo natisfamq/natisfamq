@@ -7,7 +7,6 @@
 }
 
 * { box-sizing: border-box; }
-
 body {
     background-color: var(--bg);
     color: var(--accent);
@@ -15,12 +14,11 @@ body {
     margin: 0;
     display: flex;
     flex-direction: column;
-    align-items: center; /* Gwarantuje centrowanie wszystkiego w pionie */
+    align-items: center;
     padding: 50px 0;
     min-height: 100vh;
 }
 
-/* Panel Główny */
 .glass-panel {
     background: var(--glass);
     backdrop-filter: blur(20px);
@@ -29,38 +27,18 @@ body {
     padding: 40px;
     width: 90%;
     max-width: 1000px;
-    margin: 0 auto;
 }
 
-.main-title { font-size: 3rem; text-align: center; margin-bottom: 40px; font-weight: 900; }
+.main-title { font-size: 3rem; text-align: center; margin-bottom: 40px; font-weight: 900; letter-spacing: 5px; text-transform: uppercase; }
 
-/* Przyciski i Logowanie */
+/* Przycisk Logowania i Formularzy */
 .btn { 
-    padding: 15px 25px; 
-    border-radius: 10px; 
-    border: 1px solid white; 
-    background: transparent; 
-    color: white; 
-    cursor: pointer; 
-    text-transform: uppercase; 
-    font-weight: bold; 
-    transition: 0.3s;
-    display: inline-block;
-    text-decoration: none;
-    text-align: center;
+    padding: 15px 25px; border-radius: 10px; border: 1px solid white; 
+    background: transparent; color: white; cursor: pointer; 
+    text-transform: uppercase; font-weight: bold; transition: 0.3s;
+    text-align: center; width: 100%; font-size: 1rem;
 }
-
-.glow-btn:hover { 
-    background: white; 
-    color: black; 
-    box-shadow: 0 0 20px white; 
-}
-
-#login-btn {
-    width: 100%;
-    max-width: 350px;
-    margin-top: 20px;
-}
+.glow-btn:hover { background: white; color: black; box-shadow: 0 0 20px white; }
 
 /* Nawigacja */
 .tabs-nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
@@ -71,48 +49,39 @@ body {
 }
 .tab-btn.active { color: #fff; border-bottom: 2px solid #fff; }
 
-/* Lista Członków */
 .tab-content { display: none; width: 100%; }
 .tab-content.active { display: block; }
 
+/* Profile Card */
+.profile-card { border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); overflow: hidden; }
+.user-banner { height: 120px; background: linear-gradient(90deg, #111, #222); }
+.profile-header { display: flex; align-items: center; padding: 0 40px; margin-top: -50px; margin-bottom: 30px; }
+.profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--bg); background: #000; }
+.profile-main-info { margin-left: 25px; margin-top: 50px; }
+.profile-name { font-size: 2rem; font-weight: 900; margin: 0; }
+.profile-rank { font-size: 1.1rem; color: #aaa; margin-top: 5px; display: block; font-weight: 600; }
+
+.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 40px 40px 40px; }
+.stat-item { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; border: 1px solid var(--border); }
+.stat-label { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
+.stat-value { font-size: 1.2rem; font-weight: bold; margin-top: 5px; display: block; }
+
+/* Lista Członków */
 .list-item { 
-    background: rgba(255,255,255,0.02); 
-    border: 1px solid var(--border); 
-    margin-bottom: 20px; 
-    padding: 30px; 
-    border-radius: 18px; 
-    display: flex; 
-    justify-content: space-between; 
-    align-items: center;
-    transition: all 0.3s ease;
+    background: rgba(255,255,255,0.02); border: 1px solid var(--border); 
+    margin-bottom: 15px; padding: 25px; border-radius: 15px; 
+    display: flex; justify-content: space-between; align-items: center;
+    transition: 0.3s ease;
 }
+.list-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); border-color: rgba(255,255,255,0.3); }
+.mini-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #222; }
+.member-name { font-size: 1.3rem; font-weight: 700; margin-left: 20px; }
+.member-rank-label { color: #888; font-weight: 600; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 5px; }
 
-/* Efekt podświetlenia i uniesienia pola */
-.list-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(255, 255, 255, 0.4);
-    transform: translateY(-5px);
-    box-shadow: 0 10px 30px rgba(0,0,0,0.6);
+/* Formularze */
+label { display: block; margin-bottom: 8px; font-weight: bold; color: #aaa; font-size: 0.9rem; }
+input, select { 
+    width: 100%; padding: 15px; background: #111; border: 1px solid var(--border); 
+    color: white; border-radius: 10px; margin-bottom: 20px; font-size: 1rem;
 }
-
-.member-info { display: flex; align-items: center; gap: 25px; }
-.mini-avatar { width: 75px; height: 75px; border-radius: 50%; border: 2px solid #333; }
-.member-name { font-size: 1.5rem; font-weight: 800; letter-spacing: 1px; }
-
-.member-rank-label { 
-    font-size: 1.1rem; 
-    color: #fff; 
-    font-weight: 600; 
-    background: rgba(255,255,255,0.1);
-    padding: 10px 20px;
-    border-radius: 10px;
-    border: 1px solid rgba(255,255,255,0.2);
-}
-
-/* Profil (Panel) */
-.profile-card { border-radius: 20px; overflow: hidden; background: rgba(0,0,0,0.4); }
-.user-banner { height: 180px; background: #111; background-size: cover; background-position: center; }
-.profile-info { display: flex; align-items: center; padding: 0 40px; margin-top: -60px; }
-.profile-avatar { width: 130px; height: 130px; border-radius: 50%; border: 6px solid var(--bg); }
-.profile-text { margin-left: 20px; margin-top: 60px; }
-.role-tag { background: white; color: black; padding: 5px 15px; border-radius: 6px; font-weight: 900; }
+input:focus, select:focus { outline: none; border-color: #fff; background: #161616; }
