@@ -126,24 +126,23 @@ async function fetchUserInfo() {
 
 async function loadData() {
     // 1. Pobieranie członków z Discorda
+    // Poprawiony fragment w loadData()
     try {
-        const membersRes = await fetch('/api/members');
-        if (membersRes.ok) {
-            const members = await membersRes.json();
-            const membersList = document.getElementById('members-list');
-            if (membersList && Array.isArray(members)) {
-                membersList.innerHTML = members.map(m => `
-                    <div class="member-item">
-                        <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
-                        <div class="member-info">
-                            <span class="member-name">${m.displayName}</span>
-                            <span class="member-rank">${m.rankName || ''}</span>
-                        </div>
+        const res = await fetch('/api/members');
+        const members = await res.json();
+        const list = document.getElementById('members-list');
+        if (list && Array.isArray(members)) {
+            list.innerHTML = members.map(m => `
+                <div class="member-item">
+                    <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
+                    <div class="member-info">
+                        <span class="member-name">${m.displayName}</span>
+                        <span class="member-rank">${m.rankName || ''}</span>
                     </div>
-                `).join('');
-            }
+                </div>
+            `).join('');
         }
-    } catch (e) { console.error("Błąd członków", e); }
+    } catch (e) { console.error("Błąd członków:", e); }
 
     // 2. Ładowanie prywatnych statystyk (Zostawiamy nienaruszone!)
     let userReports = JSON.parse(localStorage.getItem('user_reports') || '[]');
