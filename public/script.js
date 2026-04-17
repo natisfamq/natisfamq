@@ -18,7 +18,6 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // LOGIKA PÓL FORMULARZA (PRZYWRÓCONA)
     const typeSelect = document.getElementById('contract-type');
     typeSelect.addEventListener('change', (e) => {
         const val = e.target.value;
@@ -26,7 +25,6 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
     });
 
-    // WYSYŁANIE RAPORTU
     document.getElementById('report-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const type = document.getElementById('contract-type').value;
@@ -55,19 +53,18 @@ document.addEventListener('DOMContentLoaded', () => {
             type: desc,
             payout: payout,
             imgur: imgur,
-            date: new Date().toLocaleString('pl-PL')
+            date: new Date().toLocaleString('pl-PL'),
+            banner: me.banner // Dodano poprawne przekazywanie bannera
         };
 
-        // WEBHOOK
         await fetch('/api/webhook', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(reportData)
         });
 
-        // ADMIN STORAGE
         let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift({ ...reportData, banner: me.banner });
+        reports.unshift(reportData);
         localStorage.setItem('admin_reports', JSON.stringify(reports));
 
         alert("Raport wysłany!");
@@ -84,14 +81,15 @@ async function loadData() {
         if (!me.error) {
             document.getElementById('user-name').innerText = me.username;
             document.getElementById('user-avatar').src = me.avatar;
-            document.getElementById('user-role-text').innerText = me.roleName;
+            // FIX: Tylko wartość rangi, bez dopisywania "Ranga:" (które jest już w HTML lub CSS)
+            document.getElementById('user-role-text').innerHTML = `Ranga: <strong>${me.roleName}</strong>`;
             
             const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
             const myReports = reports.filter(r => r.username === me.username);
             document.getElementById('reports-count').innerText = myReports.length;
             document.getElementById('last-act-text').innerText = myReports[0] ? myReports[0].type : "Brak danych";
             
-            if (me.banner) document.querySelector('.user-banner').style.backgroundImage = `url(${me.banner})`;
+            if (me.banner) document.getElementById('user-banner-div').style.backgroundImage = `url(${me.banner})`;
         }
 
         const members = await (await fetch('/api/members')).json();
@@ -108,12 +106,12 @@ async function loadData() {
         const adminReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
         document.getElementById('admin-list').innerHTML = adminReports.map((r, i) => `
             <div class="admin-report-card">
-                <div class="user-banner" style="background-image: url(${r.banner})"></div>
+                <div class="user-banner" style="background-image: url(${r.banner || ''}); background-color: #1a1a1a; height: 100px;"></div>
                 <div class="report-body">
                     <div><strong>${r.username}</strong> - ${r.type}<br><small>${r.payout}$ | ${r.date}</small></div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn btn-accept" onclick="action(${i},'akcept')">OK</button>
-                        <button class="btn btn-reject" onclick="action(${i},'odrzuc')">X</button>
+                    <div style="display:flex; gap:15px;">
+                        <a href="${r.imgur}" target="_blank" class="btn" style="text-decoration:none; font-size: 0.9rem;">IMGUR</a>
+                        <button class="btn btn-accept" onclick="action(${i})">USUŃ</button>
                     </div>
                 </div>
             </div>
@@ -121,7 +119,7 @@ async function loadData() {
     } catch (e) { console.error(e); }
 }
 
-function action(i, type) {
+function action(i) {
     let r = JSON.parse(localStorage.getItem('admin_reports'));
     r.splice(i, 1);
     localStorage.setItem('admin_reports', JSON.stringify(r));
