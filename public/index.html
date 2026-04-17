@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Natis FamQ | Panel</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <section id="login-screen" class="glass-panel active">
+        <div class="login-content">
+            <h2 class="glow-text">Wymagany Dostęp</h2>
+            <p>Zaloguj się, aby zweryfikować swoją rangę na serwerze Discord.</p>
+            <button id="login-btn" class="btn glow-btn">Zaloguj przez Discord</button>
+        </div>
+    </section>
+
+    <main id="main-app" style="display: none;">
+        <header>
+            <h1 class="main-title glow-text">Natis FamQ</h1>
+        </header>
+
+        <nav class="tabs-nav">
+            <button class="tab-btn active" data-tab="czlonkowie">Członkowie</button>
+            <button class="tab-btn" data-tab="raport">Raport</button>
+            <button class="tab-btn" data-tab="admin">ADMIN</button>
+        </nav>
+
+        <section id="czlonkowie" class="tab-content glass-panel active">
+            <h3>Lista Członków</h3>
+            <div id="members-list" class="list-container">
+                </div>
+        </section>
+
+        <section id="raport" class="tab-content glass-panel">
+            <h3>Wyślij Raport</h3>
+            <form id="report-form">
+                <div class="input-group">
+                    <label>Typ Kontraktu</label>
+                    <select id="contract-type">
+                        <option value="paczki">Paczki (10.000$)</option>
+                        <option value="cenna">Cenna (10.000$)</option>
+                        <option value="grover">Grover (1.000$/Krzak)</option>
+                        <option value="capt">Capt (Uczestnictwo + Kille + DMG)</option>
+                    </select>
+                </div>
+
+                <div id="grover-fields" class="dynamic-fields">
+                    <label>Ilość krzaków</label>
+                    <input type="number" id="krzaki-count" min="0" value="0">
+                </div>
+
+                <div id="capt-fields" class="dynamic-fields">
+                    <div class="row">
+                        <div>
+                            <label>Kille (1.000$)</label>
+                            <input type="number" id="kille-count" min="0" value="0">
+                        </div>
+                        <div>
+                            <label>DMG (10$)</label>
+                            <input type="number" id="dmg-count" min="0" value="0">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Dowód (Link Imgur)</label>
+                    <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
+                </div>
+
+                <button type="submit" class="btn glow-btn w-100">Wyślij Raport</button>
+            </form>
+        </section>
+
+        <section id="admin" class="tab-content glass-panel">
+            <h3>Zarządzanie Raportami</h3>
+            <div id="admin-list" class="list-container">
+                </div>
+        </section>
+    </main>
+
+    <script src="script.js"></script>
+</body>
+</html>
