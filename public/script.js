@@ -1,46 +1,51 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // --- POPRAWKA LOGOWANIA ---
-    function handleAuth() {
+    const loginScreen = document.getElementById('login-screen');
+    const mainApp = document.getElementById('main-app');
+
+    // --- NAPRAWA LOGIKI STARTOWEJ ---
+    function initApp() {
         const params = new URLSearchParams(window.location.search);
+        
+        // 1. Sprawdź czy wróciłeś z logowania
         if (params.get('logged') === 'true') {
             localStorage.setItem('is_logged', 'true');
-            // Czyścimy URL bez przeładowania strony
             window.history.replaceState({}, document.title, window.location.pathname);
         }
 
+        // 2. Decyzja co wyświetlić
         if (localStorage.getItem('is_logged') === 'true') {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('main-app').style.display = 'block';
+            loginScreen.style.display = 'none';
+            mainApp.style.display = 'block';
             loadData();
+        } else {
+            loginScreen.style.display = 'flex'; // Wymuszenie wyświetlenia centrowania
+            mainApp.style.display = 'none';
         }
     }
-    handleAuth();
 
-    // --- PRZEŁĄCZANIE ZAKŁADEK ---
-    const tabs = document.querySelectorAll('.tab-btn');
-    const contents = document.querySelectorAll('.tab-content');
+    initApp();
 
-    tabs.forEach(tab => {
+    // --- OBSŁUGA ZAKŁADEK ---
+    document.querySelectorAll('.tab-btn').forEach(tab => {
         tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active-tab'));
+            document.querySelectorAll('.tab-btn').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active-tab'));
             tab.classList.add('active');
             document.getElementById(tab.dataset.tab).classList.add('active-tab');
         });
     });
 
-    // --- POLA DYNAMICZNE W RAPORCIE ---
+    // --- OBSŁUGA PÓL RAPORTU ---
     const contractSelect = document.getElementById('contract-type');
     contractSelect.addEventListener('change', (e) => {
         document.getElementById('grover-fields').style.display = e.target.value === 'grover' ? 'block' : 'none';
         document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
     });
 
-    // --- WYSYŁANIE RAPORTU ---
+    // --- WYSYŁKA RAPORTU ---
     document.getElementById('report-form').addEventListener('submit', (e) => {
         e.preventDefault();
-        const loader = document.getElementById('loading-overlay');
-        loader.style.display = 'flex';
+        document.getElementById('loading-overlay').style.display = 'flex';
 
         setTimeout(() => {
             let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
@@ -52,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             localStorage.setItem('admin_reports', JSON.stringify(reports));
             
-            loader.style.display = 'none';
+            document.getElementById('loading-overlay').style.display = 'none';
             alert("Raport wysłany!");
             e.target.reset();
             loadData();
