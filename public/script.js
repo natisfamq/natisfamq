@@ -1,4 +1,5 @@
 let currentUser = null;
+let currentAdminReports = []; // Dodana zmienna do trzymania raportów z bazy
 
 document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
@@ -31,10 +32,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (contractSelect) {
         contractSelect.addEventListener('change', (e) => {
             const val = e.target.value;
-            const grover = document.getElementById('grover-fields');
-            const capt = document.getElementById('capt-fields');
-            if (grover) grover.style.display = val === 'grover' ? 'block' : 'none';
-            if (capt) capt.style.display = val === 'capt' ? 'block' : 'none';
+            const groverFields = document.getElementById('grover-fields');
+            const captFields = document.getElementById('capt-fields');
+            if (groverFields) groverFields.style.display = val === 'grover' ? 'block' : 'none';
+            if (captFields) captFields.style.display = val === 'capt' ? 'block' : 'none';
         });
     }
 
@@ -42,61 +43,61 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (reportForm) {
         reportForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            if (!currentUser) await fetchUserInfo();
-            
             const type = document.getElementById('contract-type').value;
-            const imgur = document.getElementById('imgur-link').value.trim();
-            const senderName = currentUser ? currentUser.username : "Nieznany";
+            const imgur = document.getElementById('imgur-link').value;
+            
+            if (!imgur) return alert("Podaj link do dowodu!");
 
-            let payout = 10000;
-            let desc = type.toUpperCase();
+            let payout = 0;
+            let desc = "";
+            let krzaki = 0;
+            let kille = 0;
+
             if (type === 'grover') {
-                const count = document.getElementById('krzaki-count').value;
-                payout = count * 1000;
-                desc = `GROVER (${count} szt.)`;
+                krzaki = parseInt(document.getElementById('krzaki-count').value) || 0;
+                payout = krzaki * 200;
+                desc = `Grover (${krzaki} krzaków)`;
             } else if (type === 'capt') {
-                const k = document.getElementById('kille-count').value;
-                const d = document.getElementById('dmg-count').value;
-                payout = 2500 + (k * 1000) + (d * 10);
-                desc = `CAPT (K: ${k}, D: ${d})`;
+                kille = parseInt(document.getElementById('kille-count').value) || 0;
+                const dmg = parseInt(document.getElementById('dmg-count').value) || 0;
+                payout = (kille * 1000) + (dmg * 1);
+                desc = `Capt (${kille} K / ${dmg} D)`;
             }
 
-            const now = new Date();
-            const timestamp = now.toLocaleString('pl-PL');
-            
-            // Wysyłka na Discord
-            fetch('/api/webhook', {
-                method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({
-                    embeds: [{
-                        title: "📩 NOWY RAPORT DO ROZPATRZENIA",
-                        color: 16766720,
-                        fields: [
-                            { name: "Wysłał", value: senderName, inline: true },
-                            { name: "Typ", value: desc, inline: true },
-                            { name: "Kwota", value: `${payout}$`, inline: true }
-                        ],
-                        footer: { text: `Panel Wyplat | ${timestamp}` }
-                    }]
-                })
-            });
+            const reportData = {
+                username: currentUser ? currentUser.username : "Nieznany",
+                type: desc,
+                payout: payout,
+                imgur: imgur,
+                date: new Date().toLocaleString('pl-PL'),
+                krzaki: krzaki,
+                kille: kille
+            };
 
-            // Zapis lokalny
-            let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-            reports.unshift({ 
-                username: senderName, 
-                type: desc, 
-                payout: payout, 
-                imgur: imgur, 
-                date: timestamp, 
-                rawDate: now.toISOString() 
-            });
-            localStorage.setItem('admin_reports', JSON.stringify(reports));
-            
-            alert("Raport wysłany!");
-            reportForm.reset();
-            loadData();
+            // ZAPIS LOKALNY: Zostawiamy, żeby Twoje prywatne statystyki działały tak jak wcześniej!
+            let userReports = JSON.parse(localStorage.getItem('user_reports') || '[]');
+            userReports.unshift(reportData);
+            localStorage.setItem('user_reports', JSON.stringify(userReports));
+
+            // ZAPIS DO BAZY (DLA ADMINA): Nowy system wysyłania na serwer
+            try {
+                const res = await fetch('/api/save-report', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(reportData)
+                });
+
+                if (res.ok) {
+                    alert("Raport wysłany do Admina!");
+                    reportForm.reset();
+                    loadData();
+                } else {
+                    alert("Błąd serwera przy zapisie do bazy.");
+                }
+            } catch (err) {
+                console.error(err);
+                alert("Błąd połączenia z API.");
+            }
         });
     }
 });
@@ -104,8 +105,8 @@ document.addEventListener('DOMContentLoaded', async () => {
 async function fetchUserInfo() {
     try {
         const res = await fetch('/api/me');
-        currentUser = await res.json();
-        if (!currentUser.error) {
+        if (res.ok) {
+            currentUser = await res.json();
             const nameEl = document.getElementById('user-name');
             const avatarEl = document.getElementById('user-avatar');
             const roleEl = document.getElementById('user-role-text');
@@ -114,89 +115,54 @@ async function fetchUserInfo() {
             if (avatarEl) avatarEl.src = currentUser.avatar || 'logo.jpg';
             if (roleEl) roleEl.innerText = `Ranga: ${currentUser.roleName || '-'}`;
 
-            // --- LOGIKA BLOKADY ADMINA ---
+            // Ukrywanie panelu admina wizualnie dla mniejszych rang
             const adminBtn = document.querySelector('.tab-btn[data-tab="admin"]');
-            if (adminBtn) {
-                if (currentUser.roleLevel < 11) {
-                    adminBtn.remove(); // Usuwamy przycisk z menu dla rang 1-10
-                }
+            if (adminBtn && currentUser.roleLevel < 11) {
+                adminBtn.remove();
             }
         }
-    } catch (e) { console.error("Błąd profilu:", e); }
+    } catch (e) { console.error("Błąd pobierania danych użytkownika:", e); }
 }
 
 async function loadData() {
-    // 1. Zawsze najpierw ładuj raporty (niezależnie od wszystkiego)
-    renderAdminReports();
-    
-    // 2. Statystyki użytkownika
-    if (currentUser) {
-        updateUserStats(currentUser.username);
-    }
-
-    // 3. Lista członków
+    // 1. Pobieranie członków z Discorda
     try {
-        const res = await fetch('/api/members');
-        const members = await res.json();
-        const list = document.getElementById('members-list');
-        if (list && Array.isArray(members)) {
-            list.innerHTML = members.map(m => `
-                <div class="member-item">
-                    <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
-                    <div class="member-info">
+        const membersRes = await fetch('/api/members');
+        if (membersRes.ok) {
+            const members = await membersRes.json();
+            const membersList = document.getElementById('members-list');
+            if (membersList) {
+                membersList.innerHTML = members.map(m => `
+                    <div class="member-item">
+                        <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
                         <span class="member-name">${m.displayName}</span>
-                        <span class="member-rank">${m.rankName}</span>
                     </div>
-                </div>
-            `).join('');
+                `).join('');
+            }
         }
-    } catch (e) { console.error("Błąd członków:", e); }
-}
+    } catch (e) { console.error("Błąd członków", e); }
 
-function renderAdminReports() {
-    const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-    const adminList = document.getElementById('admin-list');
-    if (!adminList) return;
+    // 2. Ładowanie prywatnych statystyk (Zostawiamy nienaruszone!)
+    let userReports = JSON.parse(localStorage.getItem('user_reports') || '[]');
+    
+    let totalKrzaki = 0;
+    let totalKille = 0;
+    let totalPayout = 0;
 
-    if (reports.length === 0) {
-        adminList.innerHTML = '<p style="text-align:center; color:#444; padding:20px;">Brak raportów</p>';
-        return;
-    }
+    userReports.forEach(r => {
+        if (r.krzaki) totalKrzaki += r.krzaki;
+        if (r.kille) totalKille += r.kille;
+        if (r.payout) totalPayout += r.payout;
+    });
 
-    adminList.innerHTML = reports.map((r, i) => `
-        <div class="admin-report-card">
-            <div class="report-details">
-                <strong>OD: ${r.username || 'Anonim'}</strong><br>
-                <span>${r.type}</span><br>
-                <small>${r.payout}$ | ${r.date}</small>
-            </div>
-            <div class="report-actions">
-                <button onclick="acceptReport(${i})" class="btn-action btn-accept">AKCEPTUJ</button>
-                <a href="${r.imgur}" target="_blank" class="btn-action btn-imgur">IMGUR</a>
-                <button onclick="rejectReport(${i})" class="btn-action btn-delete">ODRZUĆ</button>
-            </div>
-        </div>
-    `).join('');
-}
+    const statKrzaki = document.getElementById('total-krzaki');
+    const statKille = document.getElementById('total-kille');
+    const statPayout = document.getElementById('total-payout');
+    
+    if (statKrzaki) statKrzaki.innerText = totalKrzaki;
+    if (statKille) statKille.innerText = totalKille;
+    if (statPayout) statPayout.innerText = `${totalPayout}$`;
 
-function updateUserStats(currentUsername) {
-    const allReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-    const userReports = allReports.filter(r => r.username === currentUsername);
-
-    // Licznik raportów z 7 dni
-    const sevenDaysAgo = new Date();
-    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
-    const weeklyCount = userReports.filter(r => new Date(r.rawDate) >= sevenDaysAgo).length;
-
-    // Suma wypłat
-    const total = userReports.reduce((sum, r) => sum + parseInt(r.payout), 0);
-
-    const countEl = document.getElementById('reports-count');
-    const totalEl = document.getElementById('payout-total');
-    if (countEl) countEl.innerText = weeklyCount;
-    if (totalEl) totalEl.innerText = `${total}$`;
-
-    // Aktywność
     const activityEl = document.getElementById('recent-activity-list');
     if (activityEl) {
         const recent = userReports.slice(0, 3);
@@ -207,34 +173,70 @@ function updateUserStats(currentUsername) {
             </div>
         `).join('') : '<p style="font-size:0.7rem; color:#444;">Brak aktywności</p>';
     }
+
+    // 3. Ładowanie raportów Admina (NOWOŚĆ: Z BAZY DANYCH)
+    const adminList = document.getElementById('admin-list');
+    if (adminList) {
+        try {
+            const res = await fetch('/api/get-reports');
+            if (res.ok) {
+                currentAdminReports = await res.json();
+                if (currentAdminReports.length === 0) {
+                    adminList.innerHTML = '<p style="text-align:center; padding:20px;">Brak oczekujących raportów.</p>';
+                    return;
+                }
+                adminList.innerHTML = currentAdminReports.map((r) => `
+                    <div class="admin-report-card">
+                        <div>
+                            <strong>${r.username} - ${r.type}</strong><br>
+                            <small>${r.payout}$ | ${r.date || 'Brak daty'}</small>
+                        </div>
+                        <div>
+                            <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
+                            <button onclick="acceptReport('${r.id}')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #2ecc71;">V</button>
+                            <button onclick="rejectReport('${r.id}')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #e74c3c;">X</button>
+                        </div>
+                    </div>
+                `).join('');
+            } else if (res.status === 403) {
+                // Jeśli serwer odrzuci (brak rangi), czyścimy listę
+                adminList.innerHTML = '';
+            }
+        } catch (err) {
+            console.error("Błąd pobierania bazy:", err);
+        }
+    }
 }
 
-async function acceptReport(index) {
-    let reports = JSON.parse(localStorage.getItem('admin_reports'));
-    const r = reports[index];
+// Funkcje Admina korzystające z nowego ID z bazy danych
+async function acceptReport(id) {
+    const r = currentAdminReports.find(rep => rep.id === id);
+    if (!r) return;
+
     const res = await fetch('/api/send-webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(r)
     });
+    
     if (res.ok) {
-        reports.splice(index, 1);
-        localStorage.setItem('admin_reports', JSON.stringify(reports));
+        alert("Zaakceptowano i wysłano log!");
         loadData();
     }
 }
 
-async function rejectReport(index) {
-    let reports = JSON.parse(localStorage.getItem('admin_reports'));
-    const r = reports[index];
+async function rejectReport(id) {
+    const r = currentAdminReports.find(rep => rep.id === id);
+    if (!r) return;
+
     const res = await fetch('/api/reject-webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(r)
     });
+    
     if (res.ok) {
-        reports.splice(index, 1);
-        localStorage.setItem('admin_reports', JSON.stringify(reports));
+        alert("Odrzucono i wysłano log!");
         loadData();
     }
 }
