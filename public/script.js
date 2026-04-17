@@ -1,7 +1,6 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// TWOJA KONFIGURACJA FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyDyTpY2vGcvM8Sz5B1TCdDeNUObQ6yZF4o",
     authDomain: "natis-add35.firebaseapp.com",
@@ -17,10 +16,10 @@ const db = getDatabase(app);
 
 let currentUser = null;
 let currentAdminReports = [];
-let isProcessing = false; // Blokada przed podwójnym kliknięciem
+let isProcessing = false;
 
 document.addEventListener('DOMContentLoaded', async () => {
-    // 1. LOGOWANIE
+    // LOGOWANIE
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
@@ -28,18 +27,18 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // 2. SPRAWDZANIE SESJI
+    // SESJA
     const params = new URLSearchParams(window.location.search);
     if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
-        const loginScreen = document.getElementById('login-screen');
-        const mainApp = document.getElementById('main-app');
-        if (loginScreen) loginScreen.style.display = 'none';
-        if (mainApp) mainApp.style.display = 'block';
+        const ls = document.getElementById('login-screen');
+        const ma = document.getElementById('main-app');
+        if (ls) ls.style.display = 'none';
+        if (ma) ma.style.display = 'block';
         await fetchUserInfo();
         loadData();
     }
 
-    // 3. OBSŁUGA ZAKŁADEK
+    // TABS
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -51,44 +50,40 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // 4. PRZEŁĄCZANIE PÓL FORMULARZA
+    // FORM FIELDS
     const contractSelect = document.getElementById('contract-type');
     if (contractSelect) {
         contractSelect.addEventListener('change', (e) => {
             const val = e.target.value;
-            const groverFields = document.getElementById('grover-fields');
-            const captFields = document.getElementById('capt-fields');
-            if (groverFields) groverFields.style.display = val === 'grover' ? 'block' : 'none';
-            if (captFields) captFields.style.display = val === 'capt' ? 'block' : 'none';
+            document.getElementById('grover-fields').style.display = val === 'grover' ? 'block' : 'none';
+            document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
         });
     }
 
-    // 5. WYSYŁANIE RAPORTU
+    // SEND REPORT
     const reportForm = document.getElementById('report-form');
     if (reportForm) {
         reportForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             if (isProcessing) return;
 
-            const type = document.getElementById('contract-type').value;
             const imgur = document.getElementById('imgur-link').value;
             if (!imgur) return alert("Podaj link do dowodu!");
 
             isProcessing = true;
-            let payout = 0, desc = "", krzaki = 0, kille = 0, dmg = 0;
+            const type = document.getElementById('contract-type').value;
+            let payout = 10000;
+            let desc = type.charAt(0).toUpperCase() + type.slice(1);
 
             if (type === 'grover') {
-                krzaki = parseInt(document.getElementById('krzaki-count').value) || 0;
-                payout = krzaki * 1000;
-                desc = `Grover (${krzaki} krzaków)`;
+                const count = parseInt(document.getElementById('krzaki-count').value) || 0;
+                payout = count * 1000;
+                desc = `Grover (${count} krzaków)`;
             } else if (type === 'capt') {
-                kille = parseInt(document.getElementById('kille-count').value) || 0;
-                dmg = parseInt(document.getElementById('dmg-count').value) || 0;
-                payout = 2500 + (kille * 1000) + (dmg * 10);
-                desc = `Capt (${kille} K / ${dmg} D)`;
-            } else {
-                payout = 10000;
-                desc = type === 'paczki' ? "Paczki" : "Cenna";
+                const k = parseInt(document.getElementById('kille-count').value) || 0;
+                const d = parseInt(document.getElementById('dmg-count').value) || 0;
+                payout = 2500 + (k * 1000) + (d * 10);
+                desc = `Capt (${k}K / ${d}D)`;
             }
 
             const reportData = {
@@ -101,19 +96,13 @@ document.addEventListener('DOMContentLoaded', async () => {
             };
 
             try {
-                // Zapis do Firebase
-                const reportsRef = ref(db, 'reports');
-                const newReportRef = push(reportsRef);
-                await set(newReportRef, reportData);
-
-                // WYSYŁKA WEBHOOKA O NOWYM RAPORCIE (Twoje stare zachowanie)
+                await set(push(ref(db, 'reports')), reportData);
                 await fetch('/api/new-report', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(reportData)
                 });
-
-                alert("Raport wysłany!");
+                alert("Wysłano raport!");
                 reportForm.reset();
                 loadData();
             } catch (err) {
@@ -133,93 +122,90 @@ async function fetchUserInfo() {
             document.getElementById('user-name').innerText = currentUser.username;
             document.getElementById('user-avatar').src = currentUser.avatar || 'logo.jpg';
             document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
-            
             if (currentUser.roleLevel < 11) {
-                const adminBtn = document.querySelector('.tab-btn[data-tab="admin"]');
-                if (adminBtn) adminBtn.remove();
+                const ab = document.querySelector('.tab-btn[data-tab="admin"]');
+                if (ab) ab.remove();
             }
         }
-    } catch (e) { console.error("UserInfo Error:", e); }
+    } catch (e) { console.error(e); }
 }
 
 async function loadData() {
-    // Ładowanie listy członków
+    // MEMBERS
     try {
         const res = await fetch('/api/members');
-        const members = await res.json();
+        const m = await res.json();
         const list = document.getElementById('members-list');
-        if (list && Array.isArray(members)) {
-            list.innerHTML = members.map(m => `
+        if (list && Array.isArray(m)) {
+            list.innerHTML = m.map(user => `
                 <div class="member-item">
-                    <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
+                    <img src="${user.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
                     <div class="member-info">
-                        <span class="member-name">${m.displayName}</span>
-                        <span class="member-rank">${m.rankName || ''}</span>
+                        <span class="member-name">${user.displayName}</span>
+                        <span class="member-rank">${user.rankName || ''}</span>
                     </div>
                 </div>
             `).join('');
         }
-    } catch (e) { console.error("Members Error:", e); }
+    } catch (e) { console.error(e); }
 
-    // Statystyki i lista Admina (Firebase Live)
-    const adminList = document.getElementById('admin-list');
-    if (adminList) {
-        onValue(ref(db, 'reports'), (snapshot) => {
-            const data = snapshot.val();
+    // WEEKLY STATS (From Firebase/Local)
+    onValue(ref(db, 'reports'), (snap) => {
+        const data = snap.val();
+        let weeklyCount = 0;
+        let lastDate = "Brak danych";
+        const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
+
+        if (data) {
+            const myReports = Object.values(data).filter(r => r.username === currentUser?.username);
+            weeklyCount = myReports.filter(r => r.timestamp > weekAgo).length;
+            if (myReports.length > 0) lastDate = myReports[myReports.length - 1].date;
+        }
+
+        if (document.getElementById('reports-count')) document.getElementById('reports-count').innerText = weeklyCount;
+        if (document.getElementById('last-act-text')) document.getElementById('last-act-text').innerText = lastDate;
+
+        // ADMIN LIST
+        const adminList = document.getElementById('admin-list');
+        if (adminList) {
             adminList.innerHTML = '';
             currentAdminReports = [];
-            if (!data) return;
-
-            Object.keys(data).forEach(key => {
-                const r = data[key];
-                r.id = key;
-                currentAdminReports.push(r);
-                const card = document.createElement('div');
-                card.className = 'admin-report-card';
-                card.innerHTML = `
-                    <div style="flex-grow:1">
-                        <strong>${r.username}</strong> - ${r.type}<br>
-                        <small>${r.payout}$ | ${r.date}</small>
-                    </div>
-                    <div>
-                        <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding:5px 10px; text-decoration:none; font-size:0.7rem">IMGUR</a>
-                        <button class="v-btn" data-id="${key}" style="background:#2ecc71; border:none; color:white; padding:5px 10px; cursor:pointer; margin-left:5px">V</button>
-                        <button class="x-btn" data-id="${key}" style="background:#e74c3c; border:none; color:white; padding:5px 10px; cursor:pointer; margin-left:5px">X</button>
-                    </div>`;
-                
-                card.querySelector('.v-btn').onclick = () => handleAdminAction(key, 'accept');
-                card.querySelector('.x-btn').onclick = () => handleAdminAction(key, 'reject');
-                adminList.appendChild(card);
-            });
-        });
-    }
+            if (data) {
+                Object.keys(data).forEach(key => {
+                    const r = data[key];
+                    r.id = key;
+                    currentAdminReports.push(r);
+                    const card = document.createElement('div');
+                    card.className = 'admin-report-card';
+                    card.innerHTML = `
+                        <div style="flex-grow:1"><strong>${r.username}</strong> - ${r.type}<br><small>${r.payout}$ | ${r.date}</small></div>
+                        <div>
+                            <button class="v-btn" style="background:#2ecc71; border:none; color:white; padding:5px 10px; cursor:pointer">V</button>
+                            <button class="x-btn" style="background:#e74c3c; border:none; color:white; padding:5px 10px; cursor:pointer; margin-left:5px">X</button>
+                        </div>`;
+                    card.querySelector('.v-btn').onclick = () => handleAdminAction(key, 'accept');
+                    card.querySelector('.x-btn').onclick = () => handleAdminAction(key, 'reject');
+                    adminList.appendChild(card);
+                });
+            }
+        }
+    });
 }
 
 async function handleAdminAction(id, action) {
     if (isProcessing) return;
-    
     const report = currentAdminReports.find(r => r.id === id);
     if (!report) return;
 
     isProcessing = true;
-    const endpoint = action === 'accept' ? '/api/send-webhook' : '/api/reject-webhook';
-    
     try {
+        const endpoint = action === 'accept' ? '/api/send-webhook' : '/api/reject-webhook';
         const res = await fetch(endpoint, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(report)
         });
-
-        if (res.ok) {
-            // Usuwamy z Firebase tylko jeśli webhook przeszedł
-            await remove(ref(db, `reports/${id}`));
-        } else {
-            alert("Błąd Webhooka!");
-        }
-    } catch (err) {
-        console.error("Admin Action Error:", err);
-    } finally {
-        isProcessing = false;
-    }
+        if (res.ok) await remove(ref(db, `reports/${id}`));
+    } catch (e) { console.error(e); }
+    finally { isProcessing = false; }
 }
