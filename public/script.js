@@ -80,7 +80,7 @@ async function loadData() {
         document.getElementById('user-role-text').innerText = `Ranga: ${me.roleName || '-'}`;
     }
 
-const members = await (await fetch('/api/members')).json();
+    const members = await (await fetch('/api/members')).json();
     document.getElementById('members-list').innerHTML = members.map(m => `
         <div class="member-item">
             <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
@@ -94,16 +94,40 @@ const members = await (await fetch('/api/members')).json();
     const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
     document.getElementById('admin-list').innerHTML = reports.map((r, i) => `
         <div class="admin-report-card">
-            <div>
-                <strong>${r.username} - ${r.type}</strong><br>
+            <div class="report-details">
+                <strong>${r.username || 'Nieznany'} - ${r.type}</strong><br>
                 <small>${r.payout}$ | ${r.date}</small>
             </div>
-            <div>
-                <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
-                <button onclick="deleteReport(${i})" class="btn-submit" style="padding: 5px 10px; margin-left:5px;">USUŃ</button>
+            <div class="report-actions">
+                <button onclick="acceptReport(${i})" class="btn-action btn-accept">AKCEPTUJ</button>
+                <a href="${r.imgur}" target="_blank" class="btn-action btn-imgur">IMGUR</a>
+                <button onclick="deleteReport(${i})" class="btn-action btn-delete">USUŃ</button>
             </div>
         </div>
     `).join('');
+}
+
+async function acceptReport(index) {
+    let reports = JSON.parse(localStorage.getItem('admin_reports'));
+    const r = reports[index];
+    
+    try {
+        const response = await fetch('/api/send-webhook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(r)
+        });
+
+        if (response.ok) {
+            alert("Raport został zaakceptowany!");
+            deleteReport(index); // Usuwamy raport z oczekujących po akceptacji
+        } else {
+            alert("Wystąpił błąd podczas akceptacji raportu.");
+        }
+    } catch (error) {
+        console.error("Błąd akceptacji:", error);
+        alert("Błąd połączenia z serwerem.");
+    }
 }
 
 function deleteReport(index) {

@@ -84,7 +84,7 @@ body {
     margin-bottom: 20px;
 }
 
-/* LISTA CZŁONKÓW - AWATARY SĄ TERAZ OKRĄGŁE */
+/* LISTA CZŁONKÓW */
 .members-container {
     display: flex;
     flex-direction: column;
@@ -104,14 +104,26 @@ body {
 .member-avatar {
     width: 60px;
     height: 60px;
-    border-radius: 50%; /* Zmieniono na 50% dla idealnego koła */
+    border-radius: 50%;
     object-fit: cover;
     border: 1px solid #222;
+}
+
+.member-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
 }
 
 .member-name {
     font-weight: 700;
     font-size: 0.95rem;
+}
+
+.member-rank {
+    font-size: 0.75rem;
+    color: #888;
+    margin-top: 2px;
 }
 
 /* FORMULARZ I EFEKTY */
@@ -163,18 +175,54 @@ input:hover, select:hover, input:focus {
     border-radius: 10px;
     border: 1px solid #222;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
+    flex-direction: column; /* Układ pionowy na bardzo małych ekranach */
+    gap: 15px;
     margin-bottom: 10px;
 }
-.member-info {
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+
+@media (min-width: 480px) {
+    .admin-report-card {
+        flex-direction: row; /* Układ poziomy na większych ekranach */
+        justify-content: space-between;
+        align-items: center;
+    }
 }
 
-.member-rank {
+.report-details {
+    flex: 1;
+}
+
+.report-actions {
+    display: flex;
+    gap: 8px; /* Bezpieczny odstęp między przyciskami - zapobiega zlewaniu się ramki */
+    flex-wrap: wrap; /* Przyciski zwiną się do nowej linii, jeśli zabraknie miejsca */
+}
+
+.btn-action {
+    padding: 6px 10px;
+    border: 1px solid #444;
+    color: #fff;
+    border-radius: 5px;
     font-size: 0.75rem;
-    color: #888; /* Szary, żeby nie odciągał uwagi od nicku */
-    margin-top: 2px;
+    font-weight: 700;
+    cursor: pointer;
+    text-decoration: none;
+    background: transparent;
+    transition: 0.3s;
+    text-align: center;
+}
+
+.btn-accept:hover {
+    background: #28a745;
+    border-color: #28a745;
+}
+
+.btn-imgur:hover {
+    background: #1da1f2;
+    border-color: #1da1f2;
+}
+
+.btn-delete:hover {
+    background: #dc3545;
+    border-color: #dc3545;
 }
