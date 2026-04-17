@@ -3,167 +3,97 @@ body {
     color: #fff;
     font-family: 'Inter', sans-serif;
     margin: 0;
+}
+
+#login-screen {
+    height: 100vh;
     display: flex;
-    flex-direction: column;
+    justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
 .main-header {
     width: 100%;
-    display: flex;
-    justify-content: center;
-    padding: 50px 0 20px;
-}
-
-.header-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 15px;
+    padding: 30px 0;
+    text-align: center;
 }
 
 .header-logo {
-    width: 100px;
-    height: 100px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
     border: 2px solid #fff;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .header-title {
-    font-size: 3rem;
+    font-size: 2.5rem;
     font-weight: 900;
-    text-transform: uppercase;
     letter-spacing: 5px;
-    margin: 0;
+    margin: 10px 0;
 }
 
 .app-container {
-    width: 100%;
-    max-width: 550px;
-    padding: 0 20px;
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 20px;
 }
 
 .tabs-nav {
     display: flex;
-    justify-content: space-around;
-    background: #0a0a0a;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    border: 1px solid #1a1a1a;
+    gap: 10px;
+    margin-bottom: 20px;
 }
 
 .tab-btn {
-    background: transparent;
-    border: none;
+    flex: 1;
+    background: #111;
+    border: 1px solid #333;
     color: #666;
-    padding: 8px 15px;
-    font-weight: 700;
+    padding: 10px;
     cursor: pointer;
-    text-transform: uppercase;
-    transition: 0.3s;
+    font-weight: bold;
 }
 
 .tab-btn.active {
     color: #fff;
-    border-bottom: 2px solid #fff;
+    border-color: #fff;
 }
 
 .glass-card {
-    background: #080808;
-    border: 1px solid #1a1a1a;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 20px;
-}
-
-.card-title {
-    text-align: center;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
-
-/* LISTA CZŁONKÓW - AWATARY SĄ TERAZ OKRĄGŁE */
-.members-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
+    background: rgba(20, 20, 20, 0.8);
+    border: 1px solid #222;
+    padding: 20px;
+    border-radius: 10px;
 }
 
 .member-item {
     display: flex;
     align-items: center;
     gap: 15px;
-    background: #0c0c0c;
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid #111;
+    padding: 10px 0;
+    border-bottom: 1px solid #222;
 }
 
 .member-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%; /* Zmieniono na 50% dla idealnego koła */
-    object-fit: cover;
-    border: 1px solid #222;
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
 }
 
-.member-name {
-    font-weight: 700;
-    font-size: 0.95rem;
+.tab-content { display: none; }
+.active-tab { display: block; }
+
+.spinner {
+    width: 40px;
+    height: 40px;
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #3498db;
+    border-radius: 50%;
+    animation: spin 2s linear infinite;
 }
 
-/* FORMULARZ I EFEKTY */
-.input-group label {
-    display: block;
-    font-size: 0.7rem;
-    color: #888;
-    margin-bottom: 5px;
-}
-
-input, select {
-    width: 100%;
-    background: #111;
-    border: 1px solid #222;
-    padding: 12px;
-    color: #fff;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-}
-
-input:hover, select:hover, input:focus {
-    border-color: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    outline: none;
-}
-
-.btn-submit, #login-btn {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    border: 1px solid #fff;
-    color: #fff;
-    border-radius: 5px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-}
-
-.btn-submit:hover, #login-btn:hover {
-    background: #fff;
-    color: #000;
-}
-
-/* ADMIN */
-.admin-report-card {
-    background: #0f0f0f;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #222;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }

@@ -2,20 +2,27 @@ document.addEventListener('DOMContentLoaded', () => {
     const loginScreen = document.getElementById('login-screen');
     const mainApp = document.getElementById('main-app');
 
-    // Obsługa logowania i URL params
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('logged') === 'true') {
-        localStorage.setItem('is_logged', 'true');
-        window.history.replaceState({}, document.title, "/");
+    // Funkcja sprawdzająca autoryzację
+    function checkAuth() {
+        const params = new URLSearchParams(window.location.search);
+        if (params.get('logged') === 'true') {
+            localStorage.setItem('is_logged', 'true');
+            window.history.replaceState({}, document.title, "/");
+        }
+
+        if (localStorage.getItem('is_logged') === 'true') {
+            loginScreen.style.display = 'none';
+            mainApp.style.display = 'block';
+            loadData();
+        } else {
+            loginScreen.style.display = 'flex';
+            mainApp.style.display = 'none';
+        }
     }
 
-    if (localStorage.getItem('is_logged') === 'true') {
-        loginScreen.style.display = 'none';
-        mainApp.style.display = 'block';
-        loadData();
-    }
+    checkAuth();
 
-    // Zakładki
+    // Przełączanie zakładek
     const tabs = document.querySelectorAll('.tab-btn');
     const contents = document.querySelectorAll('.tab-content');
 
@@ -28,14 +35,14 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Pokaż/ukryj pola raportu
+    // Obsługa pól kontraktów
     const contractType = document.getElementById('contract-type');
     contractType.addEventListener('change', (e) => {
         document.getElementById('grover-fields').style.display = e.target.value === 'grover' ? 'block' : 'none';
         document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
     });
 
-    // Formularz raportu
+    // Wysyłanie raportu
     const reportForm = document.getElementById('report-form');
     reportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
@@ -56,7 +63,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 body: JSON.stringify(data)
             });
             if (res.ok) {
-                alert('Raport wysłany pomyślnie!');
+                alert('Raport wysłany!');
                 reportForm.reset();
             }
         } catch (err) {
@@ -72,7 +79,7 @@ async function loadData() {
         const res = await fetch('/api/user-data');
         const data = await res.json();
 
-        // Profil
+        // Dane profilu
         document.getElementById('user-name').innerText = data.user.username;
         document.getElementById('user-avatar').src = data.user.avatar;
         document.getElementById('user-role-text').innerText = data.user.role;
@@ -81,12 +88,18 @@ async function loadData() {
         // Panel Admina
         if (data.isAdmin) {
             document.getElementById('admin-tab-btn').style.display = 'block';
-            updateAdminList(data.allReports);
+            const adminList = document.getElementById('admin-list');
+            adminList.innerHTML = data.allReports.map(r => `
+                <div class="glass-card" style="margin-bottom: 10px;">
+                    <strong>${r.username}</strong> - ${r.type} (${r.date})<br>
+                    <a href="${r.imgur}" target="_blank" style="color: #3498db;">Dowód</a>
+                </div>
+            `).join('');
         }
 
-        // CZŁONKOWIE - POPRAWKA: teraz widać rangę pod imieniem
-        const list = document.getElementById('members-list');
-        list.innerHTML = data.members.map(m => `
+        // Lista członków z rangami
+        const membersList = document.getElementById('members-list');
+        membersList.innerHTML = data.members.map(m => `
             <div class="member-item">
                 <img src="${m.avatar}" class="member-avatar">
                 <div>
@@ -99,14 +112,4 @@ async function loadData() {
     } catch (err) {
         console.error("Błąd ładowania danych:", err);
     }
-}
-
-function updateAdminList(reports) {
-    const adminList = document.getElementById('admin-list');
-    adminList.innerHTML = reports.map(r => `
-        <div class="glass-card" style="margin-bottom: 10px;">
-            <strong>${r.username}</strong> - ${r.type} (${r.date})<br>
-            <a href="${r.imgur}" target="_blank" style="color: #3498db;">Link do dowodu</a>
-        </div>
-    `).join('');
 }
