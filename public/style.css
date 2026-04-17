@@ -94,3 +94,53 @@ body {
 .form-container { max-width: 600px; margin: 0 auto; }
 input, select { width: 100%; padding: 18px; background: #0a0a0a; border: 1px solid var(--border); color: #fff; border-radius: 12px; margin-bottom: 20px; font-size: 1.1rem; }
 label { display: block; margin-bottom: 8px; color: #888; font-size: 1rem; font-weight: 700; text-transform: uppercase; }
+/* Efekt dla pól tekstowych i list wyboru */
+input, select, textarea {
+    border: 2px solid #333; /* Standardowe obramowanie */
+    transition: border-color 0.3s ease, box-shadow 0.3s ease;
+    background: #1a1a1a;
+    color: white;
+}
+
+/* Podświetlenie pola po kliknięciu lub najechaniu */
+input:focus, select:focus, textarea:focus, 
+input:hover, select:hover {
+    outline: none;
+    border-color: #ffffff; /* Biała obramówka przy najechaniu/akcji */
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+/* Przycisk ZALOGUJ SIĘ - Efekt podświetlenia */
+#login-btn {
+    background: transparent;
+    border: 2px solid #ffffff;
+    color: #ffffff;
+    padding: 12px 24px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-transform: uppercase;
+}
+
+/* Stan po najechaniu na przycisk logowania */
+#login-btn:hover {
+    background: #ffffff;
+    color: #000000; /* Odwrócenie kolorów */
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.4);
+    transform: translateY(-2px); /* Delikatne uniesienie */
+}
+
+/* Przycisk WYŚLIJ DO ADMINA - Styl z obrazka */
+.btn-submit {
+    background: white;
+    color: black;
+    border: none;
+    padding: 10px;
+    font-weight: 800;
+    cursor: pointer;
+    transition: opacity 0.3s;
+}
+
+.btn-submit:hover {
+    opacity: 0.8;
+}
