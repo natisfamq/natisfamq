@@ -1,115 +1,169 @@
-document.addEventListener('DOMContentLoaded', () => {
-    const loginScreen = document.getElementById('login-screen');
-    const mainApp = document.getElementById('main-app');
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
 
-    // Funkcja sprawdzająca autoryzację
-    function checkAuth() {
-        const params = new URLSearchParams(window.location.search);
-        if (params.get('logged') === 'true') {
-            localStorage.setItem('is_logged', 'true');
-            window.history.replaceState({}, document.title, "/");
-        }
+.main-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 50px 0 20px;
+}
 
-        if (localStorage.getItem('is_logged') === 'true') {
-            loginScreen.style.display = 'none';
-            mainApp.style.display = 'block';
-            loadData();
-        } else {
-            loginScreen.style.display = 'flex';
-            mainApp.style.display = 'none';
-        }
-    }
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
 
-    checkAuth();
+.header-logo {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
 
-    // Przełączanie zakładek
-    const tabs = document.querySelectorAll('.tab-btn');
-    const contents = document.querySelectorAll('.tab-content');
+.header-title {
+    font-size: 3rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 5px;
+    margin: 0;
+}
 
-    tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
-            tabs.forEach(t => t.classList.remove('active'));
-            contents.forEach(c => c.classList.remove('active-tab'));
-            tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).classList.add('active-tab');
-        });
-    });
+.app-container {
+    width: 100%;
+    max-width: 550px;
+    padding: 0 20px;
+}
 
-    // Obsługa pól kontraktów
-    const contractType = document.getElementById('contract-type');
-    contractType.addEventListener('change', (e) => {
-        document.getElementById('grover-fields').style.display = e.target.value === 'grover' ? 'block' : 'none';
-        document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
-    });
+.tabs-nav {
+    display: flex;
+    justify-content: space-around;
+    background: #0a0a0a;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    border: 1px solid #1a1a1a;
+}
 
-    // Wysyłanie raportu
-    const reportForm = document.getElementById('report-form');
-    reportForm.addEventListener('submit', async (e) => {
-        e.preventDefault();
-        const loader = document.getElementById('loading-overlay');
-        loader.style.display = 'flex';
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    padding: 8px 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
 
-        const data = {
-            type: contractType.value,
-            imgur: document.getElementById('imgur-link').value,
-            krzaki: document.getElementById('krzaki-count').value,
-            capt: document.getElementById('capt-stats').value
-        };
+.tab-btn.active {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+}
 
-        try {
-            const res = await fetch('/api/raport', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(data)
-            });
-            if (res.ok) {
-                alert('Raport wysłany!');
-                reportForm.reset();
-            }
-        } catch (err) {
-            console.error(err);
-        } finally {
-            loader.style.display = 'none';
-        }
-    });
-});
+.glass-card {
+    background: #080808;
+    border: 1px solid #1a1a1a;
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
+}
 
-async function loadData() {
-    try {
-        const res = await fetch('/api/user-data');
-        const data = await res.json();
+.card-title {
+    text-align: center;
+    text-transform: uppercase;
+    margin-bottom: 20px;
+}
 
-        // Dane profilu
-        document.getElementById('user-name').innerText = data.user.username;
-        document.getElementById('user-avatar').src = data.user.avatar;
-        document.getElementById('user-role-text').innerText = data.user.role;
-        document.getElementById('reports-count').innerText = data.reportsCount;
+/* LISTA CZŁONKÓW - AWATARY SĄ TERAZ OKRĄGŁE */
+.members-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
 
-        // Panel Admina
-        if (data.isAdmin) {
-            document.getElementById('admin-tab-btn').style.display = 'block';
-            const adminList = document.getElementById('admin-list');
-            adminList.innerHTML = data.allReports.map(r => `
-                <div class="glass-card" style="margin-bottom: 10px;">
-                    <strong>${r.username}</strong> - ${r.type} (${r.date})<br>
-                    <a href="${r.imgur}" target="_blank" style="color: #3498db;">Dowód</a>
-                </div>
-            `).join('');
-        }
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #0c0c0c;
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid #111;
+}
 
-        // Lista członków z rangami
-        const membersList = document.getElementById('members-list');
-        membersList.innerHTML = data.members.map(m => `
-            <div class="member-item">
-                <img src="${m.avatar}" class="member-avatar">
-                <div>
-                    <div style="font-weight: bold;">${m.username}</div>
-                    <div style="font-size: 0.8rem; color: #888;">${m.role}</div>
-                </div>
-            </div>
-        `).join('');
+.member-avatar {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%; /* Zmieniono na 50% dla idealnego koła */
+    object-fit: cover;
+    border: 1px solid #222;
+}
 
-    } catch (err) {
-        console.error("Błąd ładowania danych:", err);
-    }
+.member-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* FORMULARZ I EFEKTY */
+.input-group label {
+    display: block;
+    font-size: 0.7rem;
+    color: #888;
+    margin-bottom: 5px;
+}
+
+input, select {
+    width: 100%;
+    background: #111;
+    border: 1px solid #222;
+    padding: 12px;
+    color: #fff;
+    border-radius: 8px;
+    margin-bottom: 15px;
+    box-sizing: border-box;
+}
+
+input:hover, select:hover, input:focus {
+    border-color: #fff;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    outline: none;
+}
+
+.btn-submit, #login-btn {
+    width: 100%;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    border-radius: 5px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.btn-submit:hover, #login-btn:hover {
+    background: #fff;
+    color: #000;
+}
+
+/* ADMIN */
+.admin-report-card {
+    background: #0f0f0f;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #222;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
 }
