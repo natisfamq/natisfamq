@@ -1,169 +1,60 @@
-body {
-    background-color: #000;
-    color: #fff;
-    font-family: 'Inter', sans-serif;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-.main-header {
-    width: 100%;
+/* --- SYSTEM ŁADOWANIA I ANIMACJE --- */
+#loading-overlay {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0, 0, 0, 0.85);
     display: flex;
     justify-content: center;
-    padding: 50px 0 20px;
-}
-
-.header-content {
-    display: flex;
-    flex-direction: column;
     align-items: center;
-    gap: 15px;
+    z-index: 9999;
 }
 
-.header-logo {
-    width: 100px;
-    height: 100px;
+.spinner {
+    width: 45px;
+    height: 45px;
+    border: 4px solid #222;
+    border-top: 4px solid #fff;
     border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+    animation: spin 0.8s linear infinite;
 }
 
-.header-title {
-    font-size: 3rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    letter-spacing: 5px;
-    margin: 0;
+@keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+.tab-content {
+    display: none;
+    opacity: 0;
+    transform: translateY(15px);
+    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.app-container {
-    width: 100%;
-    max-width: 550px;
-    padding: 0 20px;
-}
-
-.tabs-nav {
-    display: flex;
-    justify-content: space-around;
-    background: #0a0a0a;
-    padding: 10px;
-    border-radius: 10px;
-    margin-bottom: 25px;
-    border: 1px solid #1a1a1a;
-}
-
-.tab-btn {
-    background: transparent;
-    border: none;
-    color: #666;
-    padding: 8px 15px;
-    font-weight: 700;
-    cursor: pointer;
-    text-transform: uppercase;
-    transition: 0.3s;
-}
-
-.tab-btn.active {
-    color: #fff;
-    border-bottom: 2px solid #fff;
-}
-
-.glass-card {
-    background: #080808;
-    border: 1px solid #1a1a1a;
-    border-radius: 15px;
-    padding: 25px;
-    margin-bottom: 20px;
-}
-
-.card-title {
-    text-align: center;
-    text-transform: uppercase;
-    margin-bottom: 20px;
-}
-
-/* LISTA CZŁONKÓW - AWATARY SĄ TERAZ OKRĄGŁE */
-.members-container {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-}
-
-.member-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    background: #0c0c0c;
-    padding: 10px;
-    border-radius: 12px;
-    border: 1px solid #111;
-}
-
-.member-avatar {
-    width: 60px;
-    height: 60px;
-    border-radius: 50%; /* Zmieniono na 50% dla idealnego koła */
-    object-fit: cover;
-    border: 1px solid #222;
-}
-
-.member-name {
-    font-weight: 700;
-    font-size: 0.95rem;
-}
-
-/* FORMULARZ I EFEKTY */
-.input-group label {
+.tab-content.active-tab {
     display: block;
-    font-size: 0.7rem;
-    color: #888;
-    margin-bottom: 5px;
+    opacity: 1;
+    transform: translateY(0);
 }
 
-input, select {
-    width: 100%;
-    background: #111;
-    border: 1px solid #222;
-    padding: 12px;
-    color: #fff;
-    border-radius: 8px;
-    margin-bottom: 15px;
-    box-sizing: border-box;
-}
+/* --- STYLIZACJA GŁÓWNA --- */
+body { background: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; }
 
-input:hover, select:hover, input:focus {
-    border-color: #fff;
-    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
-    outline: none;
-}
+.main-header { width: 100%; display: flex; justify-content: center; padding: 50px 0 20px; }
+.header-content { display: flex; flex-direction: column; align-items: center; gap: 15px; }
+.header-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
+.header-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; margin: 0; }
 
-.btn-submit, #login-btn {
-    width: 100%;
-    padding: 12px;
-    background: transparent;
-    border: 1px solid #fff;
-    color: #fff;
-    border-radius: 5px;
-    font-weight: 700;
-    cursor: pointer;
-    transition: 0.3s;
-}
+.app-container { width: 100%; max-width: 550px; margin: auto; padding: 0 20px; }
+.tabs-nav { display: flex; justify-content: space-around; background: #0a0a0a; padding: 10px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #1a1a1a; }
 
-.btn-submit:hover, #login-btn:hover {
-    background: #fff;
-    color: #000;
-}
+.tab-btn { background: transparent; border: none; color: #666; padding: 8px 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
+.tab-btn.active { color: #fff; border-bottom: 2px solid #fff; }
 
-/* ADMIN */
-.admin-report-card {
-    background: #0f0f0f;
-    padding: 15px;
-    border-radius: 10px;
-    border: 1px solid #222;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-}
+.glass-card { background: #080808; border: 1px solid #1a1a1a; border-radius: 15px; padding: 25px; min-height: 300px; }
+
+/* LISTA CZŁONKÓW */
+.member-item { display: flex; align-items: center; gap: 15px; background: #0c0c0c; padding: 10px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #111; }
+.member-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid #222; }
+
+input, select { width: 100%; background: #111; border: 1px solid #222; padding: 12px; color: #fff; border-radius: 8px; margin-bottom: 15px; transition: 0.3s; }
+input:hover { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
+
+.btn-submit { width: 100%; padding: 12px; background: transparent; border: 1px solid #fff; color: #fff; border-radius: 5px; cursor: pointer; font-weight: 700; text-transform: uppercase; }
+.btn-submit:hover { background: #fff; color: #000; }

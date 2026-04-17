@@ -1,74 +1,60 @@
 document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
-        loadData();
-    }
-
-    document.getElementById('login-btn').addEventListener('click', () => window.location.href = '/api/login');
-
     const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+    const loader = document.getElementById('loading-overlay');
+
+    const showLoader = (show) => loader.style.display = show ? 'flex' : 'none';
+
+    // Animacja zmiany kategorii
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            const target = tab.dataset.tab;
             tabs.forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
             tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).style.display = 'block';
+
+            contents.forEach(c => {
+                c.classList.remove('active-tab');
+                if(c.id === target) {
+                    setTimeout(() => c.classList.add('active-tab'), 50);
+                }
+            });
         });
     });
 
-    document.getElementById('contract-type').addEventListener('change', (e) => {
-        const val = e.target.value;
-        document.getElementById('grover-fields').style.display = val === 'grover' ? 'block' : 'none';
-        document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
-    });
-
+    // Obsługa formularza z ładowaniem
     document.getElementById('report-form').addEventListener('submit', async (e) => {
         e.preventDefault();
+        showLoader(true);
+
         const type = document.getElementById('contract-type').value;
-        let imgur = document.getElementById('imgur-link').value.trim();
+        const imgur = document.getElementById('imgur-link').value;
         const me = await (await fetch('/api/me')).json();
-
-        let payout = 10000;
-        let desc = type.toUpperCase();
-        if (type === 'grover') {
-            const count = document.getElementById('krzaki-count').value;
-            payout = count * 1000;
-            desc = `GROVER (${count} szt.)`;
-        } else if (type === 'capt') {
-            const k = document.getElementById('kille-count').value;
-            const d = document.getElementById('dmg-count').value;
-            payout = 2500 + (k * 1000) + (d * 10);
-            desc = `CAPT (K: ${k}, D: ${d})`;
-        }
-
         const timestamp = new Date().toLocaleString('pl-PL');
-        
-        // Webhook log
-        await fetch('/api/webhook', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                embeds: [{
-                    title: "📩 NOWY RAPORT",
-                    color: 16766720,
-                    fields: [
-                        { name: "Gracz", value: me.username, inline: true },
-                        { name: "Typ", value: type.charAt(0).toUpperCase() + type.slice(1), inline: true },
-                        { name: "Kwota", value: `${payout}$`, inline: true }
-                    ],
-                    thumbnail: { url: `${window.location.origin}/logo.jpg` },
-                    footer: { text: `Panel Wyplat | ${timestamp}` }
-                }]
-            })
-        });
 
-        let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift({ username: me.username, type: desc, payout, imgur, date: timestamp });
-        localStorage.setItem('admin_reports', JSON.stringify(reports));
-        alert("Wysłano!");
-        loadData();
+        // Symulacja laga/przesyłania
+        setTimeout(async () => {
+            await fetch('/api/webhook', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    embeds: [{
+                        title: "📩 NOWY RAPORT",
+                        color: 16766720,
+                        fields: [
+                            { name: "Gracz", value: me.username, inline: true },
+                            { name: "Typ", value: type.toUpperCase(), inline: true }
+                        ],
+                        thumbnail: { url: `${window.location.origin}/logo.jpg` },
+                        footer: { text: `Panel Wyplat | ${timestamp}` }
+                    }]
+                })
+            });
+
+            showLoader(false);
+            alert("Raport został wysłany!");
+            e.target.reset();
+            loadData();
+        }, 1200);
     });
 });
 
@@ -77,7 +63,6 @@ async function loadData() {
     if (!me.error) {
         document.getElementById('user-name').innerText = me.username;
         document.getElementById('user-avatar').src = me.avatar || 'logo.jpg';
-        document.getElementById('user-role-text').innerText = `Ranga: ${me.roleName || '-'}`;
     }
 
     const members = await (await fetch('/api/members')).json();
@@ -87,25 +72,14 @@ async function loadData() {
             <span class="member-name">${m.displayName}</span>
         </div>
     `).join('');
-
-    const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-    document.getElementById('admin-list').innerHTML = reports.map((r, i) => `
-        <div class="admin-report-card">
-            <div>
-                <strong>${r.username} - ${r.type}</strong><br>
-                <small>${r.payout}$ | ${r.date}</small>
-            </div>
-            <div>
-                <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
-                <button onclick="deleteReport(${i})" class="btn-submit" style="padding: 5px 10px; margin-left:5px;">USUŃ</button>
-            </div>
-        </div>
-    `).join('');
 }
 
-function deleteReport(index) {
-    let reports = JSON.parse(localStorage.getItem('admin_reports'));
-    reports.splice(index, 1);
-    localStorage.setItem('admin_reports', JSON.stringify(reports));
-    loadData();
+// Funkcja akceptacji z ładowaniem
+async function handleAdminAction(id, action) {
+    document.getElementById('loading-overlay').style.display = 'flex';
+    setTimeout(() => {
+        // Logika usuwania/akceptacji...
+        document.getElementById('loading-overlay').style.display = 'none';
+        loadData();
+    }, 800);
 }

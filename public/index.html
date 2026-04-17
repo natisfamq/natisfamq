@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+    <div id="loading-overlay" style="display: none;">
+        <div class="spinner"></div>
+    </div>
+
     <div id="login-screen">
         <header class="main-header">
             <div class="header-content">
@@ -35,69 +39,60 @@
                 <button class="tab-btn" data-tab="admin">ADMIN</button>
             </nav>
 
-            <div id="panel" class="tab-content">
-                <div class="glass-card user-profile">
-                    <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
-                    <div class="profile-info">
-                        <h2 id="user-name">Użytkownik</h2>
-                        <p id="user-role-text">Ranga: -</p>
-                        <div class="user-stats">
-                            <p>Raporty w tym tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
-                            <p>Ostatnia aktywność: <span id="last-act-text">Brak danych</span></p>
+            <div id="tab-container">
+                <div id="panel" class="tab-content active-tab">
+                    <div class="glass-card user-profile">
+                        <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
+                        <div class="profile-info">
+                            <h2 id="user-name">Użytkownik</h2>
+                            <p id="user-role-text">Ranga: -</p>
+                            <div class="user-stats">
+                                <p>Raporty w tym tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
 
-            <div id="members" class="tab-content" style="display: none;">
-                <div class="glass-card">
-                    <h3 class="card-title">CZŁONKOWIE RODZINY</h3>
-                    <div id="members-list" class="members-container"></div>
+                <div id="members" class="tab-content">
+                    <div class="glass-card">
+                        <h3 class="card-title">CZŁONKOWIE RODZINY</h3>
+                        <div id="members-list" class="members-container"></div>
+                    </div>
                 </div>
-            </div>
 
-            <div id="raport" class="tab-content" style="display: none;">
-                <div class="glass-card">
-                    <h3 class="card-title">Wyślij Raport</h3>
-                    <form id="report-form">
-                        <div class="input-group">
-                            <label>TYP KONTRAKTU</label>
-                            <select id="contract-type">
-                                <option value="paczki">Paczki (10.000$)</option>
-                                <option value="cenna">Cenna (10.000$)</option>
-                                <option value="grover">Grover (1.000$ / szt)</option>
-                                <option value="capt">Capt (Dynamiczny)</option>
-                            </select>
-                        </div>
-                        <div id="grover-fields" style="display:none;">
-                            <label>ILOŚĆ KRZAKÓW</label>
-                            <input type="number" id="krzaki-count" value="0">
-                        </div>
-                        <div id="capt-fields" style="display:none;">
-                            <div class="input-row">
-                                <div class="input-group">
-                                    <label>KILLE</label>
-                                    <input type="number" id="kille-count" value="0">
-                                </div>
-                                <div class="input-group">
-                                    <label>DMG</label>
-                                    <input type="number" id="dmg-count" value="0">
+                <div id="raport" class="tab-content">
+                    <div class="glass-card">
+                        <h3 class="card-title">Wyślij Raport</h3>
+                        <form id="report-form">
+                            <div class="input-group">
+                                <label>TYP KONTRAKTU</label>
+                                <select id="contract-type">
+                                    <option value="paczki">Paczki (10.000$)</option>
+                                    <option value="cenna">Cenna (10.000$)</option>
+                                    <option value="grover">Grover (1.000$ / szt)</option>
+                                    <option value="capt">Capt (Dynamiczny)</option>
+                                </select>
+                            </div>
+                            <div id="capt-fields" style="display:none;">
+                                <div class="input-row">
+                                    <input type="number" id="kille-count" placeholder="Kille" value="0">
+                                    <input type="number" id="dmg-count" placeholder="DMG" value="0">
                                 </div>
                             </div>
-                        </div>
-                        <div class="input-group">
-                            <label>DOWÓD (LINK IMGUR)</label>
-                            <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
-                        </div>
-                        <button type="submit" class="btn-submit">WYŚLIJ DO ADMINA</button>
-                    </form>
+                            <div class="input-group">
+                                <label>DOWÓD (LINK IMGUR)</label>
+                                <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
+                            </div>
+                            <button type="submit" class="btn-submit">WYŚLIJ RAPORT</button>
+                        </form>
+                    </div>
                 </div>
-            </div>
 
-            <div id="admin" class="tab-content" style="display: none;">
-                <div class="glass-card">
-                    <h3 class="card-title">Zarządzanie Raportami</h3>
-                    <div id="admin-list" class="reports-container"></div>
+                <div id="admin" class="tab-content">
+                    <div class="glass-card">
+                        <h3 class="card-title">Zarządzanie Raportami</h3>
+                        <div id="admin-list" class="reports-container"></div>
+                    </div>
                 </div>
             </div>
         </div>
