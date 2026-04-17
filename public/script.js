@@ -72,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
         reports.unshift({ username: senderName, type: desc, payout, imgur, date: timestamp });
         localStorage.setItem('admin_reports', JSON.stringify(reports));
         
-        alert("Raport został wysłany do administracji!");
+        alert("Raport został wysłany do sprawdzenia!");
         document.getElementById('report-form').reset();
         loadData();
     });
