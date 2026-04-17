@@ -1,4 +1,147 @@
-/* --- SYSTEM ŁADOWANIA I ANIMACJE --- */
+/* --- RESET I PODSTAWY --- */
+body {
+    background-color: #000;
+    color: #fff;
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    overflow-x: hidden;
+}
+
+/* --- EKRAN LOGOWANIA --- */
+#login-screen {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+
+.login-wrapper {
+    width: 100%;
+    max-width: 500px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.login-container {
+    margin-top: 30px;
+}
+
+#login-btn {
+    padding: 15px 30px;
+    background: transparent;
+    border: 2px solid #fff;
+    color: #fff;
+    border-radius: 8px;
+    font-weight: 800;
+    font-size: 1.1rem;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.3s ease;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
+}
+
+#login-btn:hover {
+    background: #fff;
+    color: #000;
+    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
+    transform: translateY(-3px);
+}
+
+/* --- NAGŁÓWEK --- */
+.main-header {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    padding: 40px 0;
+}
+
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.header-logo {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
+}
+
+.header-title {
+    font-size: 3.5rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 8px;
+    margin: 0;
+}
+
+/* --- NAWIGACJA I TABS --- */
+.app-container {
+    width: 100%;
+    max-width: 550px;
+    margin: auto;
+    padding: 0 20px;
+}
+
+.tabs-nav {
+    display: flex;
+    justify-content: space-around;
+    background: #0a0a0a;
+    padding: 10px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px solid #1a1a1a;
+}
+
+.tab-btn {
+    background: transparent;
+    border: none;
+    color: #666;
+    padding: 10px 15px;
+    font-weight: 700;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: 0.3s;
+}
+
+.tab-btn.active {
+    color: #fff;
+    border-bottom: 2px solid #fff;
+}
+
+/* --- KARTY I LISTA CZŁONKÓW --- */
+.glass-card {
+    background: #080808;
+    border: 1px solid #1a1a1a;
+    border-radius: 15px;
+    padding: 25px;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #0c0c0c;
+    padding: 12px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 1px solid #111;
+}
+
+.member-avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 1px solid #222;
+}
+
+/* --- ANIMACJE I ŁADOWANIE --- */
 #loading-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
@@ -10,10 +153,10 @@
 }
 
 .spinner {
-    width: 45px;
-    height: 45px;
-    border: 4px solid #222;
-    border-top: 4px solid #fff;
+    width: 50px;
+    height: 50px;
+    border: 5px solid #222;
+    border-top: 5px solid #fff;
     border-radius: 50%;
     animation: spin 0.8s linear infinite;
 }
@@ -24,7 +167,7 @@
     display: none;
     opacity: 0;
     transform: translateY(15px);
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    transition: all 0.4s ease;
 }
 
 .tab-content.active-tab {
@@ -32,29 +175,3 @@
     opacity: 1;
     transform: translateY(0);
 }
-
-/* --- STYLIZACJA GŁÓWNA --- */
-body { background: #000; color: #fff; font-family: 'Inter', sans-serif; margin: 0; }
-
-.main-header { width: 100%; display: flex; justify-content: center; padding: 50px 0 20px; }
-.header-content { display: flex; flex-direction: column; align-items: center; gap: 15px; }
-.header-logo { width: 100px; height: 100px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 20px rgba(255,255,255,0.3); }
-.header-title { font-size: 3rem; font-weight: 900; text-transform: uppercase; letter-spacing: 5px; margin: 0; }
-
-.app-container { width: 100%; max-width: 550px; margin: auto; padding: 0 20px; }
-.tabs-nav { display: flex; justify-content: space-around; background: #0a0a0a; padding: 10px; border-radius: 12px; margin-bottom: 25px; border: 1px solid #1a1a1a; }
-
-.tab-btn { background: transparent; border: none; color: #666; padding: 8px 15px; font-weight: 700; cursor: pointer; text-transform: uppercase; transition: 0.3s; }
-.tab-btn.active { color: #fff; border-bottom: 2px solid #fff; }
-
-.glass-card { background: #080808; border: 1px solid #1a1a1a; border-radius: 15px; padding: 25px; min-height: 300px; }
-
-/* LISTA CZŁONKÓW */
-.member-item { display: flex; align-items: center; gap: 15px; background: #0c0c0c; padding: 10px; border-radius: 12px; margin-bottom: 10px; border: 1px solid #111; }
-.member-avatar { width: 60px; height: 60px; border-radius: 50%; object-fit: cover; border: 1px solid #222; }
-
-input, select { width: 100%; background: #111; border: 1px solid #222; padding: 12px; color: #fff; border-radius: 8px; margin-bottom: 15px; transition: 0.3s; }
-input:hover { border-color: #fff; box-shadow: 0 0 10px rgba(255,255,255,0.2); }
-
-.btn-submit { width: 100%; padding: 12px; background: transparent; border: 1px solid #fff; color: #fff; border-radius: 5px; cursor: pointer; font-weight: 700; text-transform: uppercase; }
-.btn-submit:hover { background: #fff; color: #000; }
