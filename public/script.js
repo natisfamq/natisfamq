@@ -1,8 +1,7 @@
-// Importy Firebase z CDN (nie musisz nic instalować przez npm)
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, push, set, onValue, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
-// Twoja konfiguracja Firebase
+// TWOJA KONFIGURACJA FIREBASE
 const firebaseConfig = {
     apiKey: "AIzaSyDyTpY2vGcvM8Sz5B1TCdDeNUObQ6yZF4o",
     authDomain: "natis-add35.firebaseapp.com",
@@ -13,7 +12,6 @@ const firebaseConfig = {
     appId: "1:303875422065:web:c142a191607606e01a28d0"
 };
 
-// Inicjalizacja
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
@@ -21,6 +19,14 @@ let currentUser = null;
 let currentAdminReports = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
+    // NAPRAWA LOGOWANIA - TO ROZWIĄZUJE TWÓJ PROBLEM
+    const loginBtn = document.getElementById('login-btn');
+    if (loginBtn) {
+        loginBtn.addEventListener('click', () => {
+            window.location.href = '/api/login';
+        });
+    }
+
     const params = new URLSearchParams(window.location.search);
     if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
         const loginScreen = document.getElementById('login-screen');
@@ -33,7 +39,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         loadData();
     }
 
-    // Obsługa zakładek
+    // OBSŁUGA ZAKŁADEK
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
@@ -45,7 +51,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     });
 
-    // Przełączanie pól Grover/Capt
+    // POKAZYWANIE PÓL (GROVER/CAPT)
     const contractSelect = document.getElementById('contract-type');
     if (contractSelect) {
         contractSelect.addEventListener('change', (e) => {
@@ -57,7 +63,7 @@ document.addEventListener('DOMContentLoaded', async () => {
         });
     }
 
-    // WYSYŁANIE RAPORTU DO FIREBASE
+    // WYSYŁANIE RAPORTU
     const reportForm = document.getElementById('report-form');
     if (reportForm) {
         reportForm.addEventListener('submit', async (e) => {
@@ -71,16 +77,20 @@ document.addEventListener('DOMContentLoaded', async () => {
             let desc = "";
             let krzaki = 0;
             let kille = 0;
+            let dmg = 0;
 
             if (type === 'grover') {
                 krzaki = parseInt(document.getElementById('krzaki-count').value) || 0;
-                payout = krzaki * 200;
+                payout = krzaki * 1000;
                 desc = `Grover (${krzaki} krzaków)`;
             } else if (type === 'capt') {
                 kille = parseInt(document.getElementById('kille-count').value) || 0;
-                const dmg = parseInt(document.getElementById('dmg-count').value) || 0;
-                payout = (kille * 1000) + (dmg * 1);
+                dmg = parseInt(document.getElementById('dmg-count').value) || 0;
+                payout = 2500 + (kille * 1000) + (dmg * 10);
                 desc = `Capt (${kille} K / ${dmg} D)`;
+            } else if (type === 'paczki' || type === 'cenna') {
+                payout = 10000;
+                desc = type.charAt(0).toUpperCase() + type.slice(1);
             }
 
             const reportData = {
@@ -94,12 +104,12 @@ document.addEventListener('DOMContentLoaded', async () => {
                 kille: kille
             };
 
-            // ZAPIS LOKALNY (dla Twojego panelu)
+            // Zapis lokalny dla Twoich statystyk
             let userReports = JSON.parse(localStorage.getItem('user_reports') || '[]');
             userReports.unshift(reportData);
             localStorage.setItem('user_reports', JSON.stringify(userReports));
 
-            // ZAPIS DO FIREBASE (dla Admina)
+            // Zapis do Firebase dla Admina
             try {
                 const reportsRef = ref(db, 'reports');
                 const newReportRef = push(reportsRef);
@@ -110,7 +120,7 @@ document.addEventListener('DOMContentLoaded', async () => {
                 loadData();
             } catch (err) {
                 console.error(err);
-                alert("Błąd zapisu w Firebase: " + err.message);
+                alert("Błąd zapisu do Firebase!");
             }
         });
     }
@@ -130,11 +140,11 @@ async function fetchUserInfo() {
                 if (adminBtn) adminBtn.remove();
             }
         }
-    } catch (e) { console.error("Błąd pobierania użytkownika", e); }
+    } catch (e) { console.error(e); }
 }
 
 async function loadData() {
-    // 1. CZŁONKOWIE (Z FIXEM NA RANGI)
+    // Ładowanie członków (FIX rang)
     try {
         const res = await fetch('/api/members');
         const members = await res.json();
@@ -150,92 +160,57 @@ async function loadData() {
                 </div>
             `).join('');
         }
-    } catch (e) { console.error("Błąd członków", e); }
+    } catch (e) { console.error(e); }
 
-    // 2. PRYWATNE STATYSTYKI
+    // Statystyki profilu
     let userReports = JSON.parse(localStorage.getItem('user_reports') || '[]');
-    let totalKrzaki = 0, totalKille = 0, totalPayout = 0;
-
+    let tKrzaki = 0, tKille = 0, tPayout = 0;
     userReports.forEach(r => {
-        totalKrzaki += (r.krzaki || 0);
-        totalKille += (r.kille || 0);
-        totalPayout += (r.payout || 0);
+        tKrzaki += (r.krzaki || 0);
+        tKille += (r.kille || 0);
+        tPayout += (r.payout || 0);
     });
 
-    document.getElementById('total-krzaki').innerText = totalKrzaki;
-    document.getElementById('total-kille').innerText = totalKille;
-    document.getElementById('total-payout').innerText = `${totalPayout}$`;
+    if (document.getElementById('total-krzaki')) document.getElementById('total-krzaki').innerText = tKrzaki;
+    if (document.getElementById('total-kille')) document.getElementById('total-kille').innerText = tKille;
+    if (document.getElementById('total-payout')) document.getElementById('total-payout').innerText = `${tPayout}$`;
 
-    const activityEl = document.getElementById('recent-activity-list');
-    if (activityEl) {
-        const recent = userReports.slice(0, 3);
-        activityEl.innerHTML = recent.length ? recent.map(r => `
-            <div class="activity-item">
-                <span class="activity-desc">Wysłano: <strong>${r.type}</strong></span>
-                <span class="activity-date">${r.date}</span>
-            </div>
-        `).join('') : '<p style="font-size:0.7rem; color:#444;">Brak aktywności</p>';
-    }
-
-    // 3. RAPORTY ADMINA (FIREBASE REAL-TIME)
+    // Lista Admina z Firebase
     const adminList = document.getElementById('admin-list');
     if (adminList) {
-        const reportsRef = ref(db, 'reports');
-        // onValue sprawia, że lista odświeża się sama, gdy coś dojdzie do bazy
-        onValue(reportsRef, (snapshot) => {
+        onValue(ref(db, 'reports'), (snapshot) => {
             const data = snapshot.val();
             adminList.innerHTML = '';
             currentAdminReports = [];
-
-            if (!data) {
-                adminList.innerHTML = '<p style="text-align:center; padding:20px;">Brak raportów w Firebase.</p>';
-                return;
-            }
+            if (!data) return adminList.innerHTML = '<p>Brak raportów.</p>';
 
             Object.keys(data).forEach(key => {
                 const r = data[key];
-                r.firebaseId = key; // Zapisujemy klucz do usuwania
+                r.firebaseId = key;
                 currentAdminReports.push(r);
-
                 const card = document.createElement('div');
                 card.className = 'admin-report-card';
                 card.innerHTML = `
+                    <div style="flex-grow:1"><strong>${r.username}</strong> - ${r.type}<br><small>${r.payout}$ | ${r.date}</small></div>
                     <div>
-                        <strong>${r.username} - ${r.type}</strong><br>
-                        <small>${r.payout}$ | ${r.date}</small>
-                    </div>
-                    <div>
-                        <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
-                        <button onclick="handleReport('${key}', 'accept')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #2ecc71;">V</button>
-                        <button onclick="handleReport('${key}', 'reject')" class="btn-submit" style="padding: 5px 10px; margin-left:5px; background: #e74c3c;">X</button>
-                    </div>
-                `;
+                        <button class="v-btn" style="background:#2ecc71; border:none; color:white; padding:5px; cursor:pointer">V</button>
+                        <button class="x-btn" style="background:#e74c3c; border:none; color:white; padding:5px; cursor:pointer">X</button>
+                    </div>`;
+                card.querySelector('.v-btn').onclick = () => processReport(key, 'accept');
+                card.querySelector('.x-btn').onclick = () => processReport(key, 'reject');
                 adminList.appendChild(card);
             });
         });
     }
 }
 
-// Globalna funkcja do obsługi przycisków Admina
-window.handleReport = async function(firebaseId, action) {
-    const report = currentAdminReports.find(r => r.firebaseId === firebaseId);
-    if (!report) return;
-
+async function processReport(id, action) {
+    const r = currentAdminReports.find(rep => rep.firebaseId === id);
     const endpoint = action === 'accept' ? '/api/send-webhook' : '/api/reject-webhook';
-    
-    try {
-        const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(report)
-        });
-
-        if (res.ok) {
-            // USUWANIE Z FIREBASE PO KLIKNIĘCIU
-            await remove(ref(db, `reports/${firebaseId}`));
-            alert(action === 'accept' ? "Zaakceptowano!" : "Odrzucono!");
-        }
-    } catch (err) {
-        console.error("Błąd webhooka", err);
-    }
-};
+    const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(r)
+    });
+    if (res.ok) await remove(ref(db, `reports/${id}`));
+}
