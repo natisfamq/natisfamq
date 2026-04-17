@@ -27,14 +27,14 @@
             </div>
         </header>
 
-        <nav class="tabs-nav">
-            <button class="tab-btn active" data-tab="panel">PANEL</button>
-            <button class="tab-btn" data-tab="members">CZŁONKOWIE</button>
-            <button class="tab-btn" data-tab="raport">RAPORT</button>
-            <button class="tab-btn" data-tab="admin">ADMIN</button>
-        </nav>
+        <div class="app-container">
+            <nav class="tabs-nav">
+                <button class="tab-btn active" data-tab="panel">PANEL</button>
+                <button class="tab-btn" data-tab="members">CZŁONKOWIE</button>
+                <button class="tab-btn" data-tab="raport">RAPORT</button>
+                <button class="tab-btn" data-tab="admin">ADMIN</button>
+            </nav>
 
-        <div class="content-wrapper">
             <div id="panel" class="tab-content">
                 <div class="glass-card user-profile">
                     <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
@@ -46,6 +46,13 @@
                             <p>Ostatnia aktywność: <span id="last-act-text">Brak danych</span></p>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <div id="members" class="tab-content" style="display: none;">
+                <div class="glass-card">
+                    <h3 class="card-title">CZŁONKOWIE RODZINY</h3>
+                    <div id="members-list" class="members-container"></div>
                 </div>
             </div>
 
@@ -62,7 +69,10 @@
                                 <option value="capt">Capt (Dynamiczny)</option>
                             </select>
                         </div>
-
+                        <div id="grover-fields" style="display:none;">
+                            <label>ILOŚĆ KRZAKÓW</label>
+                            <input type="number" id="krzaki-count" value="0">
+                        </div>
                         <div id="capt-fields" style="display:none;">
                             <div class="input-row">
                                 <div class="input-group">
@@ -75,12 +85,10 @@
                                 </div>
                             </div>
                         </div>
-
                         <div class="input-group">
                             <label>DOWÓD (LINK IMGUR)</label>
-                            <input type="text" id="imgur-link" placeholder="imgur.com/...">
+                            <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
                         </div>
-                        
                         <button type="submit" class="btn-submit">WYŚLIJ DO ADMINA</button>
                     </form>
                 </div>
@@ -92,16 +100,8 @@
                     <div id="admin-list" class="reports-container"></div>
                 </div>
             </div>
-
-            <div id="members" class="tab-content" style="display: none;">
-                <div class="glass-card">
-                    <h3 class="card-title">Członkowie Rodziny</h3>
-                    <div id="members-list" class="members-grid"></div>
-                </div>
-            </div>
         </div>
     </div>
-
     <script src="script.js"></script>
 </body>
 </html>

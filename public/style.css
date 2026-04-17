@@ -1,55 +1,56 @@
-/* KONFIGURACJA PODSTAWOWA */
 body {
     background-color: #000;
     color: #fff;
-    font-family: 'Inter', 'Segoe UI', sans-serif;
+    font-family: 'Inter', sans-serif;
     margin: 0;
     display: flex;
     flex-direction: column;
     align-items: center;
-    min-height: 100vh;
 }
 
-/* NAGŁÓWEK - CENTROWANIE I LOGO */
 .main-header {
     width: 100%;
     display: flex;
     justify-content: center;
-    padding: 60px 0 30px;
+    padding: 50px 0 20px;
 }
 
 .header-content {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 20px;
+    gap: 15px;
 }
 
 .header-logo {
-    width: 110px;
-    height: 110px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
-    border: 3px solid #fff;
-    object-fit: cover;
+    border: 2px solid #fff;
     box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
 }
 
 .header-title {
-    font-size: 3.8rem;
+    font-size: 3rem;
     font-weight: 900;
     text-transform: uppercase;
-    letter-spacing: 10px;
+    letter-spacing: 5px;
     margin: 0;
-    text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
 }
 
-/* NAWIGACJA */
+.app-container {
+    width: 100%;
+    max-width: 550px;
+    padding: 0 20px;
+}
+
 .tabs-nav {
     display: flex;
+    justify-content: space-around;
     background: #0a0a0a;
-    padding: 8px;
-    border-radius: 12px;
-    margin-bottom: 40px;
+    padding: 10px;
+    border-radius: 10px;
+    margin-bottom: 25px;
     border: 1px solid #1a1a1a;
 }
 
@@ -57,130 +58,111 @@ body {
     background: transparent;
     border: none;
     color: #666;
-    padding: 12px 25px;
+    padding: 8px 15px;
     font-weight: 700;
     cursor: pointer;
-    transition: 0.3s;
     text-transform: uppercase;
-    font-size: 0.9rem;
+    transition: 0.3s;
 }
 
 .tab-btn.active {
     color: #fff;
-    background: #111;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(255,255,255,0.05);
-}
-
-/* KARTY (Glassmorphism) */
-.content-wrapper {
-    width: 100%;
-    max-width: 600px;
-    padding: 0 20px;
+    border-bottom: 2px solid #fff;
 }
 
 .glass-card {
     background: #080808;
     border: 1px solid #1a1a1a;
-    border-radius: 20px;
-    padding: 30px;
-    box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+    border-radius: 15px;
+    padding: 25px;
+    margin-bottom: 20px;
 }
 
 .card-title {
     text-align: center;
-    margin-top: 0;
-    margin-bottom: 25px;
     text-transform: uppercase;
-    letter-spacing: 2px;
-    font-size: 1.4rem;
-}
-
-/* FORMULARZ I EFEKT GLOW */
-.input-group {
     margin-bottom: 20px;
 }
 
-label {
+/* LISTA CZŁONKÓW */
+.members-container {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.member-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: #0c0c0c;
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #111;
+}
+
+.member-avatar {
+    width: 65px;
+    height: 65px;
+    border-radius: 5px;
+    object-fit: cover;
+}
+
+.member-name {
+    font-weight: 700;
+    font-size: 0.95rem;
+}
+
+/* FORMULARZ */
+.input-group label {
     display: block;
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     color: #888;
-    margin-bottom: 8px;
-    font-weight: 800;
-    text-transform: uppercase;
+    margin-bottom: 5px;
 }
 
 input, select {
     width: 100%;
     background: #111;
-    border: 2px solid #222;
-    padding: 14px;
+    border: 1px solid #222;
+    padding: 12px;
     color: #fff;
-    border-radius: 10px;
-    font-size: 1rem;
+    border-radius: 8px;
+    margin-bottom: 15px;
     box-sizing: border-box;
-    transition: all 0.3s ease;
 }
 
-/* Stan podświetlenia (Glow) */
-input:hover, select:hover, input:focus, select:focus {
-    outline: none;
+input:hover, select:hover, input:focus {
     border-color: #fff;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-    background: #151515;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.2);
+    outline: none;
 }
 
-/* PRZYCISKI */
 .btn-submit, #login-btn {
     width: 100%;
-    padding: 16px;
-    background: #fff;
-    color: #000;
-    border: none;
-    border-radius: 10px;
-    font-weight: 900;
-    font-size: 1rem;
+    padding: 12px;
+    background: transparent;
+    border: 1px solid #fff;
+    color: #fff;
+    border-radius: 5px;
+    font-weight: 700;
     cursor: pointer;
-    text-transform: uppercase;
     transition: 0.3s;
-    margin-top: 10px;
 }
 
 .btn-submit:hover, #login-btn:hover {
-    background: #e0e0e0;
-    box-shadow: 0 0 25px rgba(255, 255, 255, 0.4);
-    transform: translateY(-2px);
+    background: #fff;
+    color: #000;
 }
 
-/* PROFIL */
-.user-profile {
-    display: flex;
-    gap: 30px;
-    align-items: center;
-}
-
-.profile-img {
-    width: 100px;
-    height: 100px;
-    border-radius: 15px;
-    border: 2px solid #222;
-    object-fit: cover;
-}
-
-.stat-highlight {
-    color: #fff;
-    font-weight: 800;
-    font-size: 1.2rem;
-}
-
-/* ADMIN LIST */
+/* ADMIN */
 .admin-report-card {
-    background: #111;
-    padding: 20px;
-    border-radius: 12px;
+    background: #0f0f0f;
+    padding: 15px;
+    border-radius: 10px;
+    border: 1px solid #222;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 15px;
-    border: 1px solid #1a1a1a;
+    margin-bottom: 10px;
 }
