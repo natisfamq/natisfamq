@@ -55,8 +55,10 @@ document.addEventListener('DOMContentLoaded', async () => {
     if (contractSelect) {
         contractSelect.addEventListener('change', (e) => {
             const val = e.target.value;
-            document.getElementById('grover-fields').style.display = val === 'grover' ? 'block' : 'none';
-            document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
+            const groverFields = document.getElementById('grover-fields');
+            const captFields = document.getElementById('capt-fields');
+            if (groverFields) groverFields.style.display = val === 'grover' ? 'block' : 'none';
+            if (captFields) captFields.style.display = val === 'capt' ? 'block' : 'none';
         });
     }
 
@@ -149,7 +151,7 @@ async function loadData() {
         }
     } catch (e) { console.error(e); }
 
-    // WEEKLY STATS (From Firebase/Local)
+    // WEEKLY STATS & ADMIN LIST (Live from Firebase)
     onValue(ref(db, 'reports'), (snap) => {
         const data = snap.val();
         let weeklyCount = 0;
@@ -157,11 +159,21 @@ async function loadData() {
         const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
         if (data) {
+            // Filtrowanie raportów zalogowanego użytkownika
             const myReports = Object.values(data).filter(r => r.username === currentUser?.username);
+            
+            // Liczenie tych z ostatniego tygodnia
             weeklyCount = myReports.filter(r => r.timestamp > weekAgo).length;
-            if (myReports.length > 0) lastDate = myReports[myReports.length - 1].date;
+            
+            // Pobranie daty ostatniego raportu
+            if (myReports.length > 0) {
+                // Sortujemy po timestampie, żeby mieć pewność, że bierzemy najnowszy
+                myReports.sort((a, b) => b.timestamp - a.timestamp);
+                lastDate = myReports[0].date;
+            }
         }
 
+        // Wpisywanie statystyk do panelu
         if (document.getElementById('reports-count')) document.getElementById('reports-count').innerText = weeklyCount;
         if (document.getElementById('last-act-text')) document.getElementById('last-act-text').innerText = lastDate;
 
