@@ -131,11 +131,14 @@ async function loadData() {
         if (membersRes.ok) {
             const members = await membersRes.json();
             const membersList = document.getElementById('members-list');
-            if (membersList) {
+            if (membersList && Array.isArray(members)) {
                 membersList.innerHTML = members.map(m => `
                     <div class="member-item">
                         <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
-                        <span class="member-name">${m.displayName}</span>
+                        <div class="member-info">
+                            <span class="member-name">${m.displayName}</span>
+                            <span class="member-rank">${m.rankName || ''}</span>
+                        </div>
                     </div>
                 `).join('');
             }
