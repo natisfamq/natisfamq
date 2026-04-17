@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    // Logowanie
+    // Logowanie / Sesja
     const params = new URLSearchParams(window.location.search);
     if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
         document.getElementById('login-screen').style.display = 'none';
@@ -20,7 +20,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    // Formularz
+    // Formularz Raportów (Zmienne pola)
     const typeSelect = document.getElementById('contract-type');
     typeSelect.addEventListener('change', (e) => {
         const val = e.target.value;
@@ -28,6 +28,7 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
     });
 
+    // WYSYŁANIE NOWEGO RAPORTU (Lokalnie + Prosty webhook)
     document.getElementById('report-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         const type = document.getElementById('contract-type').value;
@@ -60,25 +61,39 @@ document.addEventListener('DOMContentLoaded', () => {
             type: desc,
             payout: payout,
             imgur: imgur,
+            // Czysta kwota do logów
+            payoutRaw: payout, 
             date: new Date().toLocaleString('pl-PL')
         };
 
+        // Prosty log o nowym raporcie
         await fetch('/api/webhook', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(reportData)
+            body: JSON.stringify({
+                embeds: [{
+                    title: "📩 NOWY RAPORT DO WERYFIKACJI",
+                    color: 16777215, // Biały
+                    description: `**Gracz:** ${me.username}\n**Typ:** ${desc}\n**Kwota:** ${payout}$`,
+                    url: imgur
+                }]
+            })
         });
 
+        // Zapis dla Admina (localStorage)
         let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift(reportData);
+        reports.unshift({ ...reportData, banner: me.banner });
         localStorage.setItem('admin_reports', JSON.stringify(reports));
 
         alert("Raport wysłany!");
         e.target.reset();
+        document.getElementById('grover-fields').style.display = 'none';
+        document.getElementById('capt-fields').style.display = 'none';
         loadData();
     });
 });
 
+// Ładowanie danych
 async function loadData() {
     try {
         const me = await (await fetch('/api/me')).json();
@@ -95,6 +110,7 @@ async function loadData() {
             if (me.banner) document.getElementById('user-banner-div').style.backgroundImage = `url(${me.banner})`;
         }
 
+        // Lista Członków
         const members = await (await fetch('/api/members')).json();
         document.getElementById('members-list').innerHTML = members.map(m => `
             <div class="list-item">
@@ -106,6 +122,7 @@ async function loadData() {
             </div>
         `).join('');
 
+        // Lista Admin - Nowy Design z logami
         const adminReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
         document.getElementById('admin-list').innerHTML = adminReports.map((r, i) => `
             <div class="admin-report-card">
@@ -127,19 +144,59 @@ async function loadData() {
     } catch (e) { console.error(e); }
 }
 
-async function processReport(i, actionType) {
+// PRZETWARZANIE RAPORTU Przez Admina (Logi wg screenów)
+async function processReport(index, actionType) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
-    const r = reports[i];
+    const r = reports[index]; // r = raport gracza
+    
+    // Pobierz dane zalogowanego admina (weryfikatora)
+    const meRes = await fetch('/api/me');
+    const me = await meRes.json();
+    const verifierName = me.username; // Nazwa admina
 
-    // Logi do Discorda o akcji
+    let discordPayload = {};
+    const timestamp = new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+    // Formatowanie wg przesłanych screenów
+    if (actionType === 'AKCEPTUJ') {
+        discordPayload = {
+            embeds: [{
+                title: "⚖️ RAPORT AKCEPTACJA",
+                color: 3066993, // Zielony (wg image_8.png)
+                fields: [
+                    { name: "Gracz", value: r.username, inline: true },
+                    { name: "Kwota", value: `${r.payout}$`, inline: true },
+                    { name: "Weryfikator", value: verifierName, inline: true }
+                ],
+                footer: { text: `Panel Wyplat | ${timestamp}` }
+            }]
+        };
+        alert(`Zaakceptowano raport gracza ${r.username}.`);
+    } else {
+        discordPayload = {
+            embeds: [{
+                title: "⚖️ RAPORT ODRZUCENIE",
+                color: 15158332, // Czerwony (wg image_9.png)
+                fields: [
+                    { name: "Gracz", value: r.username, inline: true },
+                    { name: "Kwota", value: `${r.payout}$`, inline: true },
+                    { name: "Weryfikator", value: verifierName, inline: true }
+                ],
+                footer: { text: `Panel Wyplat | ${timestamp}` }
+            }]
+        };
+        alert(`Odrzucono raport gracza ${r.username}.`);
+    }
+
+    // Wysyłka logu na główny webhook
     await fetch('/api/webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ ...r, status: actionType })
+        body: JSON.stringify(discordPayload)
     });
 
-    alert(`${actionType}: ${r.username}`);
-    reports.splice(i, 1);
+    // Usuń z lokalnej listy
+    reports.splice(index, 1);
     localStorage.setItem('admin_reports', JSON.stringify(reports));
     loadData();
 }
