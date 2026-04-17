@@ -43,13 +43,15 @@
 
             <div id="tab-container">
                 <div id="panel" class="tab-content active-tab">
-                    <div class="glass-card user-profile">
-                        <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
-                        <div class="profile-info">
-                            <h2 id="user-name">Użytkownik</h2>
-                            <p>Ranga: <span id="user-role-text">-</span></p>
-                            <div class="user-stats">
-                                <p>Raporty w tym tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
+                    <div class="glass-card">
+                        <div class="profile-layout">
+                            <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
+                            <div class="profile-info">
+                                <h2 id="user-name">Użytkownik</h2>
+                                <p>Ranga: <span id="user-role-text">-</span></p>
+                                <div class="user-stats">
+                                    <p>Raporty w tym tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -75,25 +77,27 @@
                                     <option value="capt">Capt (Dynamiczny)</option>
                                 </select>
                             </div>
-                            <div id="grover-fields" style="display:none;">
-                                <label>ILOŚĆ KRZAKÓW</label>
-                                <input type="number" id="krzaki-count" value="0">
+                            <div id="grover-fields" class="dynamic-fields" style="display:none;">
+                                <div class="input-group">
+                                    <label>ILOŚĆ KRZAKÓW</label>
+                                    <input type="number" id="krzaki-count" value="0" min="0">
+                                </div>
                             </div>
-                            <div id="capt-fields" style="display:none;">
-                                <div class="input-row" style="display: flex; gap: 10px;">
+                            <div id="capt-fields" class="dynamic-fields" style="display:none;">
+                                <div class="input-row">
                                     <div class="input-group">
                                         <label>KILLE</label>
-                                        <input type="number" id="kille-count" value="0">
+                                        <input type="number" id="kille-count" value="0" min="0">
                                     </div>
                                     <div class="input-group">
                                         <label>DMG</label>
-                                        <input type="number" id="dmg-count" value="0">
+                                        <input type="number" id="dmg-count" value="0" min="0">
                                     </div>
                                 </div>
                             </div>
                             <div class="input-group">
                                 <label>DOWÓD (LINK IMGUR)</label>
-                                <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
+                                <input type="text" id="imgur-link" placeholder="https://imgur.com/..." required>
                             </div>
                             <button type="submit" class="btn-submit">WYŚLIJ RAPORT</button>
                         </form>
