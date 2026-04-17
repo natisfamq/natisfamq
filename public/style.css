@@ -1,66 +1,37 @@
-/* --- RESET I PODSTAWY --- */
 body {
     background-color: #000;
     color: #fff;
     font-family: 'Inter', sans-serif;
     margin: 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
+    overflow-x: hidden;
 }
 
-/* --- NAGŁÓWEK --- */
-.main-header {
-    width: 100%;
-    padding: 40px 0;
-    display: flex;
-    justify-content: center;
-}
-
-.header-content {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 10px;
-}
-
-.header-logo {
-    width: 100px;
-    height: 100px;
-    border-radius: 50%;
-    border: 2px solid #fff;
-    box-shadow: 0 0 15px rgba(255, 255, 255, 0.2);
-}
-
-.header-title {
-    font-size: 3rem;
-    font-weight: 900;
-    letter-spacing: 6px;
-    margin: 0;
-    text-transform: uppercase;
-}
-
-/* --- EKRAN LOGOWANIA --- */
+/* --- POPRAWIONE CENTROWANIE LOGOWANIA --- */
 #login-screen {
-    width: 100%;
-    height: 80vh;
+    height: 100vh;
+    width: 100vw;
     display: flex;
     justify-content: center;
     align-items: center;
+    text-align: center;
 }
 
-.login-container {
-    margin-top: 20px;
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 20px;
 }
 
 #login-btn {
-    padding: 12px 25px;
+    padding: 12px 30px;
     background: transparent;
     border: 2px solid #fff;
     color: #fff;
     font-weight: 800;
     border-radius: 6px;
     cursor: pointer;
+    text-transform: uppercase;
     transition: 0.3s;
 }
 
@@ -69,14 +40,44 @@ body {
     color: #000;
 }
 
-/* --- KONTENER GŁÓWNY --- */
-.app-container {
+/* --- NAGŁÓWEK --- */
+.main-header {
     width: 100%;
-    max-width: 500px;
-    padding: 20px;
+    padding: 30px 0;
+    display: flex;
+    justify-content: center;
 }
 
-/* --- NAWIGACJA --- */
+.header-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.header-logo {
+    width: 90px;
+    height: 90px;
+    border-radius: 50%;
+    border: 2px solid #fff;
+    margin-bottom: 10px;
+}
+
+.header-title {
+    font-size: 2.8rem;
+    font-weight: 900;
+    letter-spacing: 5px;
+    text-transform: uppercase;
+    margin: 0;
+}
+
+/* --- KONTENER I NAV --- */
+.app-container {
+    width: 100%;
+    max-width: 480px;
+    margin: auto;
+    padding: 0 20px;
+}
+
 .tabs-nav {
     display: flex;
     background: #0a0a0a;
@@ -90,12 +91,11 @@ body {
     flex: 1;
     background: transparent;
     border: none;
-    color: #555;
+    color: #444;
     padding: 10px;
     font-weight: 700;
     cursor: pointer;
     text-transform: uppercase;
-    transition: 0.3s;
 }
 
 .tab-btn.active {
@@ -103,13 +103,12 @@ body {
     border-bottom: 2px solid #fff;
 }
 
-/* --- KARTY (GLASSMOPHISM) --- */
+/* --- KARTY --- */
 .glass-card {
-    background: rgba(10, 10, 10, 0.95);
+    background: rgba(10, 10, 10, 0.9);
     border: 1px solid #1a1a1a;
     border-radius: 12px;
     padding: 20px;
-    box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
 }
 
 .profile-layout {
@@ -120,95 +119,45 @@ body {
 }
 
 .profile-img {
-    width: 110px;
-    height: 110px;
+    width: 100px;
+    height: 100px;
     border-radius: 50%;
+    margin-bottom: 15px;
     border: 1px solid #333;
-    margin-bottom: 15px;
 }
 
-/* --- FORMULARZ --- */
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.75rem;
-    color: #777;
-    margin-bottom: 5px;
-}
-
-input, select {
-    width: 100%;
-    padding: 10px;
-    background: #111;
-    border: 1px solid #222;
-    color: #fff;
-    border-radius: 6px;
-    box-sizing: border-box;
-}
-
-.input-row {
-    display: flex;
-    gap: 10px;
-}
-
-.btn-submit {
-    width: 100%;
-    padding: 12px;
-    background: #fff;
-    color: #000;
-    border: none;
-    font-weight: 800;
-    border-radius: 6px;
-    cursor: pointer;
-    text-transform: uppercase;
-}
-
-/* --- LISTA CZŁONKÓW --- */
+/* --- CZŁONKOWIE --- */
 .member-item {
     display: flex;
     align-items: center;
-    gap: 12px;
-    padding: 10px;
+    gap: 15px;
+    padding: 10px 0;
     border-bottom: 1px solid #111;
 }
 
 .member-avatar {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
+    width: 55px;
+    height: 55px;
+    border-radius: 4px;
+    object-fit: cover;
 }
 
-/* --- ADMIN --- */
-.admin-report-card {
-    background: #050505;
-    border: 1px solid #151515;
-    padding: 15px;
-    border-radius: 8px;
-    margin-bottom: 10px;
+/* --- FORMULARZ --- */
+.input-group label { display: block; font-size: 0.7rem; color: #666; margin-bottom: 5px; }
+input, select {
+    width: 100%; padding: 10px; background: #111; border: 1px solid #222; color: #fff; border-radius: 6px; margin-bottom: 10px; box-sizing: border-box;
+}
+.input-row { display: flex; gap: 10px; }
+.btn-submit {
+    width: 100%; padding: 12px; background: #fff; color: #000; border: none; font-weight: 800; border-radius: 6px; cursor: pointer;
 }
 
-.report-actions {
-    display: flex;
-    gap: 10px;
-    margin-top: 10px;
-}
-
-.btn-accept { background: #27ae60; color: #fff; border: none; padding: 8px; border-radius: 4px; flex: 1; cursor: pointer; }
-.btn-reject { background: #c0392b; color: #fff; border: none; padding: 8px; border-radius: 4px; flex: 1; cursor: pointer; }
-
-/* --- ANIMACJE --- */
+/* --- ANIMACJE I LOADER --- */
 .tab-content { display: none; }
-.tab-content.active-tab { display: block; animation: fadeIn 0.4s ease; }
-@keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+.tab-content.active-tab { display: block; }
 
 #loading-overlay {
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 9999; display: flex; justify-content: center; align-items: center;
 }
-.spinner {
-    width: 40px; height: 40px; border: 4px solid #222; border-top: 4px solid #fff; border-radius: 50%; animation: spin 1s linear infinite;
-}
+.spinner { width: 40px; height: 40px; border: 4px solid #222; border-top: 4px solid #fff; border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
