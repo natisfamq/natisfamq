@@ -46,9 +46,8 @@
                     <div class="glass-card user-profile">
                         <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
                         <div class="profile-info">
-                            <h2 id="user-name">Użytkownik</h2>
-                            <p id="user-role-text">Ranga: -</p>
-                            <div class="user-stats">
+                            <h2 id="user-name">Ładowanie...</h2>
+                            <p>Ranga: <span id="user-role-text">-</span></p> <div class="user-stats">
                                 <p>Raporty w tym tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
                             </div>
                         </div>
@@ -75,10 +74,20 @@
                                     <option value="capt">Capt (Dynamiczny)</option>
                                 </select>
                             </div>
+                            <div id="grover-fields" style="display:none;">
+                                <label>ILOŚĆ KRZAKÓW</label>
+                                <input type="number" id="krzaki-count" value="0">
+                            </div>
                             <div id="capt-fields" style="display:none;">
                                 <div class="input-row">
-                                    <input type="number" id="kille-count" placeholder="Kille" value="0">
-                                    <input type="number" id="dmg-count" placeholder="DMG" value="0">
+                                    <div class="input-group">
+                                        <label>KILLE</label>
+                                        <input type="number" id="kille-count" value="0">
+                                    </div>
+                                    <div class="input-group">
+                                        <label>DMG</label>
+                                        <input type="number" id="dmg-count" value="0">
+                                    </div>
                                 </div>
                             </div>
                             <div class="input-group">
