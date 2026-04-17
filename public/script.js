@@ -175,44 +175,13 @@ async function loadData() {
 }
 
 async function handleAdminAction(id, action) {
-    if (isProcessing) return; // Jeśli już coś wysyłamy, zignoruj kolejne kliknięcie
-    
     const report = currentAdminReports.find(r => r.id === id);
-    if (!report) return;
-
-    isProcessing = true; // Aktywujemy blokadę
     const endpoint = action === 'accept' ? '/api/send-webhook' : '/api/reject-webhook';
-    
-    try {
-        const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                ...report,
-                // Upewniamy się, że przesyłamy dane w formacie, który lubi Twój webhook
-                content: `Nowy raport od: ${report.username}`,
-                embeds: [{
-                    title: action === 'accept' ? "✅ Raport Zaakceptowany" : "❌ Raport Odrzucony",
-                    description: `Typ: ${report.type}\nKwota: ${report.payout}$\nLink: ${report.imgur}`,
-                    color: action === 'accept' ? 3066993 : 15158332
-                }]
-            })
-        });
-
-        if (res.ok) {
-            // USUWANIE Z FIREBASE TYLKO GDY SERWER POTWIERDZI ODEBRANIE
-            const { remove, ref } = await import("https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js");
-            await remove(ref(db, `reports/${id}`));
-            console.log(`Raport ${id} został pomyślnie przetworzony.`);
-        } else {
-            alert("Serwer odebrał dane, ale wystąpił błąd z webhookiem.");
-        }
-    } catch (err) {
-        console.error("Błąd sieci:", err);
-        alert("Nie udało się połączyć z serwerem Discord.");
-    } finally {
-        isProcessing = false; // Zdejmujemy blokadę po zakończeniu
-    }
+    const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(report)
+    });
+    if (res.ok) await remove(ref(db, `reports/${id}`));
 }
-
 
