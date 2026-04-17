@@ -4,6 +4,8 @@
     --glow: rgba(255, 255, 255, 0.4);
     --glass: rgba(255, 255, 255, 0.05);
     --border: rgba(255, 255, 255, 0.1);
+    --success: #2ecc71;
+    --danger: #e74c3c;
 }
 
 * { box-sizing: border-box; }
@@ -31,14 +33,22 @@ body {
 
 .main-title { font-size: 3rem; text-align: center; margin-bottom: 40px; font-weight: 900; letter-spacing: 5px; text-transform: uppercase; }
 
+/* Przyciski */
 .btn { 
-    padding: 15px 25px; border-radius: 10px; border: 1px solid white; 
+    padding: 12px 20px; border-radius: 10px; border: 1px solid white; 
     background: transparent; color: white; cursor: pointer; 
     text-transform: uppercase; font-weight: bold; transition: 0.3s;
-    text-align: center; width: 100%; font-size: 1rem;
+    text-align: center; font-size: 0.9rem;
 }
 .glow-btn:hover { background: white; color: black; box-shadow: 0 0 20px white; }
 
+.btn-accept { border-color: var(--success); color: var(--success); }
+.btn-accept:hover { background: var(--success); color: white; }
+
+.btn-reject { border-color: var(--danger); color: var(--danger); }
+.btn-reject:hover { background: var(--danger); color: white; }
+
+/* Nawigacja */
 .tabs-nav { display: flex; justify-content: center; gap: 15px; margin-bottom: 40px; }
 .tab-btn { 
     background: none; border: none; color: #666; padding: 15px 30px; 
@@ -50,32 +60,21 @@ body {
 .tab-content { display: none; width: 100%; }
 .tab-content.active { display: block; }
 
-.profile-card { border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); overflow: hidden; }
-.user-banner { height: 120px; background: linear-gradient(90deg, #111, #222); }
-.profile-header { display: flex; align-items: center; padding: 0 40px; margin-top: -50px; margin-bottom: 30px; }
-.profile-avatar { width: 120px; height: 120px; border-radius: 50%; border: 5px solid var(--bg); background: #000; }
-.profile-main-info { margin-left: 25px; margin-top: 50px; }
-.profile-name { font-size: 2rem; font-weight: 900; margin: 0; }
-.profile-rank { font-size: 1.1rem; color: #aaa; margin-top: 5px; display: block; font-weight: 600; }
+/* Profile & Admin Cards */
+.profile-card, .admin-report-card { border-radius: 20px; background: rgba(255,255,255,0.02); border: 1px solid var(--border); overflow: hidden; margin-bottom: 20px; }
+.user-banner { height: 100px; background: linear-gradient(90deg, #111, #222); background-size: cover; background-position: center; }
+.report-body { padding: 20px; display: flex; justify-content: space-between; align-items: center; }
+.report-info h3 { margin: 0; font-size: 1.2rem; }
+.report-info p { margin: 5px 0; color: #888; font-size: 0.9rem; }
+.report-actions { display: flex; gap: 10px; }
 
-.profile-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 40px 40px 40px; }
-.stat-item { background: rgba(255,255,255,0.03); padding: 20px; border-radius: 15px; border: 1px solid var(--border); }
-.stat-label { font-size: 0.8rem; color: #666; text-transform: uppercase; letter-spacing: 1px; }
-.stat-value { font-size: 1.2rem; font-weight: bold; margin-top: 5px; display: block; }
-
+/* Lista Członków */
 .list-item { 
     background: rgba(255,255,255,0.02); border: 1px solid var(--border); 
     margin-bottom: 15px; padding: 25px; border-radius: 15px; 
     display: flex; justify-content: space-between; align-items: center;
-    transition: 0.3s ease;
+    transition: 0.3s;
 }
-.list-item:hover { background: rgba(255, 255, 255, 0.08); transform: translateY(-3px); border-color: rgba(255,255,255,0.3); }
-.mini-avatar { width: 60px; height: 60px; border-radius: 50%; border: 2px solid #222; }
-.member-name { font-size: 1.3rem; font-weight: 700; margin-left: 20px; }
-.member-rank-label { color: #888; font-weight: 600; background: rgba(255,255,255,0.05); padding: 5px 15px; border-radius: 5px; }
 
-label { display: block; margin-bottom: 8px; font-weight: bold; color: #aaa; font-size: 0.9rem; }
-input, select { 
-    width: 100%; padding: 15px; background: #111; border: 1px solid var(--border); 
-    color: white; border-radius: 10px; margin-bottom: 20px; font-size: 1rem;
-}
+/* Formularze */
+input, select { width: 100%; padding: 15px; background: #111; border: 1px solid var(--border); color: white; border-radius: 10px; margin-bottom: 20px; }

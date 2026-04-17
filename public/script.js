@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const params = new URLSearchParams(window.location.search);
-    
     if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
@@ -27,12 +26,14 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
     });
 
-    // Obsługa formularza raportu
     const reportForm = document.getElementById('report-form');
     reportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const type = document.getElementById('contract-type').value;
         const imgur = document.getElementById('imgur-link').value;
+        const userRes = await fetch('/api/me');
+        const userData = await userRes.json();
+
         let payout = 0;
         let desc = type.toUpperCase();
 
@@ -44,28 +45,30 @@ document.addEventListener('DOMContentLoaded', () => {
         } else if (type === 'capt') {
             const kille = document.getElementById('kille-count').value;
             const dmg = document.getElementById('dmg-count').value;
-            payout = (kille * 1000) + (dmg * 10);
+            // Nowa logika: 2500$ na start + bonusy
+            payout = 2500 + (kille * 1000) + (dmg * 10);
             desc = `Capt (K: ${kille}, D: ${dmg})`;
         }
 
         if (!imgur) return alert("Podaj link do dowodu!");
 
         const reportData = { 
+            username: userData.username,
+            banner: userData.banner || '',
             type: desc, 
             payout, 
             imgur, 
-            date: new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) 
+            date: new Date().toLocaleString('pl-PL', { day: '2-digit', month: '2-digit', hour: '2-digit', minute: '2-digit' }) 
         };
 
-        // Zapisywanie lokalne (dla demonstracji aktywności w panelu)
-        let myReports = JSON.parse(localStorage.getItem('my_reports') || '[]');
-        myReports.unshift(reportData);
-        localStorage.setItem('my_reports', JSON.stringify(myReports));
+        // Zapisz raport do "globalnej" listy (udawana baza danych)
+        let allReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+        allReports.unshift(reportData);
+        localStorage.setItem('admin_reports', JSON.stringify(allReports));
 
-        addReportToAdmin(reportData);
-        alert("Raport wysłany!");
+        alert("Raport wysłany do administracji!");
         e.target.reset();
-        loadData(); // Odśwież panel, aby pokazać nową aktywność
+        loadData();
     });
 });
 
@@ -78,46 +81,41 @@ async function loadData() {
             document.getElementById('user-name').innerText = me.username;
             document.getElementById('user-avatar').src = me.avatar;
             document.getElementById('user-role').innerText = me.roleName;
-            
-            // Pobieranie ostatniego raportu z pamięci lokalnej
-            const myReports = JSON.parse(localStorage.getItem('my_reports') || '[]');
-            if (myReports.length > 0) {
-                const last = myReports[0];
-                document.getElementById('reports-count').innerText = myReports.length;
-                document.getElementById('last-act-name').innerText = last.type;
-                document.getElementById('last-act-date').innerText = last.date;
-            } else {
-                document.getElementById('reports-count').innerText = "0";
-                document.getElementById('last-act-name').innerText = "Brak raportów";
-                document.getElementById('last-act-date').innerText = "-";
-            }
+            if (me.banner) document.querySelector('.user-banner').style.backgroundImage = `url(${me.banner})`;
         }
 
-        const memRes = await fetch('/api/members');
-        const members = await memRes.json();
-        const list = document.getElementById('members-list');
-        list.innerHTML = members.map(m => `
-            <div class="list-item">
-                <div style="display:flex; align-items:center;">
-                    <img src="${m.avatar}" class="mini-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
-                    <span class="member-name">${m.displayName}</span>
+        // Ładowanie raportów w panelu Admina
+        const adminList = document.getElementById('admin-list');
+        const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+        
+        adminList.innerHTML = reports.map((rep, index) => `
+            <div class="admin-report-card">
+                <div class="user-banner" style="background-image: url(${rep.banner})"></div>
+                <div class="report-body">
+                    <div class="report-info">
+                        <h3>${rep.username} - ${rep.type}</h3>
+                        <p>Kwota: <strong>${rep.payout}$</strong> | Data: ${rep.date}</p>
+                        <a href="${rep.imgur}" target="_blank" style="color: #3498db; font-size: 0.8rem;">Zobacz dowód (Imgur)</a>
+                    </div>
+                    <div class="report-actions">
+                        <button class="btn btn-accept" onclick="handleReport(${index}, 'accept')">Akceptuj</button>
+                        <button class="btn btn-reject" onclick="handleReport(${index}, 'reject')">Odrzuć</button>
+                    </div>
                 </div>
-                <span class="member-rank-label">Ranga: ${m.rankName}</span>
             </div>
         `).join('');
-    } catch (err) {
-        console.error("Błąd ładowania:", err);
-    }
+
+    } catch (err) { console.error(err); }
 }
 
-function addReportToAdmin(rep) {
-    const list = document.getElementById('admin-list');
-    if(!list) return;
-    const div = document.createElement('div');
-    div.className = 'list-item';
-    div.innerHTML = `
-        <div><strong>${rep.type}</strong><br><small>${rep.payout}$ | ${rep.date}</small></div>
-        <button class="btn" style="width:auto; padding:5px 15px;" onclick="this.parentElement.remove()">Usuń</button>
-    `;
-    list.prepend(div);
+function handleReport(index, action) {
+    let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+    if (action === 'accept') {
+        alert("Raport zaakceptowany! Pieniądze dodane do wypłaty gracza.");
+    } else {
+        alert("Raport odrzucony.");
+    }
+    reports.splice(index, 1); // Usuń z listy po akcji
+    localStorage.setItem('admin_reports', JSON.stringify(reports));
+    loadData();
 }
