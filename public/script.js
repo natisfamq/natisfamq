@@ -1,111 +1,112 @@
 document.addEventListener('DOMContentLoaded', () => {
+    const loginScreen = document.getElementById('login-screen');
+    const mainApp = document.getElementById('main-app');
+
+    // Obsługa logowania i URL params
     const params = new URLSearchParams(window.location.search);
-    if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
-        document.getElementById('login-screen').style.display = 'none';
-        document.getElementById('main-app').style.display = 'block';
+    if (params.get('logged') === 'true') {
+        localStorage.setItem('is_logged', 'true');
+        window.history.replaceState({}, document.title, "/");
+    }
+
+    if (localStorage.getItem('is_logged') === 'true') {
+        loginScreen.style.display = 'none';
+        mainApp.style.display = 'block';
         loadData();
     }
 
-    document.getElementById('login-btn').addEventListener('click', () => window.location.href = '/api/login');
-
+    // Zakładki
     const tabs = document.querySelectorAll('.tab-btn');
+    const contents = document.querySelectorAll('.tab-content');
+
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
             tabs.forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            contents.forEach(c => c.classList.remove('active-tab'));
             tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).style.display = 'block';
+            document.getElementById(tab.dataset.tab).classList.add('active-tab');
         });
     });
 
-    document.getElementById('contract-type').addEventListener('change', (e) => {
-        const val = e.target.value;
-        document.getElementById('grover-fields').style.display = val === 'grover' ? 'block' : 'none';
-        document.getElementById('capt-fields').style.display = val === 'capt' ? 'block' : 'none';
+    // Pokaż/ukryj pola raportu
+    const contractType = document.getElementById('contract-type');
+    contractType.addEventListener('change', (e) => {
+        document.getElementById('grover-fields').style.display = e.target.value === 'grover' ? 'block' : 'none';
+        document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
     });
 
-    document.getElementById('report-form').addEventListener('submit', async (e) => {
+    // Formularz raportu
+    const reportForm = document.getElementById('report-form');
+    reportForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        const type = document.getElementById('contract-type').value;
-        let imgur = document.getElementById('imgur-link').value.trim();
-        const me = await (await fetch('/api/me')).json();
+        const loader = document.getElementById('loading-overlay');
+        loader.style.display = 'flex';
 
-        let payout = 10000;
-        let desc = type.toUpperCase();
-        if (type === 'grover') {
-            const count = document.getElementById('krzaki-count').value;
-            payout = count * 1000;
-            desc = `GROVER (${count} szt.)`;
-        } else if (type === 'capt') {
-            const k = document.getElementById('kille-count').value;
-            const d = document.getElementById('dmg-count').value;
-            payout = 2500 + (k * 1000) + (d * 10);
-            desc = `CAPT (K: ${k}, D: ${d})`;
+        const data = {
+            type: contractType.value,
+            imgur: document.getElementById('imgur-link').value,
+            krzaki: document.getElementById('krzaki-count').value,
+            capt: document.getElementById('capt-stats').value
+        };
+
+        try {
+            const res = await fetch('/api/raport', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            });
+            if (res.ok) {
+                alert('Raport wysłany pomyślnie!');
+                reportForm.reset();
+            }
+        } catch (err) {
+            console.error(err);
+        } finally {
+            loader.style.display = 'none';
         }
-
-        const timestamp = new Date().toLocaleString('pl-PL');
-        
-        // Webhook log
-        await fetch('/api/webhook', {
-            method: 'POST',
-            headers: {'Content-Type': 'application/json'},
-            body: JSON.stringify({
-                embeds: [{
-                    title: "📩 NOWY RAPORT",
-                    color: 16766720,
-                    fields: [
-                        { name: "Gracz", value: me.username, inline: true },
-                        { name: "Typ", value: type.charAt(0).toUpperCase() + type.slice(1), inline: true },
-                        { name: "Kwota", value: `${payout}$`, inline: true }
-                    ],
-                    thumbnail: { url: `${window.location.origin}/logo.jpg` },
-                    footer: { text: `Panel Wyplat | ${timestamp}` }
-                }]
-            })
-        });
-
-        let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift({ username: me.username, type: desc, payout, imgur, date: timestamp });
-        localStorage.setItem('admin_reports', JSON.stringify(reports));
-        alert("Wysłano!");
-        loadData();
     });
 });
 
 async function loadData() {
-    const me = await (await fetch('/api/me')).json();
-    if (!me.error) {
-        document.getElementById('user-name').innerText = me.username;
-        document.getElementById('user-avatar').src = me.avatar || 'logo.jpg';
-        document.getElementById('user-role-text').innerText = `Ranga: ${me.roleName || '-'}`;
+    try {
+        const res = await fetch('/api/user-data');
+        const data = await res.json();
+
+        // Profil
+        document.getElementById('user-name').innerText = data.user.username;
+        document.getElementById('user-avatar').src = data.user.avatar;
+        document.getElementById('user-role-text').innerText = data.user.role;
+        document.getElementById('reports-count').innerText = data.reportsCount;
+
+        // Panel Admina
+        if (data.isAdmin) {
+            document.getElementById('admin-tab-btn').style.display = 'block';
+            updateAdminList(data.allReports);
+        }
+
+        // CZŁONKOWIE - POPRAWKA: teraz widać rangę pod imieniem
+        const list = document.getElementById('members-list');
+        list.innerHTML = data.members.map(m => `
+            <div class="member-item">
+                <img src="${m.avatar}" class="member-avatar">
+                <div>
+                    <div style="font-weight: bold;">${m.username}</div>
+                    <div style="font-size: 0.8rem; color: #888;">${m.role}</div>
+                </div>
+            </div>
+        `).join('');
+
+    } catch (err) {
+        console.error("Błąd ładowania danych:", err);
     }
-
-    const members = await (await fetch('/api/members')).json();
-    document.getElementById('members-list').innerHTML = members.map(m => `
-        <div class="member-item">
-            <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
-            <span class="member-name">${m.displayName}</span>
-        </div>
-    `).join('');
-
-    const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-    document.getElementById('admin-list').innerHTML = reports.map((r, i) => `
-        <div class="admin-report-card">
-            <div>
-                <strong>${r.username} - ${r.type}</strong><br>
-                <small>${r.payout}$ | ${r.date}</small>
-            </div>
-            <div>
-                <a href="${r.imgur}" target="_blank" class="btn-submit" style="padding: 5px 10px; text-decoration: none;">IMGUR</a>
-                <button onclick="deleteReport(${i})" class="btn-submit" style="padding: 5px 10px; margin-left:5px;">USUŃ</button>
-            </div>
-        </div>
-    `).join('');
 }
 
-function deleteReport(index) {
-    let reports = JSON.parse(localStorage.getItem('admin_reports'));
-    reports.splice(index, 1);
-    localStorage.setItem('admin_reports', JSON.stringify(reports));
-    loadData();
+function updateAdminList(reports) {
+    const adminList = document.getElementById('admin-list');
+    adminList.innerHTML = reports.map(r => `
+        <div class="glass-card" style="margin-bottom: 10px;">
+            <strong>${r.username}</strong> - ${r.type} (${r.date})<br>
+            <a href="${r.imgur}" target="_blank" style="color: #3498db;">Link do dowodu</a>
+        </div>
+    `).join('');
 }
