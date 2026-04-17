@@ -20,9 +20,12 @@ let currentAdminReports = [];
 
 document.addEventListener('DOMContentLoaded', async () => {
     // NAPRAWA LOGOWANIA - TO ROZWIĄZUJE TWÓJ PROBLEM
+    document.addEventListener('DOMContentLoaded', async () => {
+    // TO NAPRAWIA LOGOWANIE:
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
         loginBtn.addEventListener('click', () => {
+            console.log("Przekierowuję do logowania...");
             window.location.href = '/api/login';
         });
     }
