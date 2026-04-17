@@ -102,3 +102,60 @@ label { display: block; margin-bottom: 8px; color: #888; font-size: 1.1rem; font
     border-radius: 12px; 
     margin-right: 25px !important; /* Wymuszenie odstępu */
 }
+/* ... (poprzednie style) ... */
+
+/* NOWY WYGLĄD KARTY RAPORTU W ADMINIE */
+.admin-report-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border);
+    border-radius: 15px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.report-banner-stripe {
+    height: 8px; /* Mały, estetyczny pasek na górze */
+    background: linear-gradient(90deg, #fff, #444);
+    width: 100%;
+}
+
+.report-body {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 20px;
+}
+
+.report-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.report-user { font-size: 1.4rem; font-weight: 900; color: #fff; text-transform: uppercase; }
+.report-details { font-size: 1.1rem; color: #ccc; }
+.report-meta { font-size: 0.9rem; color: #666; font-family: monospace; }
+
+.report-actions {
+    display: flex;
+    gap: 10px;
+}
+
+/* PRZYCISKI W ADMINIE */
+.report-actions .btn {
+    padding: 10px 15px;
+    font-size: 0.85rem;
+    border-radius: 8px;
+    letter-spacing: 1px;
+}
+
+.btn-accept { border-color: #2ecc71 !important; color: #2ecc71 !important; }
+.btn-accept:hover { background: #2ecc71 !important; color: #000 !important; }
+
+.btn-reject { border-color: #e74c3c !important; color: #e74c3c !important; }
+.btn-reject:hover { background: #e74c3c !important; color: #000 !important; }
+
+.btn-imgur { border-color: #3498db !important; color: #3498db !important; text-decoration: none; }
+.btn-imgur:hover { background: #3498db !important; color: #fff !important; }

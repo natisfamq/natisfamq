@@ -138,3 +138,75 @@ function action(i) {
     localStorage.setItem('admin_reports', JSON.stringify(r));
     loadData();
 }
+// ... (reszta kodu bez zmian do momentu loadData)
+
+async function loadData() {
+    try {
+        const me = await (await fetch('/api/me')).json();
+        if (!me.error) {
+            document.getElementById('user-name').innerText = me.username;
+            document.getElementById('user-avatar').src = me.avatar;
+            document.getElementById('user-role-text').innerHTML = `Ranga: <strong>${me.roleName}</strong>`;
+            
+            const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+            const myReports = reports.filter(r => r.username === me.username);
+            document.getElementById('reports-count').innerText = myReports.length;
+            document.getElementById('last-act-text').innerText = myReports[0] ? myReports[0].type : "Brak danych";
+            
+            if (me.banner) document.getElementById('user-banner-div').style.backgroundImage = `url(${me.banner})`;
+        }
+
+        const members = await (await fetch('/api/members')).json();
+        document.getElementById('members-list').innerHTML = members.map(m => `
+            <div class="list-item">
+                <div style="display:flex; align-items:center;">
+                    <img src="${m.avatar}" class="mini-avatar" onerror="this.src='https://cdn.discordapp.com/embed/avatars/0.png'">
+                    <span class="member-name">${m.displayName}</span>
+                </div>
+                <span class="member-rank-label">${m.rankName}</span>
+            </div>
+        `).join('');
+
+        // PANEL ADMINA - POPRAWIONE KARTY I PRZYCISKI
+        const adminReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+        document.getElementById('admin-list').innerHTML = adminReports.map((r, i) => `
+            <div class="admin-report-card">
+                <div class="report-banner-stripe"></div> <div class="report-body">
+                    <div class="report-info">
+                        <span class="report-user">${r.username}</span>
+                        <span class="report-details">${r.type}</span>
+                        <span class="report-meta">${r.payout}$ | ${r.date}</span>
+                    </div>
+                    <div class="report-actions">
+                        <a href="${r.imgur}" target="_blank" class="btn btn-imgur">IMGUR</a>
+                        <button class="btn btn-accept" onclick="acceptReport(${i})">AKCEPTUJ</button>
+                        <button class="btn btn-reject" onclick="deleteReport(${i})">USUŃ</button>
+                    </div>
+                </div>
+            </div>
+        `).join('');
+    } catch (e) { console.error(e); }
+}
+
+// Funkcja akceptacji (np. wysyła log do innej sekcji)
+async function acceptReport(i) {
+    let reports = JSON.parse(localStorage.getItem('admin_reports'));
+    const report = reports[i];
+    
+    // Opcjonalnie: Webhook o zaakceptowaniu
+    await fetch('/api/webhook-accept', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(report)
+    });
+
+    alert(`Zaakceptowano raport gracza ${report.username}`);
+    deleteReport(i); // Usuwa z listy po akceptacji
+}
+
+function deleteReport(i) {
+    let r = JSON.parse(localStorage.getItem('admin_reports'));
+    r.splice(i, 1);
+    localStorage.setItem('admin_reports', JSON.stringify(r));
+    loadData();
+}
