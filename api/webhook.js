@@ -1,27 +1,24 @@
 export default async function handler(req, res) {
-    if (req.method !== 'POST') return res.status(405).end();
-    
-    const { username, type, payout, imgur, date } = req.body;
+    if (req.method !== 'POST') return res.status(405).send('Method Not Allowed');
 
-    const discordPayload = {
-        embeds: [{
-            title: "📩 NOWY RAPORT",
-            color: 16777215,
-            fields: [
-                { name: "Gracz", value: username, inline: true },
-                { name: "Typ", value: type, inline: true },
-                { name: "Kwota", value: `${payout}$`, inline: true },
-                { name: "Dowód", value: imgur }
-            ],
-            footer: { text: `Panel Wyplat | ${date}` }
-        }]
-    };
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL;
+    if (!webhookUrl) return res.status(500).json({ error: 'Brak URL Webhooka w Env' });
 
-    await fetch(process.env.DISCORD_WEBHOOK_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(discordPayload)
-    });
+    try {
+        const response = await fetch(webhookUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(req.body) // Przekazuje dokładnie to, co wyśle script.js
+        });
 
-    res.status(200).json({ success: true });
+        if (!response.ok) {
+            const errBody = await response.text();
+            console.error("Discord Error:", errBody);
+            return res.status(response.status).json({ error: errBody });
+        }
+
+        return res.status(200).json({ success: true });
+    } catch (error) {
+        return res.status(500).json({ error: error.message });
+    }
 }

@@ -121,19 +121,22 @@ async function processReport(index, actionType) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
     
-    // Dane admina (weryfikatora)
+    // Pobranie danych weryfikatora
     const meRes = await fetch('/api/me');
     const me = await meRes.json();
-    const verifierName = me.username || "System";
+    const verifierName = me.username || "Admin";
 
-    // Konfiguracja wyglądu (kolor i emoji)
     const isAccept = actionType === 'AKCEPTACJA';
     const embedColor = isAccept ? 3066993 : 15158332; // Zielony vs Czerwony
-    const timestamp = new Date().toLocaleString('pl-PL');
+    
+    // Generowanie timestampu dokładnie jak na screenie
+    const now = new Date();
+    const timestamp = now.toLocaleDateString('pl-PL') + ', ' + now.toLocaleTimeString('pl-PL', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
+    // Payload zgodny z Twoimi screenami
     const discordPayload = {
         embeds: [{
-            title: `⚖️ RAPORT ${actionType}`,
+            title: isAccept ? "⚖️ RAPORT AKCEPTACJA" : "⚖️ RAPORT ODRZUCENIE",
             color: embedColor,
             fields: [
                 { name: "Gracz", value: r.username, inline: true },
@@ -141,9 +144,11 @@ async function processReport(index, actionType) {
                 { name: "Weryfikator", value: verifierName, inline: true }
             ],
             thumbnail: {
-                url: "https://i.imgur.com/8NatisLogo.png" // Podmień na bezpośredni link do Twojego logo
+                url: "https://cdn.discordapp.com/icons/1218558455823405108/a_d65e2361099e03f191b4e3e6060f0891.webp" 
             },
-            footer: { text: `Panel Wyplat | ${timestamp}` }
+            footer: { 
+                text: `Panel Wyplat | ${timestamp}` 
+            }
         }]
     };
 
@@ -155,15 +160,15 @@ async function processReport(index, actionType) {
         });
 
         if (response.ok) {
-            alert(`${actionType}: Log wysłany pomyślnie.`);
+            // Dopiero gdy Discord potwierdzi odebranie, usuwamy z listy
             reports.splice(index, 1);
             localStorage.setItem('admin_reports', JSON.stringify(reports));
             loadData();
         } else {
-            alert("Błąd serwera przy wysyłaniu logu.");
+            const errorData = await response.json();
+            alert("Błąd Discorda: " + JSON.stringify(errorData));
         }
     } catch (error) {
-        console.error("Błąd wysyłki:", error);
-        alert("Błąd połączenia z API.");
+        alert("Błąd wysyłania: Sprawdź połączenie z internetem lub URL Webhooka.");
     }
 }
