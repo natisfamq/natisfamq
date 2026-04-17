@@ -42,14 +42,14 @@
                 </div>
             </section>
 
-            <section id="czlonkowie" class="tab-content">
-                <h2 style="text-align: center; margin-bottom: 20px;">Lista Członków</h2>
+            <section id="czlonkowie" class="tab-content" style="display:none;">
+                <h2 class="section-title">Lista Członków</h2>
                 <div id="members-list"></div>
             </section>
 
-            <section id="raport" class="tab-content">
-                <div style="width: 100%; max-width: 600px; margin: 0 auto; padding: 20px;">
-                    <h2 style="text-align: center; margin-bottom: 25px; font-size: 2rem;">Wyślij Raport</h2>
+            <section id="raport" class="tab-content" style="display:none;">
+                <div class="form-container">
+                    <h2 class="section-title">Wyślij Raport</h2>
                     <form id="report-form">
                         <label>Typ Kontraktu</label>
                         <select id="contract-type">
@@ -58,29 +58,25 @@
                             <option value="grover">Grover</option>
                             <option value="capt">Capt</option>
                         </select>
-                        
                         <div id="grover-fields" style="display:none;">
                             <label>Ilość krzaków</label>
                             <input type="number" id="krzaki-count" value="0">
                         </div>
-
                         <div id="capt-fields" style="display:none;">
                             <label>Kille (1.000$)</label>
                             <input type="number" id="kille-count" value="0">
                             <label>DMG (10$)</label>
                             <input type="number" id="dmg-count" value="0">
                         </div>
-
                         <label>Dowód (Link Imgur)</label>
-                        <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
-                        
-                        <button type="submit" class="btn glow-btn">WYŚLIJ DO ADMINA</button>
+                        <input type="text" id="imgur-link" placeholder="imgur.com/...">
+                        <button type="submit" class="btn glow-btn">WYŚLIJ RAPORT</button>
                     </form>
                 </div>
             </section>
 
-            <section id="admin" class="tab-content">
-                <h2 style="text-align: center; margin-bottom: 20px;">Zarządzanie Raportami</h2>
+            <section id="admin" class="tab-content" style="display:none;">
+                <h2 class="section-title">Zarządzanie Raportami</h2>
                 <div id="admin-list"></div>
             </section>
         </div>
