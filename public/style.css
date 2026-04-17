@@ -226,3 +226,30 @@ input:hover, select:hover, input:focus {
     background: #dc3545;
     border-color: #dc3545;
 }
+/* STYL DLA OSTATNIEJ AKTYWNOŚCI */
+.activity-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-top: 10px;
+}
+
+.activity-item {
+    background: #0c0c0c;
+    padding: 10px;
+    border-radius: 8px;
+    border-left: 3px solid #fff; /* Biały pasek z boku dla stylu */
+    display: flex;
+    flex-direction: column;
+}
+
+.activity-desc {
+    font-size: 0.85rem;
+    color: #eee;
+}
+
+.activity-date {
+    font-size: 0.7rem;
+    color: #555;
+    margin-top: 4px;
+}

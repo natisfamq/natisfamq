@@ -29,7 +29,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const type = document.getElementById('contract-type').value;
         let imgur = document.getElementById('imgur-link').value.trim();
         
-        // Pobieranie danych zalogowanego użytkownika
         const meResponse = await fetch('/api/me');
         const me = await meResponse.json();
         const senderName = me.username || "Nieznany";
@@ -47,9 +46,10 @@ document.addEventListener('DOMContentLoaded', () => {
             desc = `CAPT (K: ${k}, D: ${d})`;
         }
 
-        const timestamp = new Date().toLocaleString('pl-PL');
+        const now = new Date();
+        const timestamp = now.toLocaleString('pl-PL');
+        const isoDate = now.toISOString(); // Potrzebne do łatwego filtrowania dat
         
-        // Powiadomienie o nowym raporcie (oczekującym)
         await fetch('/api/webhook', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
@@ -67,12 +67,11 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         });
 
-        // Zapis do localStorage (z nazwą wysyłającego)
         let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift({ username: senderName, type: desc, payout, imgur, date: timestamp });
+        reports.unshift({ username: senderName, type: desc, payout, imgur, date: timestamp, rawDate: isoDate });
         localStorage.setItem('admin_reports', JSON.stringify(reports));
         
-        alert("Raport został wysłany do sprawdzenia!");
+        alert("Raport został wysłany!");
         document.getElementById('report-form').reset();
         loadData();
     });
@@ -81,10 +80,14 @@ document.addEventListener('DOMContentLoaded', () => {
 async function loadData() {
     const meRes = await fetch('/api/me');
     const me = await meRes.json();
+    
     if (!me.error) {
         document.getElementById('user-name').innerText = me.username;
         document.getElementById('user-avatar').src = me.avatar || 'logo.jpg';
         document.getElementById('user-role-text').innerText = `Ranga: ${me.roleName || '-'}`;
+        
+        // Obliczanie statystyk i aktywności dla zalogowanego użytkownika
+        updateUserStats(me.username);
     }
 
     const members = await (await fetch('/api/members')).json();
@@ -115,18 +118,52 @@ async function loadData() {
     `).join('');
 }
 
+function updateUserStats(currentUsername) {
+    const allReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
+    const userReports = allReports.filter(r => r.username === currentUsername);
+
+    // 1. Raporty w tym tygodniu (ostatnie 7 dni)
+    const sevenDaysAgo = new Date();
+    sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
+    
+    const weeklyReports = userReports.filter(r => {
+        const reportDate = r.rawDate ? new Date(r.rawDate) : new Date();
+        return reportDate >= sevenDaysAgo;
+    });
+
+    // 2. Suma wypłat
+    const totalPayout = userReports.reduce((sum, r) => sum + parseInt(r.payout), 0);
+
+    // Aktualizacja w DOM
+    document.getElementById('reports-count').innerText = weeklyReports.length;
+    document.getElementById('payout-total').innerText = `${totalPayout}$`;
+
+    // 3. Ostatnia aktywność (max 3 ostatnie)
+    const recentList = userReports.slice(0, 3);
+    const activityContainer = document.getElementById('recent-activity-list');
+    
+    if (recentList.length === 0) {
+        activityContainer.innerHTML = '<p style="color:#444; font-size:0.8rem;">Brak niedawnej aktywności</p>';
+    } else {
+        activityContainer.innerHTML = recentList.map(r => `
+            <div class="activity-item">
+                <span class="activity-desc">Wysłano raport: <strong>${r.type}</strong></span>
+                <span class="activity-date">${r.date}</span>
+            </div>
+        `).join('');
+    }
+}
+
 async function acceptReport(index) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
-    
     const response = await fetch('/api/send-webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(r)
     });
-
     if (response.ok) {
-        alert("Raport Zaakceptowany!");
+        alert("Zaakceptowano!");
         reports.splice(index, 1);
         localStorage.setItem('admin_reports', JSON.stringify(reports));
         loadData();
@@ -136,16 +173,13 @@ async function acceptReport(index) {
 async function rejectReport(index) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
-    
-    // Wysyłanie logu o odrzuceniu na Discord
     const response = await fetch('/api/reject-webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(r)
     });
-
     if (response.ok) {
-        alert("Raport Odrzucony!");
+        alert("Odrzucono!");
         reports.splice(index, 1);
         localStorage.setItem('admin_reports', JSON.stringify(reports));
         loadData();
