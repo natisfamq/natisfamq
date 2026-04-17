@@ -28,7 +28,11 @@ document.addEventListener('DOMContentLoaded', () => {
         e.preventDefault();
         const type = document.getElementById('contract-type').value;
         let imgur = document.getElementById('imgur-link').value.trim();
-        const me = await (await fetch('/api/me')).json();
+        
+        // Pobieranie danych zalogowanego użytkownika
+        const meResponse = await fetch('/api/me');
+        const me = await meResponse.json();
+        const senderName = me.username || "Nieznany";
 
         let payout = 10000;
         let desc = type.toUpperCase();
@@ -45,35 +49,38 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const timestamp = new Date().toLocaleString('pl-PL');
         
-        // Webhook log
+        // Powiadomienie o nowym raporcie (oczekującym)
         await fetch('/api/webhook', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
                 embeds: [{
-                    title: "📩 NOWY RAPORT",
+                    title: "📩 NOWY RAPORT DO ROZPATRZENIA",
                     color: 16766720,
                     fields: [
-                        { name: "Gracz", value: me.username, inline: true },
-                        { name: "Typ", value: type.charAt(0).toUpperCase() + type.slice(1), inline: true },
+                        { name: "Wysłał", value: senderName, inline: true },
+                        { name: "Typ", value: desc, inline: true },
                         { name: "Kwota", value: `${payout}$`, inline: true }
                     ],
-                    thumbnail: { url: `${window.location.origin}/logo.jpg` },
                     footer: { text: `Panel Wyplat | ${timestamp}` }
                 }]
             })
         });
 
+        // Zapis do localStorage (z nazwą wysyłającego)
         let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift({ username: me.username, type: desc, payout, imgur, date: timestamp });
+        reports.unshift({ username: senderName, type: desc, payout, imgur, date: timestamp });
         localStorage.setItem('admin_reports', JSON.stringify(reports));
-        alert("Wysłano!");
+        
+        alert("Raport został wysłany do administracji!");
+        document.getElementById('report-form').reset();
         loadData();
     });
 });
 
 async function loadData() {
-    const me = await (await fetch('/api/me')).json();
+    const meRes = await fetch('/api/me');
+    const me = await meRes.json();
     if (!me.error) {
         document.getElementById('user-name').innerText = me.username;
         document.getElementById('user-avatar').src = me.avatar || 'logo.jpg';
@@ -95,13 +102,14 @@ async function loadData() {
     document.getElementById('admin-list').innerHTML = reports.map((r, i) => `
         <div class="admin-report-card">
             <div class="report-details">
-                <strong>${r.username || 'Nieznany'} - ${r.type}</strong><br>
+                <strong>OD: ${r.username || 'Anonim'}</strong><br>
+                <span>${r.type}</span><br>
                 <small>${r.payout}$ | ${r.date}</small>
             </div>
             <div class="report-actions">
                 <button onclick="acceptReport(${i})" class="btn-action btn-accept">AKCEPTUJ</button>
                 <a href="${r.imgur}" target="_blank" class="btn-action btn-imgur">IMGUR</a>
-                <button onclick="deleteReport(${i})" class="btn-action btn-delete">USUŃ</button>
+                <button onclick="rejectReport(${i})" class="btn-action btn-delete">ODRZUĆ</button>
             </div>
         </div>
     `).join('');
@@ -111,28 +119,35 @@ async function acceptReport(index) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
     
-    try {
-        const response = await fetch('/api/send-webhook', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(r)
-        });
+    const response = await fetch('/api/send-webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(r)
+    });
 
-        if (response.ok) {
-            alert("Raport został zaakceptowany!");
-            deleteReport(index); // Usuwamy raport z oczekujących po akceptacji
-        } else {
-            alert("Wystąpił błąd podczas akceptacji raportu.");
-        }
-    } catch (error) {
-        console.error("Błąd akceptacji:", error);
-        alert("Błąd połączenia z serwerem.");
+    if (response.ok) {
+        alert("Raport Zaakceptowany!");
+        reports.splice(index, 1);
+        localStorage.setItem('admin_reports', JSON.stringify(reports));
+        loadData();
     }
 }
 
-function deleteReport(index) {
+async function rejectReport(index) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
-    reports.splice(index, 1);
-    localStorage.setItem('admin_reports', JSON.stringify(reports));
-    loadData();
+    const r = reports[index];
+    
+    // Wysyłanie logu o odrzuceniu na Discord
+    const response = await fetch('/api/reject-webhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(r)
+    });
+
+    if (response.ok) {
+        alert("Raport Odrzucony!");
+        reports.splice(index, 1);
+        localStorage.setItem('admin_reports', JSON.stringify(reports));
+        loadData();
+    }
 }

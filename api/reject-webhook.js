@@ -2,22 +2,21 @@ export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
     const r = req.body;
 
-    const webhookUrl = process.env.DISCORD_WEBHOOK_URL_ACCEPTED || process.env.DISCORD_WEBHOOK_URL;
+    const webhookUrl = process.env.DISCORD_WEBHOOK_URL_REJECTED || process.env.DISCORD_WEBHOOK_URL;
 
     await fetch(webhookUrl, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
             embeds: [{
-                title: "✅ RAPORT ZAAKCEPTOWANY",
-                color: 3066993, // Zielony
+                title: "❌ RAPORT ODRZUCONY",
+                color: 15158332, // Czerwony
                 fields: [
                     { name: "Gracz", value: r.username || "Nieznany", inline: true },
                     { name: "Typ", value: r.type, inline: true },
-                    { name: "Wypłata", value: `${r.payout}$`, inline: true },
-                    { name: "Dowód", value: r.imgur || "Brak" }
+                    { name: "Niedoszła wypłata", value: `${r.payout}$`, inline: true }
                 ],
-                footer: { text: `Status: Zaakceptowano przez Admina` },
+                footer: { text: `Status: Odrzucono przez Admina` },
                 timestamp: new Date().toISOString()
             }]
         })
