@@ -78,3 +78,27 @@ input, select {
     margin-bottom: 20px; 
 }
 label { display: block; margin-bottom: 8px; color: #888; font-size: 1.1rem; font-weight: 700; text-transform: uppercase; }
+/* ... reszta stylów bez zmian ... */
+
+.tab-content { 
+    display: none; /* Domyślnie ukryte */
+    width: 100%; 
+    animation: fadeIn 0.3s ease-in;
+}
+
+.tab-content.active { 
+    display: block; /* Pokazywane tylko gdy mają klasę active */
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Poprawka dla odstępu loga w członkach */
+.mini-avatar { 
+    width: 65px; 
+    height: 65px; 
+    border-radius: 12px; 
+    margin-right: 25px !important; /* Wymuszenie odstępu */
+}

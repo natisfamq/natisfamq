@@ -8,15 +8,29 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('login-btn').addEventListener('click', () => window.location.href = '/api/login');
 
+    // OBSŁUGA ZAKŁADEK (POPRAWIONA)
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
         tab.addEventListener('click', () => {
+            // Usuń klasę active ze wszystkich przycisków
             tabs.forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            // Ukryj wszystkie sekcje
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.classList.remove('active');
+                c.style.display = 'none'; 
+            });
+            
+            // Aktywuj wybrany przycisk
             tab.classList.add('active');
-            document.getElementById(tab.dataset.tab).classList.add('active');
+            // Pokaż wybraną sekcję
+            const activeSection = document.getElementById(tab.dataset.tab);
+            activeSection.classList.add('active');
+            activeSection.style.display = 'block';
         });
     });
+
+    // Pokaż domyślnie tylko pierwszą zakładkę
+    document.querySelector('.tab-content.active').style.display = 'block';
 
     const typeSelect = document.getElementById('contract-type');
     typeSelect.addEventListener('change', (e) => {
@@ -54,7 +68,7 @@ document.addEventListener('DOMContentLoaded', () => {
             payout: payout,
             imgur: imgur,
             date: new Date().toLocaleString('pl-PL'),
-            banner: me.banner // Dodano poprawne przekazywanie bannera
+            banner: me.banner
         };
 
         await fetch('/api/webhook', {
@@ -81,7 +95,6 @@ async function loadData() {
         if (!me.error) {
             document.getElementById('user-name').innerText = me.username;
             document.getElementById('user-avatar').src = me.avatar;
-            // FIX: Tylko wartość rangi, bez dopisywania "Ranga:" (które jest już w HTML lub CSS)
             document.getElementById('user-role-text').innerHTML = `Ranga: <strong>${me.roleName}</strong>`;
             
             const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
@@ -110,7 +123,7 @@ async function loadData() {
                 <div class="report-body">
                     <div><strong>${r.username}</strong> - ${r.type}<br><small>${r.payout}$ | ${r.date}</small></div>
                     <div style="display:flex; gap:15px;">
-                        <a href="${r.imgur}" target="_blank" class="btn" style="text-decoration:none; font-size: 0.9rem;">IMGUR</a>
+                        <a href="${r.imgur}" target="_blank" class="btn" style="text-decoration:none;">IMGUR</a>
                         <button class="btn btn-accept" onclick="action(${i})">USUŃ</button>
                     </div>
                 </div>
