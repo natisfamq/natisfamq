@@ -1,8 +1,14 @@
-document.addEventListener('DOMContentLoaded', () => {
+// Globalna zmienna na dane użytkownika, żeby nie pobierać ich 100 razy
+let currentUser = null;
+
+document.addEventListener('DOMContentLoaded', async () => {
     const params = new URLSearchParams(window.location.search);
     if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
         document.getElementById('login-screen').style.display = 'none';
         document.getElementById('main-app').style.display = 'block';
+        
+        // Najpierw pobierz dane o mnie, potem ładuj resztę
+        await fetchUserInfo();
         loadData();
     }
 
@@ -29,9 +35,9 @@ document.addEventListener('DOMContentLoaded', () => {
         const type = document.getElementById('contract-type').value;
         let imgur = document.getElementById('imgur-link').value.trim();
         
-        const meResponse = await fetch('/api/me');
-        const me = await meResponse.json();
-        const senderName = me.username || "Nieznany";
+        // Upewnij się, że mamy nazwę gracza
+        if (!currentUser) await fetchUserInfo();
+        const senderName = currentUser ? currentUser.username : "Nieznany";
 
         let payout = 10000;
         let desc = type.toUpperCase();
@@ -48,9 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const now = new Date();
         const timestamp = now.toLocaleString('pl-PL');
-        const isoDate = now.toISOString(); // Potrzebne do łatwego filtrowania dat
+        const isoDate = now.toISOString();
         
-        await fetch('/api/webhook', {
+        // Wysyłka na Discord (Oczekiwanie)
+        fetch('/api/webhook', {
             method: 'POST',
             headers: {'Content-Type': 'application/json'},
             body: JSON.stringify({
@@ -67,62 +74,91 @@ document.addEventListener('DOMContentLoaded', () => {
             })
         });
 
+        // Zapis do localStorage
         let reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-        reports.unshift({ username: senderName, type: desc, payout, imgur, date: timestamp, rawDate: isoDate });
+        reports.unshift({ 
+            username: senderName, 
+            type: desc, 
+            payout: payout, 
+            imgur: imgur, 
+            date: timestamp, 
+            rawDate: isoDate 
+        });
         localStorage.setItem('admin_reports', JSON.stringify(reports));
         
         alert("Raport został wysłany!");
         document.getElementById('report-form').reset();
-        loadData();
+        loadData(); // Odśwież widok
     });
 });
 
+async function fetchUserInfo() {
+    try {
+        const res = await fetch('/api/me');
+        currentUser = await res.json();
+        if (!currentUser.error) {
+            document.getElementById('user-name').innerText = currentUser.username;
+            document.getElementById('user-avatar').src = currentUser.avatar || 'logo.jpg';
+            document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
+        }
+    } catch (e) {
+        console.error("Błąd pobierania profilu:", e);
+    }
+}
+
 async function loadData() {
-    const meRes = await fetch('/api/me');
-    const me = await meRes.json();
-    
-    if (!me.error) {
-        document.getElementById('user-name').innerText = me.username;
-        document.getElementById('user-avatar').src = me.avatar || 'logo.jpg';
-        document.getElementById('user-role-text').innerText = `Ranga: ${me.roleName || '-'}`;
-        
-        // Obliczanie statystyk i aktywności dla zalogowanego użytkownika
-        updateUserStats(me.username);
+    // 1. STATYSTYKI (Najpierw to, bo jest lokalne i szybkie)
+    if (currentUser) {
+        updateUserStats(currentUser.username);
     }
 
-    const members = await (await fetch('/api/members')).json();
-    document.getElementById('members-list').innerHTML = members.map(m => `
-        <div class="member-item">
-            <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
-            <div class="member-info">
-                <span class="member-name">${m.displayName}</span>
-                <span class="member-rank">${m.rankName}</span>
-            </div>
-        </div>
-    `).join('');
-
+    // 2. LISTA DLA ADMINA (Też lokalne, musi się pojawić od razu)
     const reports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
-    document.getElementById('admin-list').innerHTML = reports.map((r, i) => `
-        <div class="admin-report-card">
-            <div class="report-details">
-                <strong>OD: ${r.username || 'Anonim'}</strong><br>
-                <span>${r.type}</span><br>
-                <small>${r.payout}$ | ${r.date}</small>
+    const adminList = document.getElementById('admin-list');
+    
+    if (reports.length === 0) {
+        adminList.innerHTML = '<p style="text-align:center; color:#444; padding:20px;">Brak raportów do rozpatrzenia</p>';
+    } else {
+        adminList.innerHTML = reports.map((r, i) => `
+            <div class="admin-report-card">
+                <div class="report-details">
+                    <strong>OD: ${r.username || 'Anonim'}</strong><br>
+                    <span>${r.type}</span><br>
+                    <small>${r.payout}$ | ${r.date}</small>
+                </div>
+                <div class="report-actions">
+                    <button onclick="acceptReport(${i})" class="btn-action btn-accept">AKCEPTUJ</button>
+                    <a href="${r.imgur}" target="_blank" class="btn-action btn-imgur">IMGUR</a>
+                    <button onclick="rejectReport(${i})" class="btn-action btn-delete">ODRZUĆ</button>
+                </div>
             </div>
-            <div class="report-actions">
-                <button onclick="acceptReport(${i})" class="btn-action btn-accept">AKCEPTUJ</button>
-                <a href="${r.imgur}" target="_blank" class="btn-action btn-imgur">IMGUR</a>
-                <button onclick="rejectReport(${i})" class="btn-action btn-delete">ODRZUĆ</button>
-            </div>
-        </div>
-    `).join('');
+        `).join('');
+    }
+
+    // 3. LISTA CZŁONKÓW (Na końcu, bo API Discorda bywa wolne)
+    try {
+        const membersRes = await fetch('/api/members');
+        if (membersRes.ok) {
+            const members = await membersRes.json();
+            document.getElementById('members-list').innerHTML = members.map(m => `
+                <div class="member-item">
+                    <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
+                    <div class="member-info">
+                        <span class="member-name">${m.displayName}</span>
+                        <span class="member-rank">${m.rankName}</span>
+                    </div>
+                </div>
+            `).join('');
+        }
+    } catch (e) {
+        console.error("Błąd listy członków:", e);
+    }
 }
 
 function updateUserStats(currentUsername) {
     const allReports = JSON.parse(localStorage.getItem('admin_reports') || '[]');
     const userReports = allReports.filter(r => r.username === currentUsername);
 
-    // 1. Raporty w tym tygodniu (ostatnie 7 dni)
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
     
@@ -131,23 +167,20 @@ function updateUserStats(currentUsername) {
         return reportDate >= sevenDaysAgo;
     });
 
-    // 2. Suma wypłat
     const totalPayout = userReports.reduce((sum, r) => sum + parseInt(r.payout), 0);
 
-    // Aktualizacja w DOM
     document.getElementById('reports-count').innerText = weeklyReports.length;
     document.getElementById('payout-total').innerText = `${totalPayout}$`;
 
-    // 3. Ostatnia aktywność (max 3 ostatnie)
     const recentList = userReports.slice(0, 3);
     const activityContainer = document.getElementById('recent-activity-list');
     
     if (recentList.length === 0) {
-        activityContainer.innerHTML = '<p style="color:#444; font-size:0.8rem;">Brak niedawnej aktywności</p>';
+        activityContainer.innerHTML = '<p style="color:#444; font-size:0.8rem;">Brak aktywności</p>';
     } else {
         activityContainer.innerHTML = recentList.map(r => `
             <div class="activity-item">
-                <span class="activity-desc">Wysłano raport: <strong>${r.type}</strong></span>
+                <span class="activity-desc">Wysłano: <strong>${r.type}</strong></span>
                 <span class="activity-date">${r.date}</span>
             </div>
         `).join('');
@@ -157,11 +190,13 @@ function updateUserStats(currentUsername) {
 async function acceptReport(index) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
+    
     const response = await fetch('/api/send-webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(r)
     });
+
     if (response.ok) {
         alert("Zaakceptowano!");
         reports.splice(index, 1);
@@ -173,11 +208,13 @@ async function acceptReport(index) {
 async function rejectReport(index) {
     let reports = JSON.parse(localStorage.getItem('admin_reports'));
     const r = reports[index];
+    
     const response = await fetch('/api/reject-webhook', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(r)
     });
+
     if (response.ok) {
         alert("Odrzucono!");
         reports.splice(index, 1);
