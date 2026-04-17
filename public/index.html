@@ -7,10 +7,6 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="loading-overlay" style="display: none;">
-        <div class="spinner"></div>
-    </div>
-
     <div id="login-screen">
         <div class="login-wrapper">
             <header class="main-header">
@@ -20,12 +16,12 @@
                 </div>
             </header>
             <div class="login-container">
-                <button id="login-btn" onclick="window.location.href='/api/login'">Zaloguj się przez Discord</button>
+                <button id="login-btn" onclick="login()">Zaloguj się przez Discord</button>
             </div>
         </div>
     </div>
 
-    <div id="main-app">
+    <div id="main-app" style="display: none;">
         <header class="main-header">
             <div class="header-content">
                 <img src="logo.jpg" alt="Logo" class="header-logo">
@@ -47,9 +43,9 @@
                         <div class="profile-layout">
                             <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
                             <div class="profile-info">
-                                <h2 id="user-name">Użytkownik</h2>
-                                <p>Ranga: <span id="user-role-text">-</span></p>
-                                <p>Raporty w tym tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
+                                <h2 id="user-name">Travis Natis</h2>
+                                <p>Ranga: <span id="user-role-text">14 | V-Lider</span></p>
+                                <p>Raporty w tym tygodniu: <span id="reports-count">0</span></p>
                             </div>
                         </div>
                     </div>
@@ -58,7 +54,7 @@
                 <div id="members" class="tab-content">
                     <div class="glass-card">
                         <h3 class="card-title">CZŁONKOWIE RODZINY</h3>
-                        <div id="members-list" class="members-container"></div>
+                        <div id="members-list"></div>
                     </div>
                 </div>
 
@@ -66,46 +62,21 @@
                     <div class="glass-card">
                         <h3 class="card-title">Wyślij Raport</h3>
                         <form id="report-form">
-                            <div class="input-group">
-                                <label>TYP KONTRAKTU</label>
-                                <select id="contract-type">
-                                    <option value="paczki">Paczki (10.000$)</option>
-                                    <option value="cenna">Cenna (10.000$)</option>
-                                    <option value="grover">Grover (1.000$ / szt)</option>
-                                    <option value="capt">Capt (Dynamiczny)</option>
-                                </select>
-                            </div>
-                            <div id="grover-fields" style="display:none;">
-                                <div class="input-group">
-                                    <label>ILOŚĆ KRZAKÓW</label>
-                                    <input type="number" id="krzaki-count" value="0">
-                                </div>
-                            </div>
-                            <div id="capt-fields" style="display:none;">
-                                <div class="input-row">
-                                    <div class="input-group">
-                                        <label>KILLE</label>
-                                        <input type="number" id="kille-count" value="0">
-                                    </div>
-                                    <div class="input-group">
-                                        <label>DMG</label>
-                                        <input type="number" id="dmg-count" value="0">
-                                    </div>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label>DOWÓD (LINK IMGUR)</label>
-                                <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
-                            </div>
-                            <button type="submit" class="btn-submit">WYŚLIJ RAPORT</button>
+                            <select id="contract-type">
+                                <option value="paczki">Paczki (10.000$)</option>
+                                <option value="cenna">Cenna (10.000$)</option>
+                                <option value="grover">Grover (1.000$ / szt)</option>
+                            </select>
+                            <input type="text" id="imgur-link" placeholder="Link do dowodu (Imgur)">
+                            <button type="submit" class="btn-submit">WYŚLIJ</button>
                         </form>
                     </div>
                 </div>
 
                 <div id="admin" class="tab-content">
                     <div class="glass-card">
-                        <h3 class="card-title">Zarządzanie Raportami</h3>
-                        <div id="admin-list" class="reports-container"></div>
+                        <h3 class="card-title">Zarządzanie</h3>
+                        <div id="admin-list"></div>
                     </div>
                 </div>
             </div>
