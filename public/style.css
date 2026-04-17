@@ -167,3 +167,14 @@ input:hover, select:hover, input:focus {
     align-items: center;
     margin-bottom: 10px;
 }
+.member-info {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.member-rank {
+    font-size: 0.75rem;
+    color: #888; /* Szary, żeby nie odciągał uwagi od nicku */
+    margin-top: 2px;
+}

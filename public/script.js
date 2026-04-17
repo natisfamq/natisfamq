@@ -80,11 +80,14 @@ async function loadData() {
         document.getElementById('user-role-text').innerText = `Ranga: ${me.roleName || '-'}`;
     }
 
-    const members = await (await fetch('/api/members')).json();
+const members = await (await fetch('/api/members')).json();
     document.getElementById('members-list').innerHTML = members.map(m => `
         <div class="member-item">
             <img src="${m.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
-            <span class="member-name">${m.displayName}</span>
+            <div class="member-info">
+                <span class="member-name">${m.displayName}</span>
+                <span class="member-rank">${m.rankName}</span>
+            </div>
         </div>
     `).join('');
 
