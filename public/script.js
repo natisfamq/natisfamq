@@ -71,6 +71,10 @@ function updateUI() {
     document.getElementById('user-name').innerText = currentUser.username;
     document.getElementById('user-avatar').src = currentUser.avatar || 'logo.jpg';
     document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
+    const adminTab = document.querySelector('.tab-btn[data-tab="admin"]');
+    if (adminTab) {
+        adminTab.style.display = currentUser.roleLevel >= 11 ? 'inline-block' : 'none';
+    }
 }
 
 async function loadMembers() {
@@ -98,7 +102,9 @@ async function loadReports() {
 
     const reports = await loadReportsFromFirebase();
     const list = document.getElementById('admin-list');
-    list.innerHTML = reports.map(r => `
+    list.innerHTML = reports.map(r => {
+        const reportPayload = encodeURIComponent(JSON.stringify(r));
+        return `
             <div class="report-item modern-glass-card">
                 <div class="report-header">
                     <strong>${r.username}</strong> - ${r.type} - ${r.payout}$
@@ -109,11 +115,12 @@ async function loadReports() {
                     ${r.kille ? `<br>Kille: ${r.kille}, DMG: ${r.dmg}` : ''}
                 </div>
                 <div class="report-actions">
-                    <button onclick="approveReport('${r.id}', ${JSON.stringify(r).replace(/"/g, '&quot;')})" class="btn-approve">Zatwierdź</button>
-                    <button onclick="rejectReport('${r.id}', ${JSON.stringify(r).replace(/"/g, '&quot;')})" class="btn-reject">Odrzuć</button>
+                    <button class="btn-approve" data-id="${r.id}" data-report="${reportPayload}">Zatwierdź</button>
+                    <button class="btn-reject" data-id="${r.id}" data-report="${reportPayload}">Odrzuć</button>
                 </div>
             </div>
-        `).join('');
+        `;
+    }).join('');
 }
 
 async function approveReport(id, reportData) {
@@ -180,6 +187,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Przycisk logowania
     const btn = document.getElementById('login-btn');
     if(btn) btn.onclick = () => window.location.href = '/api/login';
+
+    // Obsługa admina (approve / reject)
+    const adminList = document.getElementById('admin-list');
+    if (adminList) {
+        adminList.addEventListener('click', async (e) => {
+            const approveBtn = e.target.closest('.btn-approve');
+            const rejectBtn = e.target.closest('.btn-reject');
+            if (!approveBtn && !rejectBtn) return;
+
+            const button = approveBtn || rejectBtn;
+            const id = button.dataset.id;
+            const reportData = JSON.parse(decodeURIComponent(button.dataset.report));
+
+            if (approveBtn) {
+                await approveReport(id, reportData);
+            }
+            if (rejectBtn) {
+                await rejectReport(id, reportData);
+            }
+        });
+    }
 
     // Obsługa formularza (Grover/Capt)
     const select = document.getElementById('contract-type');
