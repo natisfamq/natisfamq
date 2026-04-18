@@ -1,3 +1,5 @@
+console.log('Script loaded');
+
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
 import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
@@ -17,17 +19,22 @@ let currentUser = null;
 
 async function checkAuth() {
     try {
+        console.log('Checking auth...');
         const res = await fetch('/api/me');
+        console.log('Auth response:', res.status);
         if (res.ok) {
             currentUser = await res.json();
+            console.log('User logged in:', currentUser);
             document.getElementById('login-screen').style.display = 'none';
             document.getElementById('main-app').style.display = 'block';
             updateUI();
             loadMembers();
         } else {
+            console.log('Not logged in, showing login screen');
             document.getElementById('login-screen').style.display = 'flex';
         }
     } catch (e) {
+        console.log('Auth check error:', e);
         document.getElementById('login-screen').style.display = 'flex';
     }
 }
