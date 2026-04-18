@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { readReports, writeReports } from './report-store.js';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
@@ -21,19 +21,13 @@ export default async function handler(req, res) {
         const { reportId } = req.body;
         if (!reportId) return res.status(400).json({ error: "Brak ID raportu" });
 
-        // Usuń raport z listy
-        await kv.lrem('reports_list', 0, JSON.stringify({ id: reportId })); // To może nie działać, bo lrem usuwa po wartości
-        
-        // Lepiej pobrać wszystkie i odfiltrować
-        const reports = await kv.lrange('reports_list', 0, -1);
+        const reports = await readReports();
         const filtered = reports.filter(r => r.id !== reportId);
-        await kv.del('reports_list');
-        for (const r of filtered) {
-            await kv.lpush('reports_list', r);
-        }
+        await writeReports(filtered);
         
         res.status(200).json({ success: true });
     } catch (error) {
+        console.error('delete-report error:', error);
         res.status(500).json({ error: "Błąd serwera" });
     }
 }

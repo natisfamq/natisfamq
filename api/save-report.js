@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { readReports, writeReports } from './report-store.js';
 
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
@@ -17,11 +17,13 @@ export default async function handler(req, res) {
             timestamp: new Date().toISOString()
         };
 
-        // Zapisujemy na początku listy 'reports_list' w Redis
-        await kv.lpush('reports_list', newReport);
+        const reports = await readReports();
+        reports.unshift(newReport);
+        await writeReports(reports);
         
         res.status(200).json({ success: true });
     } catch (error) {
-        res.status(500).json({ error: "Błąd bazy danych" });
+        console.error('save-report error:', error);
+        res.status(500).json({ error: "Błąd zapisu raportu" });
     }
 }

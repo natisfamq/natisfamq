@@ -28,7 +28,7 @@ function showToast(message, type = 'info') {
 async function checkAuth() {
     try {
         console.log('Checking auth...');
-        const res = await fetch('/api/me');
+        const res = await fetch('/api/me', { credentials: 'include' });
         console.log('Auth response:', res.status);
         if (res.ok) {
             currentUser = await res.json();
@@ -55,7 +55,7 @@ function updateUI() {
 }
 
 async function loadMembers() {
-    const res = await fetch('/api/members');
+    const res = await fetch('/api/members', { credentials: 'include' });
     if (res.ok) {
         const m = await res.json();
         const list = document.getElementById('members-list');
@@ -72,7 +72,7 @@ async function loadMembers() {
 }
 
 async function loadReports() {
-    const res = await fetch('/api/get-reports');
+    const res = await fetch('/api/get-reports', { credentials: 'include' });
     if (res.ok) {
         const reports = await res.json();
         const list = document.getElementById('admin-list');
@@ -101,6 +101,7 @@ async function approveReport(id, reportData) {
     try {
         const res = await fetch('/api/send-webhook', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(reportData)
         });
@@ -108,6 +109,7 @@ async function approveReport(id, reportData) {
             // Usuń raport
             await fetch('/api/delete-report', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reportId: id })
             });
@@ -125,6 +127,7 @@ async function rejectReport(id, reportData) {
     try {
         const res = await fetch('/api/reject-webhook', {
             method: 'POST',
+            credentials: 'include',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(reportData)
         });
@@ -132,6 +135,7 @@ async function rejectReport(id, reportData) {
             // Usuń raport
             await fetch('/api/delete-report', {
                 method: 'POST',
+                credentials: 'include',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ reportId: id })
             });
@@ -229,7 +233,10 @@ document.addEventListener('DOMContentLoaded', () => {
             });
             console.log('Save response:', saveRes.status);
             
-            if (!saveRes.ok) throw new Error('Błąd zapisu');
+            if (!saveRes.ok) {
+                const errorBody = await saveRes.text();
+                throw new Error(`Błąd zapisu: ${errorBody || saveRes.status}`);
+            }
             
             // Potem wyślij webhook
             console.log('Sending webhook...');

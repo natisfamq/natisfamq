@@ -1,4 +1,4 @@
-import { kv } from '@vercel/kv';
+import { readReports } from './report-store.js';
 
 export default async function handler(req, res) {
     const userId = req.cookies.user_id;
@@ -16,9 +16,10 @@ export default async function handler(req, res) {
         const isAdmin = member.roles && member.roles.some(r => adminRoles.includes(r));
         if (!isAdmin) return res.status(403).json({ error: "Brak uprawnień" });
 
-        const reports = await kv.lrange('reports_list', 0, -1);
+        const reports = await readReports();
         res.status(200).json(reports);
     } catch (error) {
+        console.error('get-reports error:', error);
         res.status(500).json({ error: "Błąd serwera" });
     }
 }
