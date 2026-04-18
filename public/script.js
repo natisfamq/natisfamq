@@ -163,7 +163,10 @@ async function rejectReport(id, reportData) {
     }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function initApp() {
+    document.getElementById('login-screen').style.display = 'flex';
+    document.getElementById('main-app').style.display = 'none';
+
     checkAuth();
 
     // Obsługa zakładek
@@ -290,4 +293,6 @@ document.addEventListener('DOMContentLoaded', () => {
             showToast('Błąd wysyłania raportu: ' + error.message, 'error');
         }
     });
-});
+}
+
+initApp();
