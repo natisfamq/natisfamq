@@ -15,40 +15,49 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 let currentUser = null;
 
-function showToast(msg, type = 'success') {
-    const container = document.getElementById('toast-container');
-    const t = document.createElement('div');
-    t.className = `toast ${type}`;
-    t.innerText = msg;
-    container.appendChild(t);
-    setTimeout(() => {
-        t.classList.add('fade-out');
-        setTimeout(() => t.remove(), 350);
-    }, 4000);
-}
-
-// Funkcja przełączania ekranów
-function showApp() {
-    document.getElementById('login-screen').style.display = 'none';
-    document.getElementById('main-app').style.display = 'block';
-}
-
-document.addEventListener('DOMContentLoaded', async () => {
-    // 1. Sprawdź czy użytkownik jest zalogowany przez API (pewniejsze niż cookie)
+async function checkAuth() {
     try {
         const res = await fetch('/api/me');
         if (res.ok) {
             currentUser = await res.json();
-            updateUIWithUser();
-            showApp();
+            document.getElementById('login-screen').style.display = 'none';
+            document.getElementById('main-app').style.display = 'block';
+            updateUI();
             loadMembers();
         } else {
-            // Jeśli nie zalogowany, upewnij się że widzi ekran logowania
             document.getElementById('login-screen').style.display = 'flex';
         }
     } catch (e) {
-        console.error("Błąd autoryzacji:", e);
+        document.getElementById('login-screen').style.display = 'flex';
     }
+}
+
+function updateUI() {
+    if(!currentUser) return;
+    document.getElementById('user-name').innerText = currentUser.username;
+    document.getElementById('user-avatar').src = currentUser.avatar || 'logo.jpg';
+    document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
+}
+
+async function loadMembers() {
+    const res = await fetch('/api/members');
+    if (res.ok) {
+        const m = await res.json();
+        const list = document.getElementById('members-list');
+        list.innerHTML = m.map(u => `
+            <div class="member-item">
+                <img src="${u.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
+                <div class="member-info">
+                    <span class="member-name">${u.displayName}</span>
+                    <span class="member-rank">${u.rankName || 'Członek'}</span>
+                </div>
+            </div>
+        `).join('');
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    checkAuth();
 
     // Obsługa zakładek
     const tabs = document.querySelectorAll('.tab-btn');
@@ -57,84 +66,18 @@ document.addEventListener('DOMContentLoaded', async () => {
             tabs.forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
             tab.classList.add('active');
-            const target = document.getElementById(tab.dataset.tab);
-            if(target) target.style.display = 'block';
+            document.getElementById(tab.dataset.tab).style.display = 'block';
         };
     });
 
     // Przycisk logowania
-    const loginBtn = document.getElementById('login-btn');
-    if (loginBtn) {
-        loginBtn.onclick = () => {
-            window.location.href = '/api/login';
-        };
-    }
+    const btn = document.getElementById('login-btn');
+    if(btn) btn.onclick = () => window.location.href = '/api/login';
 
-    // Formularz raportów
-    const contractSelect = document.getElementById('contract-type');
-    if (contractSelect) {
-        contractSelect.onchange = (e) => {
-            document.getElementById('grover-fields').style.display = e.target.value === 'grover' ? 'block' : 'none';
-            document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
-        };
-    }
-
-    const reportForm = document.getElementById('report-form');
-    if (reportForm) {
-        reportForm.onsubmit = async (e) => {
-            e.preventDefault();
-            const imgur = document.getElementById('imgur-link').value;
-            if (!imgur) return showToast("Podaj link do dowodu!", "error");
-
-            const reportData = {
-                username: currentUser ? currentUser.username : "Nieznany",
-                type: document.getElementById('contract-type').value,
-                imgur: imgur,
-                timestamp: Date.now(),
-                date: new Date().toLocaleString('pl-PL')
-            };
-
-            try {
-                await set(push(ref(db, 'reports')), reportData);
-                showToast("Raport wysłany pomyślnie!");
-                e.target.reset();
-            } catch (err) {
-                showToast("Błąd wysyłania!", "error");
-            }
-        };
-    }
+    // Obsługa formularza (Grover/Capt)
+    const select = document.getElementById('contract-type');
+    select.onchange = (e) => {
+        document.getElementById('grover-fields').style.display = e.target.value === 'grover' ? 'block' : 'none';
+        document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
+    };
 });
-
-function updateUIWithUser() {
-    if (!currentUser) return;
-    const nameEl = document.getElementById('user-name');
-    const avatarEl = document.getElementById('user-avatar');
-    const roleEl = document.getElementById('user-role-text');
-
-    if(nameEl) nameEl.innerText = currentUser.username;
-    if(avatarEl) avatarEl.src = currentUser.avatar || 'logo.jpg';
-    if(roleEl) roleEl.innerText = `Ranga: ${currentUser.roleName || '-'}`;
-}
-
-async function loadMembers() {
-    try {
-        const res = await fetch('/api/members');
-        if (res.ok) {
-            const m = await res.json();
-            const list = document.getElementById('members-list');
-            if(list) {
-                list.innerHTML = m.map(u => `
-                    <div class="member-item">
-                        <img src="${u.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
-                        <div class="member-info">
-                            <span class="member-name">${u.displayName}</span>
-                            <span class="member-rank">${u.rankName || 'Członek'}</span>
-                        </div>
-                    </div>
-                `).join('');
-            }
-        }
-    } catch (e) {
-        console.error("Błąd ładowania członków", e);
-    }
-}
