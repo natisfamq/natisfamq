@@ -8,37 +8,42 @@
 </head>
 <body>
     <div id="login-screen">
-        <div class="login-wrapper">
-            <img src="logo.jpg" alt="Logo" class="header-logo login-logo">
-            <h1 class="header-title">NATIS FAMQ</h1>
-            <div class="login-container">
-                <button id="login-btn">Zaloguj się przez Discord</button>
+        <div class="login-wrapper fade-in">
+            <div class="logo-container">
+                <img src="logo.jpg" alt="Logo" class="login-logo">
+            </div>
+            <h1 class="header-title glow-text">NATIS FAMQ</h1>
+            <div class="login-container glass-panel">
+                <p class="login-subtitle">Witaj w panelu rodzinnym</p>
+                <button id="login-btn" class="btn-primary">Zaloguj się przez Discord</button>
             </div>
         </div>
     </div>
 
-    <div id="main-app" style="display: none;">
-        <header class="main-header">
+    <div id="main-app" style="display: none;" class="fade-in">
+        <header class="main-header glass-panel">
             <div class="header-content">
                 <img src="logo.jpg" alt="Logo" class="header-logo">
-                <h1 class="header-title">NATIS FAMQ</h1>
+                <h1 class="header-title glow-text">NATIS FAMQ</h1>
             </div>
         </header>
 
         <div class="app-container">
-            <nav class="tabs-nav">
+            <nav class="tabs-nav glass-panel">
                 <button class="tab-btn active" data-tab="panel">PANEL</button>
                 <button class="tab-btn" data-tab="members">CZŁONKOWIE</button>
                 <button class="tab-btn" data-tab="raport">RAPORT</button>
                 <button class="tab-btn" data-tab="admin">ADMIN</button>
             </nav>
 
-            <div id="panel" class="tab-content">
+            <div id="panel" class="tab-content fade-in">
                 <div class="glass-card user-profile">
-                    <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
+                    <div class="avatar-ring">
+                        <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
+                    </div>
                     <div class="profile-info">
                         <h2 id="user-name">Użytkownik</h2>
-                        <p id="user-role-text">Ranga: -</p>
+                        <p id="user-role-text" class="rank-badge">Ranga: -</p>
                         <div class="user-stats">
                             <p>Aktywność w tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
                             <p>Ostatnia aktywność: <span id="last-act-text">Brak danych</span></p>
@@ -47,52 +52,53 @@
                 </div>
             </div>
 
-            <div id="members" class="tab-content" style="display: none;">
+            <div id="members" class="tab-content fade-in" style="display: none;">
                 <div class="glass-card">
                     <h3 class="card-title">CZŁONKOWIE RODZINY</h3>
-                    <div id="members-list" class="members-container"></div>
+                    <div id="members-list" class="members-container">
+                        </div>
                 </div>
             </div>
 
-            <div id="raport" class="tab-content" style="display: none;">
+            <div id="raport" class="tab-content fade-in" style="display: none;">
                 <div class="glass-card">
                     <h3 class="card-title">Wyślij Raport</h3>
-                    <form id="report-form">
+                    <form id="report-form" class="modern-form">
                         <div class="input-group">
                             <label>TYP KONTRAKTU</label>
-                            <select id="contract-type">
+                            <select id="contract-type" class="modern-input">
                                 <option value="paczki">Paczki (10.000$)</option>
                                 <option value="cenna">Cenna (10.000$)</option>
                                 <option value="grover">Grover (1.000$ / szt)</option>
                                 <option value="capt">Capt (2.500$ + kille/dmg)</option>
                             </select>
                         </div>
-                        <div id="grover-fields" style="display:none;">
+                        <div id="grover-fields" class="input-group slide-down" style="display:none;">
                             <label>ILOŚĆ KRZAKÓW</label>
-                            <input type="number" id="krzaki-count" value="0">
+                            <input type="number" id="krzaki-count" value="0" class="modern-input">
                         </div>
-                        <div id="capt-fields" style="display:none;">
+                        <div id="capt-fields" class="slide-down" style="display:none;">
                             <div class="input-row">
                                 <div class="input-group">
                                     <label>KILLE</label>
-                                    <input type="number" id="kille-count" value="0">
+                                    <input type="number" id="kille-count" value="0" class="modern-input">
                                 </div>
                                 <div class="input-group">
                                     <label>DMG</label>
-                                    <input type="number" id="dmg-count" value="0">
+                                    <input type="number" id="dmg-count" value="0" class="modern-input">
                                 </div>
                             </div>
                         </div>
                         <div class="input-group">
                             <label>DOWÓD (LINK IMGUR)</label>
-                            <input type="text" id="imgur-link" placeholder="https://imgur.com/...">
+                            <input type="text" id="imgur-link" placeholder="https://imgur.com/..." class="modern-input">
                         </div>
                         <button type="submit" class="btn-submit">Wyślij raport</button>
                     </form>
                 </div>
             </div>
 
-            <div id="admin" class="tab-content" style="display: none;">
+            <div id="admin" class="tab-content fade-in" style="display: none;">
                 <div class="glass-card">
                     <h3 class="card-title">Zarządzanie Raportami</h3>
                     <div id="admin-list" class="reports-container"></div>
@@ -100,6 +106,9 @@
             </div>
         </div>
     </div>
+    
+    <div id="toast-container"></div>
+
     <script type="module" src="script.js"></script>
 </body>
 </html>

@@ -18,101 +18,119 @@ let currentUser = null;
 let currentAdminReports = [];
 let isProcessing = false;
 
+// Funkcja do ładnych powiadomień
+function showToast(message, type = 'default') {
+    const container = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = `toast ${type}`;
+    toast.innerHTML = `<span>${message}</span>`;
+    container.appendChild(toast);
+    
+    setTimeout(() => {
+        toast.classList.add('fade-out');
+        setTimeout(() => toast.remove(), 300);
+    }, 3000);
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
-    // LOGOWANIE
+    // 1. LOGOWANIE
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
-        loginBtn.addEventListener('click', () => {
-            window.location.href = '/api/login';
-        });
+        loginBtn.onclick = () => { window.location.href = '/api/login'; };
     }
 
-    // SESJA
+    // 2. SESJA
     const params = new URLSearchParams(window.location.search);
     if (params.get('logged') === 'true' || document.cookie.includes('user_id')) {
-        const ls = document.getElementById('login-screen');
-        const ma = document.getElementById('main-app');
-        if (ls) ls.style.display = 'none';
-        if (ma) ma.style.display = 'block';
+        document.getElementById('login-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
         await fetchUserInfo();
         loadData();
     }
 
-    // TABS
+    // 3. ZAKŁADKI (Z animacją pojawiania)
     const tabs = document.querySelectorAll('.tab-btn');
     tabs.forEach(tab => {
-        tab.addEventListener('click', () => {
+        tab.onclick = () => {
             tabs.forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
+            document.querySelectorAll('.tab-content').forEach(c => {
+                c.style.display = 'none';
+                c.classList.remove('fade-in');
+            });
             tab.classList.add('active');
             const target = document.getElementById(tab.dataset.tab);
-            if (target) target.style.display = 'block';
-        });
+            target.style.display = 'block';
+            // Wymuszenie reflow dla restartu animacji CSS
+            void target.offsetWidth; 
+            target.classList.add('fade-in');
+        };
     });
 
-    // FORM FIELDS
+    // 4. PRZEŁĄCZANIE PÓL FORMULARZA
     const contractSelect = document.getElementById('contract-type');
     if (contractSelect) {
-        contractSelect.addEventListener('change', (e) => {
+        contractSelect.onchange = (e) => {
             const val = e.target.value;
-            const groverFields = document.getElementById('grover-fields');
-            const captFields = document.getElementById('capt-fields');
-            if (groverFields) groverFields.style.display = val === 'grover' ? 'block' : 'none';
-            if (captFields) captFields.style.display = val === 'capt' ? 'block' : 'none';
-        });
+            const grover = document.getElementById('grover-fields');
+            const capt = document.getElementById('capt-fields');
+            
+            grover.style.display = val === 'grover' ? 'block' : 'none';
+            capt.style.display = val === 'capt' ? 'block' : 'none';
+        };
     }
 
-    // SEND REPORT
+    // 5. WYSYŁANIE RAPORTU
     const reportForm = document.getElementById('report-form');
     if (reportForm) {
-        reportForm.addEventListener('submit', async (e) => {
+        reportForm.onsubmit = async (e) => {
             e.preventDefault();
             if (isProcessing) return;
 
             const imgur = document.getElementById('imgur-link').value;
-            if (!imgur) return alert("Podaj link do dowodu!");
+            if (!imgur) return showToast("Podaj link do dowodu!", "error");
 
             isProcessing = true;
             const type = document.getElementById('contract-type').value;
-            let payout = 10000;
             let desc = type.charAt(0).toUpperCase() + type.slice(1);
+            let payout = 10000;
 
             if (type === 'grover') {
                 const count = parseInt(document.getElementById('krzaki-count').value) || 0;
-                payout = count * 1000;
                 desc = `Grover (${count} krzaków)`;
+                payout = count * 1000;
             } else if (type === 'capt') {
                 const k = parseInt(document.getElementById('kille-count').value) || 0;
                 const d = parseInt(document.getElementById('dmg-count').value) || 0;
-                payout = 2500 + (k * 1000) + (d * 10);
                 desc = `Capt (${k}K / ${d}D)`;
+                payout = 2500 + (k * 1000) + (d * 10);
             }
 
             const reportData = {
-                username: currentUser ? currentUser.username : "Nieznany",
+                username: currentUser?.username || "Nieznany",
                 type: desc,
                 payout: payout,
                 imgur: imgur,
-                date: new Date().toLocaleString('pl-PL'),
-                timestamp: Date.now()
+                timestamp: Date.now(),
+                date: new Date().toLocaleString('pl-PL')
             };
 
             try {
                 await set(push(ref(db, 'reports')), reportData);
                 await fetch('/api/new-report', {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
+                    headers: {'Content-Type': 'application/json'},
                     body: JSON.stringify(reportData)
                 });
-                alert("Wysłano raport!");
+                showToast("Raport został pomyślnie wysłany!", "success");
                 reportForm.reset();
-                loadData();
+                document.getElementById('grover-fields').style.display = 'none';
+                document.getElementById('capt-fields').style.display = 'none';
             } catch (err) {
-                alert("Błąd: " + err.message);
+                showToast("Wystąpił błąd podczas wysyłania: " + err.message, "error");
             } finally {
                 isProcessing = false;
             }
-        });
+        };
     }
 });
 
@@ -125,15 +143,15 @@ async function fetchUserInfo() {
             document.getElementById('user-avatar').src = currentUser.avatar || 'logo.jpg';
             document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
             if (currentUser.roleLevel < 11) {
-                const ab = document.querySelector('.tab-btn[data-tab="admin"]');
-                if (ab) ab.remove();
+                const adminTab = document.querySelector('.tab-btn[data-tab="admin"]');
+                if (adminTab) adminTab.remove();
             }
         }
-    } catch (e) { console.error(e); }
+    } catch (e) { console.error("UserInfo Error:", e); }
 }
 
 async function loadData() {
-    // MEMBERS
+    // Ładowanie członków
     try {
         const res = await fetch('/api/members');
         const m = await res.json();
@@ -144,14 +162,14 @@ async function loadData() {
                     <img src="${user.avatar}" class="member-avatar" onerror="this.src='logo.jpg'">
                     <div class="member-info">
                         <span class="member-name">${user.displayName}</span>
-                        <span class="member-rank">${user.rankName || ''}</span>
+                        <span class="member-rank">${user.rankName || 'Członek'}</span>
                     </div>
                 </div>
             `).join('');
         }
     } catch (e) { console.error(e); }
 
-    // WEEKLY STATS & ADMIN LIST (Live from Firebase)
+    // Live statystyki z bazy
     onValue(ref(db, 'reports'), (snap) => {
         const data = snap.val();
         let weeklyCount = 0;
@@ -159,65 +177,17 @@ async function loadData() {
         const weekAgo = Date.now() - (7 * 24 * 60 * 60 * 1000);
 
         if (data) {
-            // Filtrowanie raportów zalogowanego użytkownika
             const myReports = Object.values(data).filter(r => r.username === currentUser?.username);
-            
-            // Liczenie tych z ostatniego tygodnia
             weeklyCount = myReports.filter(r => r.timestamp > weekAgo).length;
-            
-            // Pobranie daty ostatniego raportu
             if (myReports.length > 0) {
-                // Sortujemy po timestampie, żeby mieć pewność, że bierzemy najnowszy
                 myReports.sort((a, b) => b.timestamp - a.timestamp);
                 lastDate = myReports[0].date;
             }
         }
 
-        // Wpisywanie statystyk do panelu
-        if (document.getElementById('reports-count')) document.getElementById('reports-count').innerText = weeklyCount;
-        if (document.getElementById('last-act-text')) document.getElementById('last-act-text').innerText = lastDate;
-
-        // ADMIN LIST
-        const adminList = document.getElementById('admin-list');
-        if (adminList) {
-            adminList.innerHTML = '';
-            currentAdminReports = [];
-            if (data) {
-                Object.keys(data).forEach(key => {
-                    const r = data[key];
-                    r.id = key;
-                    currentAdminReports.push(r);
-                    const card = document.createElement('div');
-                    card.className = 'admin-report-card';
-                    card.innerHTML = `
-                        <div style="flex-grow:1"><strong>${r.username}</strong> - ${r.type}<br><small>${r.payout}$ | ${r.date}</small></div>
-                        <div>
-                            <button class="v-btn" style="background:#2ecc71; border:none; color:white; padding:5px 10px; cursor:pointer">V</button>
-                            <button class="x-btn" style="background:#e74c3c; border:none; color:white; padding:5px 10px; cursor:pointer; margin-left:5px">X</button>
-                        </div>`;
-                    card.querySelector('.v-btn').onclick = () => handleAdminAction(key, 'accept');
-                    card.querySelector('.x-btn').onclick = () => handleAdminAction(key, 'reject');
-                    adminList.appendChild(card);
-                });
-            }
-        }
+        const countEl = document.getElementById('reports-count');
+        const lastEl = document.getElementById('last-act-text');
+        if (countEl) countEl.innerText = weeklyCount;
+        if (lastEl) lastEl.innerText = lastDate;
     });
-}
-
-async function handleAdminAction(id, action) {
-    if (isProcessing) return;
-    const report = currentAdminReports.find(r => r.id === id);
-    if (!report) return;
-
-    isProcessing = true;
-    try {
-        const endpoint = action === 'accept' ? '/api/send-webhook' : '/api/reject-webhook';
-        const res = await fetch(endpoint, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(report)
-        });
-        if (res.ok) await remove(ref(db, `reports/${id}`));
-    } catch (e) { console.error(e); }
-    finally { isProcessing = false; }
 }
