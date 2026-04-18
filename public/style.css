@@ -1,4 +1,4 @@
-/* --- GŁÓWNE STYLE (Zachowane z Twojego pliku) --- */
+/* --- ZMIENNE I PODSTAWY --- */
 :root {
     --primary-color: #7289da;
     --bg-color: #0c0c0c;
@@ -6,7 +6,6 @@
     --text-color: #ffffff;
     --text-muted: #aaaaaa;
     --border-color: #333333;
-    --glass: rgba(255, 255, 255, 0.03);
 }
 
 * {
@@ -22,7 +21,50 @@ body {
     overflow-x: hidden;
 }
 
-/* --- HEADER & NAV --- */
+/* --- FIX: EKRAN LOGOWANIA NA ŚRODKU --- */
+#login-screen {
+    display: flex;
+    justify-content: center; /* Środek poziomo */
+    align-items: center;     /* Środek pionowo */
+    min-height: 100vh;
+    text-align: center;
+    background-color: var(--bg-color);
+}
+
+.login-wrapper {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.login-container {
+    background: var(--card-bg);
+    padding: 30px 50px;
+    border-radius: 12px;
+    border: 1px solid var(--border-color);
+    margin-top: 10px;
+}
+
+/* --- FIX: STYL PRZYCISKU LOGOWANIA --- */
+#login-btn {
+    background-color: var(--primary-color);
+    color: white;
+    border: none;
+    padding: 14px 28px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.3s, transform 0.2s;
+}
+
+#login-btn:hover {
+    background-color: #5b6eae;
+    transform: scale(1.03);
+}
+
+/* --- HEADER --- */
 .main-header {
     background: linear-gradient(180deg, rgba(0,0,0,0.8) 0%, rgba(0,0,0,0) 100%);
     padding: 20px 0;
@@ -44,6 +86,47 @@ body {
     font-weight: 800;
 }
 
+/* --- PANEL: OKRĄGŁY AVATAR I INFO PO PRAWEJ --- */
+.user-profile {
+    display: flex;         /* Ustawia avatar i tekst w linii */
+    align-items: center;   /* Wyrównuje w pionie */
+    gap: 25px;             /* Odstęp między zdjęciem a tekstem */
+    padding: 25px;
+}
+
+.profile-img {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;    /* Robi avatar okrągłym */
+    border: 3px solid var(--border-color);
+    object-fit: cover;
+}
+
+.profile-info {
+    text-align: left;      /* Tekst wyrównany do lewej przy avatarze */
+}
+
+.profile-info h2 {
+    font-size: 1.4rem;
+    margin-bottom: 5px;
+}
+
+.user-stats {
+    margin-top: 8px;
+}
+
+.stat-highlight {
+    color: var(--primary-color);
+    font-weight: bold;
+}
+
+/* --- NAWIGACJA I KARTY --- */
+.app-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
 .tabs-nav {
     display: flex;
     justify-content: center;
@@ -59,119 +142,23 @@ body {
     color: var(--text-muted);
     padding: 10px 20px;
     cursor: pointer;
-    font-size: 0.9rem;
     font-weight: 600;
-    transition: all 0.3s ease;
     text-transform: uppercase;
 }
 
-.tab-btn:hover, .tab-btn.active {
-    color: var(--text-color);
-}
-
 .tab-btn.active {
+    color: var(--text-color);
     border-bottom: 2px solid var(--primary-color);
-}
-
-/* --- CARDS & COMMON --- */
-.app-container {
-    max-width: 800px;
-    margin: 0 auto;
-    padding: 0 20px;
 }
 
 .glass-card {
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: 12px;
-    padding: 20px;
     margin-bottom: 20px;
 }
 
-.card-title {
-    font-size: 1.1rem;
-    margin-bottom: 15px;
-    color: var(--text-muted);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-}
-
-/* --- NOWY UKŁAD PROFILU NA PANELU (To zmienia widok) --- */
-.user-profile {
-    display: flex; /* Ustawia elementy w rzędzie */
-    align-items: center; /* Wyrównuje avatar i tekst w pionie */
-    gap: 25px; /* Odstęp między avatarem a tekstem */
-}
-
-.profile-img {
-    width: 100px; /* Rozmiar avatara */
-    height: 100px;
-    border-radius: 50%; /* Robi avatar okrągłym */
-    border: 3px solid var(--border-color);
-    object-fit: cover;
-}
-
-.profile-info {
-    display: flex;
-    flex-direction: column; /* Układa tekst (nick, ranga) jeden pod drugim */
-    gap: 5px;
-}
-
-.profile-info h2 {
-    font-size: 1.4rem;
-    margin-bottom: 2px;
-}
-
-.profile-info p {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-}
-
-.user-stats {
-    margin-top: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 5px;
-}
-
-.user-stats p {
-    font-size: 0.85rem;
-    color: var(--text-muted);
-}
-
-.stat-highlight {
-    color: var(--primary-color);
-    font-weight: bold;
-}
-
-/* --- FORMULARZ RAPORTU --- */
-.input-group {
-    margin-bottom: 15px;
-}
-
-.input-group label {
-    display: block;
-    font-size: 0.8rem;
-    color: var(--text-muted);
-    margin-bottom: 5px;
-    text-transform: uppercase;
-}
-
-select, input[type="text"], input[type="number"] {
-    width: 100%;
-    background: rgba(255,255,255,0.05);
-    border: 1px solid var(--border-color);
-    color: var(--text-color);
-    padding: 12px;
-    border-radius: 8px;
-    font-size: 0.9rem;
-}
-
-.input-row {
-    display: flex;
-    gap: 15px;
-}
-
+/* --- FORMULARZ I PRZYCISKI --- */
 .btn-submit {
     width: 100%;
     background-color: var(--primary-color);
@@ -181,45 +168,19 @@ select, input[type="text"], input[type="number"] {
     border-radius: 8px;
     cursor: pointer;
     font-weight: bold;
-    font-size: 1rem;
-    transition: background 0.3s;
+    margin-top: 15px;
 }
 
-.btn-submit:hover {
-    background-color: #5b6eae;
+.input-group {
+    margin-bottom: 15px;
+    padding: 0 20px;
 }
 
-/* --- LISTY (Członkowie, Admin) --- */
-.member-item, .admin-report-card {
-    display: flex;
-    align-items: center;
-    padding: 10px 0;
-    border-bottom: 1px solid rgba(255,255,255,0.05);
-}
-
-.member-avatar {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    margin-right: 15px;
-    object-fit: cover;
-}
-
-.member-info {
-    display: flex;
-    flex-direction: column;
-}
-
-.member-name {
-    font-weight: 600;
-}
-
-.member-rank {
-    font-size: 0.8rem;
-    color: var(--text-muted);
-}
-
-.admin-report-card {
-    justify-content: space-between;
-    gap: 10px;
+select, input {
+    width: 100%;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border-color);
+    color: white;
+    padding: 12px;
+    border-radius: 8px;
 }
