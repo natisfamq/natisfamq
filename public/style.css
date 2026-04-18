@@ -101,3 +101,13 @@ body {
 @keyframes slideIn { from { transform: translateX(100%); } to { transform: translateX(0); } }
 .fade-in { animation: fadeIn 0.5s ease-out; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+/* RAPORTY W ADMIN */
+.reports-container { display: flex; flex-direction: column; gap: 15px; }
+.report-item { padding: 20px; margin-bottom: 15px; }
+.report-header { font-size: 1.1rem; margin-bottom: 10px; }
+.report-details { margin-bottom: 15px; color: #ccc; }
+.report-details a { color: var(--success-green); text-decoration: none; }
+.report-actions { display: flex; gap: 10px; }
+.btn-approve { background: var(--success-green); color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; }
+.btn-reject { background: #e74c3c; color: white; border: none; padding: 8px 16px; border-radius: 5px; cursor: pointer; }

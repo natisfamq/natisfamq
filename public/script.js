@@ -17,6 +17,14 @@ const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 let currentUser = null;
 
+function showToast(message, type = 'info') {
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.textContent = message;
+    document.getElementById('toast-container').appendChild(toast);
+    setTimeout(() => toast.remove(), 5000);
+}
+
 async function checkAuth() {
     try {
         console.log('Checking auth...');
@@ -63,6 +71,80 @@ async function loadMembers() {
     }
 }
 
+async function loadReports() {
+    const res = await fetch('/api/get-reports');
+    if (res.ok) {
+        const reports = await res.json();
+        const list = document.getElementById('admin-list');
+        list.innerHTML = reports.map(r => `
+            <div class="report-item modern-glass-card">
+                <div class="report-header">
+                    <strong>${r.username}</strong> - ${r.type} - ${r.payout}$
+                </div>
+                <div class="report-details">
+                    ${r.imgur ? `<a href="${r.imgur}" target="_blank">Dowód</a>` : 'Brak dowodu'}
+                    ${r.krzaki ? `<br>Krzaki: ${r.krzaki}` : ''}
+                    ${r.kille ? `<br>Kille: ${r.kille}, DMG: ${r.dmg}` : ''}
+                </div>
+                <div class="report-actions">
+                    <button onclick="approveReport('${r.id}', ${JSON.stringify(r).replace(/"/g, '&quot;')})" class="btn-approve">Zatwierdź</button>
+                    <button onclick="rejectReport('${r.id}', ${JSON.stringify(r).replace(/"/g, '&quot;')})" class="btn-reject">Odrzuć</button>
+                </div>
+            </div>
+        `).join('');
+    } else if (res.status === 403) {
+        document.getElementById('admin-list').innerHTML = '<p>Brak uprawnień do przeglądania raportów.</p>';
+    }
+}
+
+async function approveReport(id, reportData) {
+    try {
+        const res = await fetch('/api/send-webhook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reportData)
+        });
+        if (res.ok) {
+            // Usuń raport
+            await fetch('/api/delete-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reportId: id })
+            });
+            showToast('Raport zatwierdzony!', 'success');
+            loadReports();
+        } else {
+            showToast('Błąd zatwierdzania', 'error');
+        }
+    } catch (error) {
+        showToast('Błąd: ' + error.message, 'error');
+    }
+}
+
+async function rejectReport(id, reportData) {
+    try {
+        const res = await fetch('/api/reject-webhook', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(reportData)
+        });
+        if (res.ok) {
+            // Usuń raport
+            await fetch('/api/delete-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ reportId: id })
+            });
+            showToast('Raport odrzucony!', 'success');
+            loadReports();
+        } else {
+            showToast('Błąd odrzucania', 'error');
+        }
+    } catch (error) {
+        showToast('Błąd: ' + error.message, 'error');
+    }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
     checkAuth();
 
@@ -74,6 +156,13 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelectorAll('.tab-content').forEach(c => c.style.display = 'none');
             tab.classList.add('active');
             document.getElementById(tab.dataset.tab).style.display = 'block';
+            
+            // Ładuj dane dla odpowiedniej zakładki
+            if (tab.dataset.tab === 'members') {
+                loadMembers();
+            } else if (tab.dataset.tab === 'admin') {
+                loadReports();
+            }
         };
     });
 
@@ -87,4 +176,83 @@ document.addEventListener('DOMContentLoaded', () => {
         document.getElementById('grover-fields').style.display = e.target.value === 'grover' ? 'block' : 'none';
         document.getElementById('capt-fields').style.display = e.target.value === 'capt' ? 'block' : 'none';
     };
+
+    // Obsługa wysyłania raportu
+    const reportForm = document.getElementById('report-form');
+    reportForm.addEventListener('submit', async (e) => {
+        e.preventDefault();
+        console.log('Form submit triggered');
+        
+        if (!currentUser) {
+            showToast('Musisz być zalogowany!', 'error');
+            return;
+        }
+        
+        const type = document.getElementById('contract-type').value;
+        const imgur = document.getElementById('imgur-link').value;
+        
+        let payout = 0;
+        let details = {};
+        
+        if (type === 'paczki' || type === 'cenna') {
+            payout = 10000;
+        } else if (type === 'grover') {
+            const count = parseInt(document.getElementById('krzaki-count').value) || 0;
+            payout = count * 1000;
+            details.krzaki = count;
+        } else if (type === 'capt') {
+            const kille = parseInt(document.getElementById('kille-count').value) || 0;
+            const dmg = parseInt(document.getElementById('dmg-count').value) || 0;
+            payout = 2500 + (kille * 500) + (dmg * 100);
+            details.kille = kille;
+            details.dmg = dmg;
+        }
+        
+        const reportData = {
+            username: currentUser.username,
+            type: type,
+            payout: payout,
+            imgur: imgur,
+            ...details
+        };
+        
+        console.log('Sending report:', reportData);
+        
+        try {
+            // Najpierw zapisz w bazie
+            console.log('Saving to database...');
+            const saveRes = await fetch('/api/save-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(reportData)
+            });
+            console.log('Save response:', saveRes.status);
+            
+            if (!saveRes.ok) throw new Error('Błąd zapisu');
+            
+            // Potem wyślij webhook
+            console.log('Sending webhook...');
+            const webhookRes = await fetch('/api/new-report', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                credentials: 'include',
+                body: JSON.stringify(reportData)
+            });
+            console.log('Webhook response:', webhookRes.status);
+            
+            if (webhookRes.ok) {
+                showToast('Raport wysłany pomyślnie!', 'success');
+                reportForm.reset();
+                // Ukryj pola dodatkowe
+                document.getElementById('grover-fields').style.display = 'none';
+                document.getElementById('capt-fields').style.display = 'none';
+            } else {
+                showToast('Błąd wysyłania webhooka', 'error');
+            }
+        } catch (error) {
+            console.log('Error:', error);
+            showToast('Błąd wysyłania raportu: ' + error.message, 'error');
+        }
+    });
 });
