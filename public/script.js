@@ -1,7 +1,7 @@
 console.log('Script loaded');
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-import { getDatabase, ref, push, set, onValue } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+import { getDatabase, ref, push, set, onValue, get, remove } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
 
 const firebaseConfig = {
     apiKey: "AIzaSyDyTpY2vGcvM8Sz5B1TCdDeNUObQ6yZF4o",
@@ -16,6 +16,25 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 let currentUser = null;
+
+async function addReportToFirebase(report) {
+    const reportsRef = ref(db, 'reports');
+    const newReportRef = await push(reportsRef, report);
+    return newReportRef.key;
+}
+
+async function loadReportsFromFirebase() {
+    const snapshot = await get(ref(db, 'reports'));
+    const data = snapshot.val();
+    if (!data) return [];
+    return Object.entries(data)
+        .map(([id, report]) => ({ id, ...report }))
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+}
+
+async function deleteReportFromFirebase(reportId) {
+    await remove(ref(db, `reports/${reportId}`));
+}
 
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
@@ -72,11 +91,14 @@ async function loadMembers() {
 }
 
 async function loadReports() {
-    const res = await fetch('/api/get-reports', { credentials: 'include' });
-    if (res.ok) {
-        const reports = await res.json();
-        const list = document.getElementById('admin-list');
-        list.innerHTML = reports.map(r => `
+    if (!currentUser || currentUser.roleLevel < 11) {
+        document.getElementById('admin-list').innerHTML = '<p>Brak uprawnień do przeglądania raportów.</p>';
+        return;
+    }
+
+    const reports = await loadReportsFromFirebase();
+    const list = document.getElementById('admin-list');
+    list.innerHTML = reports.map(r => `
             <div class="report-item modern-glass-card">
                 <div class="report-header">
                     <strong>${r.username}</strong> - ${r.type} - ${r.payout}$
@@ -92,9 +114,6 @@ async function loadReports() {
                 </div>
             </div>
         `).join('');
-    } else if (res.status === 403) {
-        document.getElementById('admin-list').innerHTML = '<p>Brak uprawnień do przeglądania raportów.</p>';
-    }
 }
 
 async function approveReport(id, reportData) {
@@ -106,13 +125,7 @@ async function approveReport(id, reportData) {
             body: JSON.stringify(reportData)
         });
         if (res.ok) {
-            // Usuń raport
-            await fetch('/api/delete-report', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reportId: id })
-            });
+            await deleteReportFromFirebase(id);
             showToast('Raport zatwierdzony!', 'success');
             loadReports();
         } else {
@@ -132,13 +145,7 @@ async function rejectReport(id, reportData) {
             body: JSON.stringify(reportData)
         });
         if (res.ok) {
-            // Usuń raport
-            await fetch('/api/delete-report', {
-                method: 'POST',
-                credentials: 'include',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ reportId: id })
-            });
+            await deleteReportFromFirebase(id);
             showToast('Raport odrzucony!', 'success');
             loadReports();
         } else {
@@ -225,18 +232,11 @@ document.addEventListener('DOMContentLoaded', () => {
         try {
             // Najpierw zapisz w bazie
             console.log('Saving to database...');
-            const saveRes = await fetch('/api/save-report', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                credentials: 'include',
-                body: JSON.stringify(reportData)
+            const reportId = await addReportToFirebase({
+                ...reportData,
+                timestamp: new Date().toISOString()
             });
-            console.log('Save response:', saveRes.status);
-            
-            if (!saveRes.ok) {
-                const errorBody = await saveRes.text();
-                throw new Error(`Błąd zapisu: ${errorBody || saveRes.status}`);
-            }
+            console.log('Firebase report ID:', reportId);
             
             // Potem wyślij webhook
             console.log('Sending webhook...');

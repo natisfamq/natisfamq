@@ -1,4 +1,4 @@
-import { getCookieValue } from './utils.js';
+import { getCookieValue } from '../utils.js';
 
 export default async function handler(req, res) {
     const userId = getCookieValue(req, 'user_id');

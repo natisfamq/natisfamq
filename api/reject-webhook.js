@@ -1,4 +1,4 @@
-import { getCookieValue } from './utils.js';
+import { getCookieValue } from '../utils.js';
 
 export default async function handler(req, res) {
     // Przyjmujemy tylko metodę POST
