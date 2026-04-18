@@ -1,5 +1,7 @@
+import { getCookieValue } from './utils.js';
+
 export default async function handler(req, res) {
-    const userId = req.cookies.user_id;
+    const userId = getCookieValue(req, 'user_id');
     if (!userId) return res.status(401).json({ error: "Brak sesji" });
 
     const roleNames = {

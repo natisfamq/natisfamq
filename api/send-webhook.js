@@ -1,7 +1,9 @@
+import { getCookieValue } from './utils.js';
+
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
-    const userId = req.cookies.user_id;
+    const userId = getCookieValue(req, 'user_id');
     if (!userId) return res.status(401).json({ error: "Brak autoryzacji" });
 
     // 1. Sprawdzamy rangę użytkownika prosto z Discorda (nie ufamy przeglądarce!)

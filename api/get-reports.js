@@ -1,7 +1,8 @@
 import { readReports } from './report-store.js';
+import { getCookieValue } from './utils.js';
 
 export default async function handler(req, res) {
-    const userId = req.cookies.user_id;
+    const userId = getCookieValue(req, 'user_id');
     if (!userId) return res.status(401).json({ error: "Brak sesji" });
 
     // Twoja lista ról admina (11-15)
