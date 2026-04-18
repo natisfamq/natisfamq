@@ -3,33 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NATIS FAMQ | Panel</title>
+    <title>NATIS FAMQ | Panel Premium</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div id="login-screen">
-        <div class="login-wrapper fade-in">
-            <div class="logo-container">
+    <div id="login-screen" class="fade-in">
+        <div class="login-wrapper">
+            <div class="logo-glow-container">
                 <img src="logo.jpg" alt="Logo" class="login-logo">
             </div>
-            <h1 class="header-title glow-text">NATIS FAMQ</h1>
-            <div class="login-container glass-panel">
+            <h1 class="header-title white-glow-text">NATIS FAMQ</h1>
+            <div class="login-container modern-glass-panel">
                 <p class="login-subtitle">Witaj w panelu rodzinnym</p>
-                <button id="login-btn" class="btn-primary">Zaloguj się przez Discord</button>
+                <button id="login-btn">Zaloguj się przez Discord</button>
             </div>
         </div>
     </div>
 
     <div id="main-app" style="display: none;" class="fade-in">
-        <header class="main-header glass-panel">
+        <header class="main-header modern-glass-panel sticky-header">
             <div class="header-content">
                 <img src="logo.jpg" alt="Logo" class="header-logo">
-                <h1 class="header-title glow-text">NATIS FAMQ</h1>
+                <h1 class="header-title white-glow-text">NATIS FAMQ</h1>
             </div>
         </header>
 
         <div class="app-container">
-            <nav class="tabs-nav glass-panel">
+            <nav class="tabs-nav modern-glass-panel">
                 <button class="tab-btn active" data-tab="panel">PANEL</button>
                 <button class="tab-btn" data-tab="members">CZŁONKOWIE</button>
                 <button class="tab-btn" data-tab="raport">RAPORT</button>
@@ -37,15 +37,15 @@
             </nav>
 
             <div id="panel" class="tab-content fade-in">
-                <div class="glass-card user-profile">
-                    <div class="avatar-ring">
+                <div class="modern-glass-card user-profile">
+                    <div class="avatar-holder">
                         <img id="user-avatar" src="logo.jpg" alt="Avatar" class="profile-img">
                     </div>
                     <div class="profile-info">
                         <h2 id="user-name">Użytkownik</h2>
-                        <p id="user-role-text" class="rank-badge">Ranga: -</p>
+                        <span id="user-role-text" class="rank-badge modern-badge">Ranga: -</span>
                         <div class="user-stats">
-                            <p>Aktywność w tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
+                            <p>Raporty w tygodniu: <span id="reports-count" class="stat-highlight">0</span></p>
                             <p>Ostatnia aktywność: <span id="last-act-text">Brak danych</span></p>
                         </div>
                     </div>
@@ -53,20 +53,19 @@
             </div>
 
             <div id="members" class="tab-content fade-in" style="display: none;">
-                <div class="glass-card">
+                <div class="modern-glass-card">
                     <h3 class="card-title">CZŁONKOWIE RODZINY</h3>
-                    <div id="members-list" class="members-container">
-                        </div>
+                    <div id="members-list" class="members-grid-fix"></div>
                 </div>
             </div>
 
             <div id="raport" class="tab-content fade-in" style="display: none;">
-                <div class="glass-card">
+                <div class="modern-glass-card">
                     <h3 class="card-title">Wyślij Raport</h3>
-                    <form id="report-form" class="modern-form">
+                    <form id="report-form" class="premium-form">
                         <div class="input-group">
                             <label>TYP KONTRAKTU</label>
-                            <select id="contract-type" class="modern-input">
+                            <select id="contract-type" class="premium-input">
                                 <option value="paczki">Paczki (10.000$)</option>
                                 <option value="cenna">Cenna (10.000$)</option>
                                 <option value="grover">Grover (1.000$ / szt)</option>
@@ -75,31 +74,31 @@
                         </div>
                         <div id="grover-fields" class="input-group slide-down" style="display:none;">
                             <label>ILOŚĆ KRZAKÓW</label>
-                            <input type="number" id="krzaki-count" value="0" class="modern-input">
+                            <input type="number" id="krzaki-count" value="0" class="premium-input">
                         </div>
                         <div id="capt-fields" class="slide-down" style="display:none;">
                             <div class="input-row">
                                 <div class="input-group">
                                     <label>KILLE</label>
-                                    <input type="number" id="kille-count" value="0" class="modern-input">
+                                    <input type="number" id="kille-count" value="0" class="premium-input">
                                 </div>
                                 <div class="input-group">
                                     <label>DMG</label>
-                                    <input type="number" id="dmg-count" value="0" class="modern-input">
+                                    <input type="number" id="dmg-count" value="0" class="premium-input">
                                 </div>
                             </div>
                         </div>
                         <div class="input-group">
                             <label>DOWÓD (LINK IMGUR)</label>
-                            <input type="text" id="imgur-link" placeholder="https://imgur.com/..." class="modern-input">
+                            <input type="text" id="imgur-link" placeholder="https://imgur.com/..." class="premium-input">
                         </div>
-                        <button type="submit" class="btn-submit">Wyślij raport</button>
+                        <button type="submit" class="btn-submit premium-btn-green">Wyślij raport</button>
                     </form>
                 </div>
             </div>
 
             <div id="admin" class="tab-content fade-in" style="display: none;">
-                <div class="glass-card">
+                <div class="modern-glass-card">
                     <h3 class="card-title">Zarządzanie Raportami</h3>
                     <div id="admin-list" class="reports-container"></div>
                 </div>
@@ -108,7 +107,6 @@
     </div>
     
     <div id="toast-container"></div>
-
     <script type="module" src="script.js"></script>
 </body>
 </html>
