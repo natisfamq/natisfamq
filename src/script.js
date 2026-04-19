@@ -104,9 +104,9 @@ function updateUI() {
     document.getElementById('user-name').innerText = currentUser.username;
     document.getElementById('user-avatar').src = currentUser.avatar || 'logo.jpg';
     document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
-    const adminTab = document.querySelector('.tab-btn[data-tab="admin"]');
-    if (adminTab) {
-        adminTab.style.display = currentUser.roleLevel >= 11 ? 'inline-block' : 'none';
+    const adminLink = document.getElementById('admin-link');
+    if (adminLink) {
+        adminLink.style.display = currentUser.roleLevel >= 11 ? 'inline-block' : 'none';
     }
     getLastActivity();
 }
@@ -128,74 +128,7 @@ async function loadMembers() {
     }
 }
 
-async function loadReports() {
-    if (!currentUser || currentUser.roleLevel < 11) {
-        document.getElementById('admin-list').innerHTML = '<p>Brak uprawnień do przeglądania raportów.</p>';
-        return;
-    }
 
-    const reports = await loadReportsFromFirebase();
-    const list = document.getElementById('admin-list');
-    list.innerHTML = reports.map(r => {
-        const reportPayload = encodeURIComponent(JSON.stringify(r));
-        return `
-            <div class="report-item modern-glass-card">
-                <div class="report-header">
-                    <strong>${r.username}</strong> - ${r.type} - ${r.payout}$
-                </div>
-                <div class="report-details">
-                    ${r.imgur ? `<a href="${r.imgur}" target="_blank">Dowód</a>` : 'Brak dowodu'}
-                    ${r.krzaki ? `<br>Krzaki: ${r.krzaki}` : ''}
-                    ${r.kille ? `<br>Kille: ${r.kille}, DMG: ${r.dmg}` : ''}
-                </div>
-                <div class="report-actions">
-                    <button class="btn-approve" data-id="${r.id}" data-report="${reportPayload}">Zatwierdź</button>
-                    <button class="btn-reject" data-id="${r.id}" data-report="${reportPayload}">Odrzuć</button>
-                </div>
-            </div>
-        `;
-    }).join('');
-}
-
-async function approveReport(id, reportData) {
-    try {
-        const res = await fetch('/api/send-webhook', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(reportData)
-        });
-        if (res.ok) {
-            await deleteReportFromFirebase(id);
-            showToast('Raport zatwierdzony!', 'success');
-            loadReports();
-        } else {
-            showToast('Błąd zatwierdzania', 'error');
-        }
-    } catch (error) {
-        showToast('Błąd: ' + error.message, 'error');
-    }
-}
-
-async function rejectReport(id, reportData) {
-    try {
-        const res = await fetch('/api/reject-webhook', {
-            method: 'POST',
-            credentials: 'include',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(reportData)
-        });
-        if (res.ok) {
-            await deleteReportFromFirebase(id);
-            showToast('Raport odrzucony!', 'success');
-            loadReports();
-        } else {
-            showToast('Błąd odrzucania', 'error');
-        }
-    } catch (error) {
-        showToast('Błąd: ' + error.message, 'error');
-    }
-}
 
 function initApp() {
     document.getElementById('login-screen').style.display = 'flex';
@@ -213,8 +146,6 @@ function initApp() {
             
             if (tab.dataset.tab === 'members') {
                 loadMembers();
-            } else if (tab.dataset.tab === 'admin') {
-                loadReports();
             }
         };
     });
@@ -222,25 +153,6 @@ function initApp() {
     const btn = document.getElementById('login-btn');
     if(btn) btn.onclick = () => window.location.href = '/api/login';
 
-    const adminList = document.getElementById('admin-list');
-    if (adminList) {
-        adminList.addEventListener('click', async (e) => {
-            const approveBtn = e.target.closest('.btn-approve');
-            const rejectBtn = e.target.closest('.btn-reject');
-            if (!approveBtn && !rejectBtn) return;
-
-            const button = approveBtn || rejectBtn;
-            const id = button.dataset.id;
-            const reportData = JSON.parse(decodeURIComponent(button.dataset.report));
-
-            if (approveBtn) {
-                await approveReport(id, reportData);
-            }
-            if (rejectBtn) {
-                await rejectReport(id, reportData);
-            }
-        });
-    }
 
     const select = document.getElementById('contract-type');
     select.onchange = (e) => {
