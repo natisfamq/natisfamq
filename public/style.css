@@ -67,6 +67,21 @@ body {
 
 .header-title-small { font-size: 1.4rem; letter-spacing: 2px; }
 
+.admin-button {
+    margin-left: auto;
+    background: var(--discord-blue);
+    color: white;
+    padding: 10px 18px;
+    border-radius: 12px;
+    font-weight: bold;
+    border: 1px solid rgba(255,255,255,0.12);
+    transition: transform 0.2s ease, background 0.2s ease;
+}
+.admin-button:hover {
+    transform: translateY(-2px);
+    background: rgba(88, 101, 242, 0.9);
+}
+
 /* PANEL I KARTY */
 .app-container { max-width: 900px; margin: 0 auto; padding: 20px; }
 .modern-glass-panel { background: var(--card-bg); backdrop-filter: blur(10px); border: 1px solid var(--border-color); border-radius: 15px; }

@@ -36,7 +36,15 @@ export default async function handler(req, res) {
         }
 
         const member = await memberRes.json();
-        const isAdmin = member.roles.some(r => Object.keys(roleNames).includes(r));
+        const allowedAdminRoles = [
+            "1435005337492263033", // 15 | Bosik
+            "1435005341606875300", // 14 | V-Lider
+            "1435005371105411215", // 13 | Prawa ręka
+            "1435005373198241945", // 12 | Lewe jądro
+            "1435005375727276112"  // 11 | Klapmistrz
+        ];
+
+        const isAdmin = member.roles && member.roles.some(r => allowedAdminRoles.includes(r));
         if (!isAdmin) {
             return res.status(403).send('Brak uprawnień');
         }

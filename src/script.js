@@ -106,9 +106,29 @@ function updateUI() {
     document.getElementById('user-role-text').innerText = `Ranga: ${currentUser.roleName || '-'}`;
     const adminLink = document.getElementById('admin-link');
     if (adminLink) {
-        adminLink.style.display = currentUser.roleLevel >= 11 ? 'inline-block' : 'none';
+        adminLink.style.display = currentUser.roleLevel >= 11 && currentUser.roleLevel <= 15 ? 'inline-flex' : 'none';
     }
     getLastActivity();
+}
+
+async function verifyAdminRoleAndRedirect() {
+    try {
+        const res = await fetch('/api/me', { credentials: 'include' });
+        if (!res.ok) {
+            showToast('Brak dostępu admina.', 'error');
+            return;
+        }
+
+        const user = await res.json();
+        if (user.roleLevel >= 11 && user.roleLevel <= 15) {
+            window.location.href = '/api/admin';
+        } else {
+            showToast('Brak uprawnień admina.', 'error');
+        }
+    } catch (error) {
+        console.error('Admin redirect verification failed:', error);
+        showToast('Błąd weryfikacji admina.', 'error');
+    }
 }
 
 async function loadMembers() {
@@ -153,6 +173,17 @@ function initApp() {
     const btn = document.getElementById('login-btn');
     if(btn) btn.onclick = () => window.location.href = '/api/login';
 
+    const adminLink = document.getElementById('admin-link');
+    if (adminLink) {
+        adminLink.addEventListener('click', async (e) => {
+            e.preventDefault();
+            if (!currentUser) {
+                showToast('Musisz być zalogowany!', 'error');
+                return;
+            }
+            await verifyAdminRoleAndRedirect();
+        });
+    }
 
     const select = document.getElementById('contract-type');
     select.onchange = (e) => {
