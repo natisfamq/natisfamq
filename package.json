@@ -3,9 +3,10 @@
   "version": "1.0.0",
   "type": "module",
   "scripts": {
-    "build": "esbuild src/script.js --minify --target=es2020 --outfile=public/script.js"
+    "build": "esbuild src/script.js --minify --target=es2020 --outfile=public/script.js && javascript-obfuscator public/script.js --output public/script.js --compact true --control-flow-flattening true --control-flow-flattening-threshold 0.75 --dead-code-injection true --dead-code-injection-threshold 0.4 --numbers-to-expressions true --string-array true --string-array-encoding base64 --string-array-threshold 0.75 --string-array-rotate true --self-defending true --simplify true"
   },
   "devDependencies": {
-    "esbuild": "^0.19.2"
+    "esbuild": "^0.19.2",
+    "javascript-obfuscator": "^4.0.0"
   }
 }
