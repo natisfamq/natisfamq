@@ -45,13 +45,10 @@ export default async function handler(req, res) {
         }
 
         const reply = {
-            type: 4,
-            data: {
-                content: `Przetwarzam raport...`,
-                flags: 64
-            }
+            type: 5 // DEFERRED_CHANNEL_MESSAGE_WITH_SOURCE
         };
 
+        console.log('Interaction acked with deferred response');
         res.status(200).json(reply);
 
         (async () => {
