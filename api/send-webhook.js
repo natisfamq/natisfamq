@@ -42,7 +42,8 @@ export default async function handler(req, res) {
                         { name: "Typ", value: r.type, inline: true },
                         { name: "Wypłata", value: `${r.payout}$` }
                     ],
-                    footer: { text: `Zaakceptował: ${member.nick || member.user.username}` }
+                    footer: { text: `Zaakceptował: ${member.nick || member.user.username}` },
+                    timestamp: new Date().toISOString()
                 }]
             })
         });
