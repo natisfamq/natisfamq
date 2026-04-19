@@ -1,10 +1,8 @@
-import { getCookieValue } from '../utils.js';
-import { readReports, writeReports } from './report-store.js';
-
 export default async function handler(req, res) {
     if (req.method !== 'POST') return res.status(405).end();
 
     const interaction = req.body;
+    console.log('Interaction received:', interaction.type, interaction.data?.custom_id, interaction.member?.user?.id);
 
     // Handle ping (Discord checks if endpoint is alive)
     if (interaction.type === 1) {
