@@ -1,7 +1,19 @@
 export default async function handler(req, res) {
-    if (req.method === 'GET' || req.method === 'HEAD') {
-        return res.status(200).json({ message: 'Interactions endpoint is alive.' });
+    if (req.method === 'OPTIONS') {
+        res.setHeader('Access-Control-Allow-Origin', '*');
+        res.setHeader('Access-Control-Allow-Methods', 'GET, HEAD, POST, OPTIONS');
+        return res.status(200).end();
     }
+
+    if (req.method === 'HEAD') {
+        return res.status(200).end();
+    }
+
+    if (req.method === 'GET') {
+        res.setHeader('Content-Type', 'text/plain');
+        return res.status(200).send('Interactions endpoint is alive.');
+    }
+
     if (req.method !== 'POST') return res.status(405).end();
 
     const interaction = req.body;
