@@ -43,8 +43,15 @@ export default async function handler(req, res) {
     };
 
     try {
-        if (process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_REPORT_CHANNEL_ID) {
-            await fetch(`https://discord.com/api/channels/${process.env.DISCORD_REPORT_CHANNEL_ID}/messages`, {
+        let route = 'none';
+        let response;
+
+        if (process.env.DISCORD_BOT_TOKEN) {
+            if (!process.env.DISCORD_REPORT_CHANNEL_ID) {
+                throw new Error('Brakuje DISCORD_REPORT_CHANNEL_ID');
+            }
+            route = 'bot-channel';
+            response = await fetch(`https://discord.com/api/channels/${process.env.DISCORD_REPORT_CHANNEL_ID}/messages`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -52,16 +59,27 @@ export default async function handler(req, res) {
                 },
                 body: JSON.stringify(payload)
             });
-        } else {
-            await fetch(process.env.DISCORD_WEBHOOK_URL, {
+        } else if (process.env.DISCORD_WEBHOOK_URL) {
+            route = 'webhook';
+            response = await fetch(process.env.DISCORD_WEBHOOK_URL, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(payload)
             });
+        } else {
+            throw new Error('Brakuje DISCORD_BOT_TOKEN lub DISCORD_WEBHOOK_URL');
         }
 
-        return res.status(200).json({ success: true });
+        console.log('new-report route:', route, 'status:', response?.status);
+        if (response && !response.ok) {
+            const text = await response.text().catch(() => 'no body');
+            console.error('Discord send failed:', response.status, text);
+            throw new Error(`Discord send failed: ${response.status}`);
+        }
+
+        return res.status(200).json({ success: true, route });
     } catch (err) {
+        console.error('New report send error:', err.message);
         return res.status(500).json({ error: err.message });
     }
 }
