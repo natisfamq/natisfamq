@@ -36,16 +36,30 @@ export default async function handler(req, res) {
         ]
     }];
 
+    const payload = {
+        content: "W panelu pojawił się nowy raport!",
+        embeds: [embed],
+        components: components
+    };
+
     try {
-        await fetch(process.env.DISCORD_WEBHOOK_URL, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                content: "W panelu pojawił się nowy raport!",
-                embeds: [embed],
-                components: components
-            })
-        });
+        if (process.env.DISCORD_BOT_TOKEN && process.env.DISCORD_REPORT_CHANNEL_ID) {
+            await fetch(`https://discord.com/api/channels/${process.env.DISCORD_REPORT_CHANNEL_ID}/messages`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bot ${process.env.DISCORD_BOT_TOKEN}`
+                },
+                body: JSON.stringify(payload)
+            });
+        } else {
+            await fetch(process.env.DISCORD_WEBHOOK_URL, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+        }
+
         return res.status(200).json({ success: true });
     } catch (err) {
         return res.status(500).json({ error: err.message });
