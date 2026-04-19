@@ -1,4 +1,7 @@
 export default async function handler(req, res) {
+    if (req.method === 'GET') {
+        return res.status(200).json({ message: 'Interactions endpoint is alive.' });
+    }
     if (req.method !== 'POST') return res.status(405).end();
 
     const interaction = req.body;
