@@ -264,7 +264,10 @@ function initApp() {
         }
         
         const type = document.getElementById('contract-type').value;
-        const imgur = document.getElementById('imgur-link').value;
+        let imgur = document.getElementById('imgur-link').value.trim();
+        if (imgur && !/^https?:\/\//i.test(imgur)) {
+            imgur = `https://${imgur}`;
+        }
         
         let payout = 0;
         let details = {};
