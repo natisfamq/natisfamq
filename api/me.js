@@ -21,7 +21,11 @@ export default async function handler(req, res) {
         });
         const data = await response.json();
 
-        const hierarchy = Object.keys(roleNames);
+        const hierarchy = Object.keys(roleNames).sort((a, b) => {
+            const levelA = parseInt(roleNames[a].split(' | ')[0]);
+            const levelB = parseInt(roleNames[b].split(' | ')[0]);
+            return levelB - levelA; // Sort descending (highest first)
+        });
         const topRoleId = hierarchy.find(id => data.roles.includes(id));
         const roleName = roleNames[topRoleId] || "Brak rangi";
         

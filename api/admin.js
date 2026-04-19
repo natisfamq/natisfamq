@@ -36,7 +36,12 @@ export default async function handler(req, res) {
         }
 
         const member = await memberRes.json();
-        const topRoleId = Object.keys(roleNames).find(roleId => member.roles.includes(roleId));
+        const hierarchy = Object.keys(roleNames).sort((a, b) => {
+            const levelA = parseInt(roleNames[a].split(' | ')[0]);
+            const levelB = parseInt(roleNames[b].split(' | ')[0]);
+            return levelB - levelA; // Sort descending (highest first)
+        });
+        const topRoleId = hierarchy.find(roleId => member.roles.includes(roleId));
         const topRoleName = roleNames[topRoleId] || 'Brak rangi';
         const topRoleLevel = parseInt(topRoleName.split(' | ')[0], 10) || 0;
 
