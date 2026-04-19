@@ -3,17 +3,19 @@ export default async function handler(req, res) {
 
     const report = req.body;
 
+    const reportId = report.id || 'unknown';
     const embed = {
         title: "🔔 NOWY RAPORT DO SPRAWDZENIA",
         color: 15844367, // Złoty
         fields: [
             { name: "Obywatel", value: report.username || "Nieznany", inline: true },
             { name: "Typ", value: report.type || "Brak", inline: true },
-            { name: "Kwota", value: `${report.payout}$` || "0$", inline: true },
-            { name: "Link do dowodu", value: report.imgur || "Brak" }
+            { name: "Kwota", value: `${report.payout}$`, inline: true },
+            { name: "Link do dowodu", value: report.imgur || "Brak" },
+            { name: "ID", value: reportId }
         ],
         timestamp: new Date().toISOString(),
-        footer: { text: `ID: ${report.id || 'unknown'}` }
+        footer: { text: "Raport do sprawdzenia" }
     };
 
     const components = [{
@@ -23,13 +25,13 @@ export default async function handler(req, res) {
                 type: 2, // Button
                 style: 3, // Success (green)
                 label: "Zaakceptuj",
-                custom_id: `accept_${report.id || 'unknown'}`
+                custom_id: `accept:${reportId}`
             },
             {
                 type: 2, // Button
                 style: 4, // Danger (red)
                 label: "Odrzuć",
-                custom_id: `reject_${report.id || 'unknown'}`
+                custom_id: `reject:${reportId}`
             }
         ]
     }];

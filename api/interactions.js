@@ -13,8 +13,8 @@ export default async function handler(req, res) {
 
     // Handle button interactions
     if (interaction.type === 3) { // MESSAGE_COMPONENT
-        const customId = interaction.data.custom_id;
-        const [action, reportId] = customId.split('_');
+        const customId = interaction.data.custom_id || '';
+        const [action, reportId] = customId.includes(':') ? customId.split(':') : customId.split('_');
 
         if (!reportId || (action !== 'accept' && action !== 'reject')) {
             return res.status(200).json({
