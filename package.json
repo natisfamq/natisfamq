@@ -2,5 +2,10 @@
   "name": "natisfamq",
   "version": "1.0.0",
   "type": "module",
-  "dependencies": {}
+  "scripts": {
+    "build": "esbuild src/script.js --minify --target=es2020 --outfile=public/script.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.19.2"
+  }
 }
