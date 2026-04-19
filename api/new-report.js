@@ -12,8 +12,27 @@ export default async function handler(req, res) {
             { name: "Kwota", value: `${report.payout}$` || "0$", inline: true },
             { name: "Link do dowodu", value: report.imgur || "Brak" }
         ],
-        timestamp: new Date().toISOString()
+        timestamp: new Date().toISOString(),
+        footer: { text: `ID: ${report.id || 'unknown'}` }
     };
+
+    const components = [{
+        type: 1, // Action row
+        components: [
+            {
+                type: 2, // Button
+                style: 3, // Success (green)
+                label: "Zaakceptuj",
+                custom_id: `accept_${report.id || 'unknown'}`
+            },
+            {
+                type: 2, // Button
+                style: 4, // Danger (red)
+                label: "Odrzuć",
+                custom_id: `reject_${report.id || 'unknown'}`
+            }
+        ]
+    }];
 
     try {
         await fetch(process.env.DISCORD_WEBHOOK_URL, {
@@ -21,7 +40,8 @@ export default async function handler(req, res) {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({
                 content: "W panelu pojawił się nowy raport!",
-                embeds: [embed]
+                embeds: [embed],
+                components: components
             })
         });
         return res.status(200).json({ success: true });

@@ -308,7 +308,10 @@ function initApp() {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 credentials: 'include',
-                body: JSON.stringify(reportData)
+                body: JSON.stringify({
+                    ...reportData,
+                    id: reportId
+                })
             });
             console.log('Webhook response:', webhookRes.status);
             
