@@ -36,6 +36,40 @@ async function deleteReportFromFirebase(reportId) {
     await remove(ref(db, `reports/${reportId}`));
 }
 
+async function getLastActivity() {
+    if (!currentUser) return;
+    
+    const snapshot = await get(ref(db, 'reports'));
+    const data = snapshot.val();
+    if (!data) return;
+    
+    const userReports = Object.values(data)
+        .filter(report => report.username === currentUser.username)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+    
+    if (userReports.length > 0) {
+        const lastReport = userReports[0];
+        const date = new Date(lastReport.timestamp);
+        const formattedDate = date.toLocaleString('pl-PL', {
+            year: 'numeric',
+            month: '2-digit',
+            day: '2-digit',
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+        document.getElementById('last-act-text').textContent = formattedDate;
+        
+        // Liczymy raporty w tym tygodniu
+        const now = new Date();
+        const startOfWeek = new Date(now);
+        startOfWeek.setDate(now.getDate() - now.getDay());
+        startOfWeek.setHours(0, 0, 0, 0);
+        
+        const weeklyReports = userReports.filter(report => new Date(report.timestamp) >= startOfWeek);
+        document.getElementById('reports-count').textContent = weeklyReports.length;
+    }
+}
+
 function showToast(message, type = 'info') {
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -74,8 +108,7 @@ function updateUI() {
     const adminTab = document.querySelector('.tab-btn[data-tab="admin"]');
     if (adminTab) {
         adminTab.style.display = currentUser.roleLevel >= 11 ? 'inline-block' : 'none';
-    }
-}
+    }    getLastActivity();}
 
 async function loadMembers() {
     const res = await fetch('/api/members', { credentials: 'include' });
@@ -285,6 +318,8 @@ function initApp() {
                 // Ukryj pola dodatkowe
                 document.getElementById('grover-fields').style.display = 'none';
                 document.getElementById('capt-fields').style.display = 'none';
+                // Odśwież ostatnią aktywność
+                getLastActivity();
             } else {
                 showToast('Błąd wysyłania webhooka', 'error');
             }
