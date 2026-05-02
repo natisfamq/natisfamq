@@ -40,20 +40,25 @@ function showToast(message, type = 'info') {
 
 async function checkAuth() {
     try {
+        console.log('Admin checkAuth: Starting authentication check');
         const res = await fetch('/api/me', { credentials: 'include' });
+        console.log('Admin checkAuth: /api/me response status:', res.status);
         if (!res.ok) {
+            console.log('Admin checkAuth: /api/me failed, redirecting to /');
             window.location.href = '/';
             return;
         }
 
         currentUser = await res.json();
+        console.log('Admin checkAuth: User data:', currentUser);
+        console.log('Admin checkAuth: roleLevel:', currentUser.roleLevel);
         if (currentUser.roleLevel < 11) {
+            console.log('Admin checkAuth: roleLevel < 11, showing access denied');
             document.body.innerHTML = '<div class="modern-glass-card" style="margin: 40px auto; max-width: 600px; padding: 24px; text-align: center;"><h2>Brak uprawnień</h2><p>Nie masz dostępu do tego panelu.</p><a href="/">Wróć do strony głównej</a></div>';
             return;
         }
 
-        document.getElementById('user-name').textContent = currentUser.username;
-        document.getElementById('user-role-text').textContent = `Ranga: ${currentUser.roleName || '-'}`;
+        console.log('Admin checkAuth: Access granted, loading admin panel');
         loadReports();
     } catch (error) {
         console.error('Admin auth error:', error);

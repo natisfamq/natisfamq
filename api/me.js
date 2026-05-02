@@ -32,6 +32,12 @@ export default async function handler(req, res) {
         // Wyciągamy numer rangi (np. 15)
         const roleLevel = parseInt(roleName.split(' | ')[0]) || 0;
 
+        console.log('API /me: user roles:', data.roles);
+        console.log('API /me: hierarchy:', hierarchy);
+        console.log('API /me: topRoleId:', topRoleId);
+        console.log('API /me: roleName:', roleName);
+        console.log('API /me: roleLevel:', roleLevel);
+
         res.status(200).json({
             username: data.nick || data.user.username,
             avatar: data.user.avatar ? `https://cdn.discordapp.com/avatars/${userId}/${data.user.avatar}.png` : null,

@@ -36,18 +36,26 @@ export default async function handler(req, res) {
         }
 
         const member = await memberRes.json();
+        console.log('API /admin: user roles:', member.roles);
         const hierarchy = Object.keys(roleNames).sort((a, b) => {
             const levelA = parseInt(roleNames[a].split(' | ')[0]);
             const levelB = parseInt(roleNames[b].split(' | ')[0]);
             return levelB - levelA; // Sort descending (highest first)
         });
+        console.log('API /admin: hierarchy:', hierarchy);
         const topRoleId = hierarchy.find(roleId => member.roles.includes(roleId));
+        console.log('API /admin: topRoleId:', topRoleId);
         const topRoleName = roleNames[topRoleId] || 'Brak rangi';
+        console.log('API /admin: topRoleName:', topRoleName);
         const topRoleLevel = parseInt(topRoleName.split(' | ')[0], 10) || 0;
+        console.log('API /admin: topRoleLevel:', topRoleLevel);
 
         if (topRoleLevel < 11 || topRoleLevel > 15) {
+            console.log('API /admin: Access denied');
             return res.status(403).send('Brak uprawnień');
         }
+
+        console.log('API /admin: Access granted, serving admin page');
 
         const html = `<!DOCTYPE html>
 <html lang="pl">
